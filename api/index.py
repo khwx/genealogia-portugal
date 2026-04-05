@@ -25,7 +25,12 @@ HTML_TEMPLATE = """
 <body class="bg-gray-100 min-h-screen">
     <nav class="bg-green-800 text-white p-4">
         <div class="container mx-auto">
-            <h1 class="text-2xl font-bold">🌳 Árvore Genealógica de Portugal</h1>
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold">🌳 Árvore Genealógica de Portugal</h1>
+                <a href="/index_pages.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                    📚 Editor de Índices
+                </a>
+            </div>
         </div>
     </nav>
     
@@ -158,3 +163,137 @@ def get_stats():
 
 if __name__ == '__main__':
     app.run()
+
+
+@app.route('/index_pages.html')
+def serve_index_pages():
+    return '''<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Índices - Celorico da Beira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .book-item { transition: all 0.2s; }
+        .book-item:hover { background-color: #f9fafb; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto p-4">
+        <header class="mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">📚 Editor de Índices</h1>
+                <p class="text-gray-600">Indica as páginas do índice de cada livro</p>
+            </div>
+            <a href="/" class="text-blue-600 hover:underline">← Voltar à Pesquisa</a>
+        </header>
+
+        <div class="mb-4">
+            <input type="text" id="search" placeholder="Pesquisar freguesia ou livro..." 
+                   class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+
+        <div id="books-list" class="space-y-3">
+            <div class="text-center py-10 text-gray-500">A carregar livros...</div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchBooks() {
+            try {
+                const res = await fetch('/api/livros');
+                const books = await res.json();
+                renderBooks(books);
+            } catch (err) {
+                document.getElementById('books-list').innerHTML = '<div class="text-red-500 text-center p-4 bg-red-50 rounded">⚠️ Erro ao carregar dados.</div>';
+            }
+        }
+
+        function renderBooks(books) {
+            const container = document.getElementById('books-list');
+            if (!books || books.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">Nenhum livro encontrado.</div>';
+                return;
+            }
+
+            container.innerHTML = books.map(book => `
+                <div class="book-item bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-800">${book.freguesia}</h3>
+                            <p class="text-sm text-gray-600">${book.titulo}</p>
+                            <p class="text-xs text-gray-400">${book.datas || ''}</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                            <a href="${book.url_viewer}" target="_blank" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                                🔗 Ver no Digitarq
+                            </a>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-medium text-gray-500">Pág. Índice:</span>
+                                <input type="text" id="pages-${book.id}" value="${book.paginas_indice || ''}" 
+                                       class="w-24 p-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                                       placeholder="ex: 249-255">
+                                <button onclick="savePages(${book.id})" 
+                                        class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded transition">
+                                    💾
+                                </button>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(book.status)}">
+                                ${book.status || 'pendente'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'concluido': return 'bg-green-100 text-green-800';
+                case 'processando': return 'bg-yellow-100 text-yellow-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        async function savePages(id) {
+            const input = document.getElementById(`pages-${id}`);
+            const pages = input.value.trim();
+            if (!pages) return;
+
+            const btn = input.nextElementSibling;
+            btn.disabled = true;
+            btn.textContent = '⏳';
+
+            try {
+                const res = await fetch(`/api/livros/${id}`, {
+                    method: 'PATCH',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ paginas_indice: pages })
+                });
+                if (res.ok) {
+                    btn.textContent = '✅';
+                    setTimeout(() => { btn.textContent = '💾'; btn.disabled = false; }, 1500);
+                } else {
+                    throw new Error('Erro ao guardar');
+                }
+            } catch (err) {
+                btn.textContent = '❌';
+                setTimeout(() => { btn.textContent = '💾'; btn.disabled = false; }, 1500);
+            }
+        }
+
+        document.getElementById('search').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            // O filtro é feito no browser para simplificar
+            const allDivs = document.querySelectorAll('.book-item');
+            allDivs.forEach(div => {
+                const text = div.textContent.toLowerCase();
+                div.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+
+        fetchBooks();
+    </script>
+</body>
+</html>'''
