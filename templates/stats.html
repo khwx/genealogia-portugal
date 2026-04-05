@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas - Registo de Óbitos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 70px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Óbitos Celorico da Beira</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Pesquisar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">Sobre</a></li>
+                    <li class="nav-item active"><a class="nav-link" href="/stats">Estatísticas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mt-4 mb-4">Estatísticas dos Registos de Óbitos</h2>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">{{ stats.total }}</h3>
+                        <p class="card-text">Total de registos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title text-success">{{ stats.por_ano|length }}</h3>
+                        <p class="card-text">Anos abrangidos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title text-info">{{ stats.por_freguesia|length }}</h3>
+                        <p class="card-text">Freguesias</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title text-warning">{{ stats.com_familysearch + stats.com_transkribus }}</h3>
+                        <p class="card-text">Com fontes externas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if stats.por_freguesia %}
+        <div class="card mb-4">
+            <div class="card-header">Registos por Freguesia</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Freguesia</th>
+                                <th>Registos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in stats.por_freguesia %}
+                            <tr>
+                                <td>{{ item.freguesia }}</td>
+                                <td>{{ item.count }}</td>
+                                <td><a href="/freguesia/{{ item.freguesia }}" class="btn btn-sm btn-outline-primary">Ver todos</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if stats.por_ano %}
+        <div class="card mb-4">
+            <div class="card-header">Registos por Ano</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ano</th>
+                                <th>Registos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in stats.por_ano %}
+                            <tr>
+                                <td>{{ item.ano }}</td>
+                                <td>{{ item.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if stats.por_fonte %}
+        <div class="card mb-4">
+            <div class="card-header">Registos por Fonte</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Fonte</th>
+                                <th>Registos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in stats.por_fonte %}
+                            <tr>
+                                <td><span class="badge bg-secondary">{{ item.fonte }}</span></td>
+                                <td>{{ item.count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <a href="/" class="btn btn-secondary mb-4">Voltar à pesquisa</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

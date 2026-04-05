@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa: {{ query }} - Registo de Óbitos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 70px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Óbitos Celorico da Beira</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Pesquisar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/stats">Estatísticas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="mt-4">
+            <form action="/search" method="GET" class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="q" value="{{ query }}" required>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+                </div>
+            </form>
+        </div>
+
+        <h2>Resultados para "{{ query }}"</h2>
+        <p class="text-muted">{{ total_results }} registos encontrados</p>
+
+        {% if results %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Data Óbito</th>
+                        <th>Nº Registo</th>
+                        <th>Freguesia</th>
+                        <th>Fonte</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obito in results %}
+                    <tr>
+                        <td><a href="/obito/{{ obito.id }}">{{ obito.nome or '—' }}</a></td>
+                        <td>{{ obito.data_obito or '—' }}</td>
+                        <td>{{ obito.numero_registo or '—' }}</td>
+                        <td>{{ obito.freguesia or '—' }}</td>
+                        <td><span class="badge bg-secondary">{{ obito.fonte or '—' }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning mt-4">
+            Nenhum registo encontrado para "{{ query }}". Tenta outro nome ou data.
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

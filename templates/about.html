@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre - Registo de Óbitos de Celorico da Beira</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 70px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Óbitos Celorico da Beira</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Pesquisar</a></li>
+                    <li class="nav-item active"><a class="nav-link" href="/about">Sobre</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/stats">Estatísticas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="mt-4 mb-4">Sobre o Projeto</h2>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">O que é este projeto?</h5>
+                <p class="card-text">
+                    Este projeto visa extrair, transcrever e disponibilizar os registos de óbitos 
+                    do concelho de Celorico da Beira (distrito da Guarda, Portugal) que estão 
+                    disponíveis em formato digital nos arquivos nacionais.
+                </p>
+                <p class="card-text">
+                    Os registos abrangem um período desde 1654 até 1911, e incluem 
+                    registos paroquiais e civis das 27 freguesias do concelho.
+                </p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Fontes de Dados</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Tombo.pt</strong> - Portal de registos paroquiais portugueses
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Digitarq</strong> - Arquivo digital da DGLAB com imagens dos registos originais
+                    </li>
+                    <li class="list-group-item">
+                        <strong>FamilySearch</strong> - Índices já transcritos de registos paroquiais
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Transkribus</strong> - Transcrição HTR (Handwritten Text Recognition) para manuscritos antigos
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Tecnologias Utilizadas</h5>
+                <ul>
+                    <li>Python 3.8+</li>
+                    <li>BeautifulSoup / Requests (web scraping)</li>
+                    <li>SQLite (base de dados)</li>
+                    <li>Pandas (exportação Excel/CSV)</li>
+                    <li>Flask (interface web)</li>
+                    <li>FamilySearch API</li>
+                    <li>Transkribus API</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Aviso Legal</h5>
+                <p class="card-text">
+                    Todos os dados neste projeto são de <strong>domínio público</strong>. 
+                    Os registos de óbitos têm mais de 100 anos, não existindo qualquer 
+                    restrição de proteção de dados (RGPD).
+                </p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Contribuir</h5>
+                <p class="card-text">
+                    Este é um projeto de código aberto. As contribuições são bem-vindas!
+                </p>
+                <p class="card-text">
+                    <a href="https://github.com/seu-utilizador/obitos-celorico-da-beira" target="_blank" class="btn btn-primary">
+                        Ver no GitHub
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <a href="/" class="btn btn-secondary mb-4">Voltar à pesquisa</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

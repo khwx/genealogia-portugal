@@ -1,0 +1,8 @@
+[project]
+name = "genealogia-portugal"
+version = "1.0.0"
+description = "Árvore genealógica colaborativa de Portugal"
+dependencies = [
+    "flask>=3.0.0",
+    "requests>=2.31.0"
+]
