@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exportar GEDCOM — Genealogia Portugal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a;
+            --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8;
+            --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        .topbar {
+            background: var(--bg2); border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.1rem; font-weight: 700; }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            color: var(--text2); font-size: .85rem; padding: 6px 12px;
+            border-radius: 8px; text-decoration: none; transition: .2s;
+        }
+        .nav-link:hover, .nav-link.active { background: var(--bg3); color: var(--text); }
+
+        .content { max-width: 800px; margin: 0 auto; padding: 32px 24px; }
+        h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
+        .subtitle { color: var(--text2); margin-bottom: 32px; }
+
+        .card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+        }
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size:.78rem; color:var(--text2); margin-bottom:6px; font-weight:500; }
+        .form-input, .form-select {
+            width: 100%; background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 14px; color: var(--text);
+            font-size:.9rem; font-family:inherit; outline:none; transition:.2s;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--accent); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .btn {
+            padding: 12px 24px; border-radius: 10px; font-size:.9rem;
+            font-weight:600; cursor:pointer; border:none; font-family:inherit;
+            transition:all .2s; display:inline-flex; align-items:center; gap:8px;
+        }
+        .btn-primary { background: var(--accent); color:#fff; width:100%; justify-content:center; }
+        .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+        .btn-secondary {
+            background: var(--bg3); color: var(--text2);
+            border: 1px solid var(--border); width:100%; justify-content:center;
+        }
+        .btn-secondary:hover { color: var(--text); }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-box {
+            background: var(--bg3); border-radius: 10px; padding: 16px;
+            text-align: center; border: 1px solid var(--border);
+        }
+        .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--accent2); }
+        .stat-label { font-size: .75rem; color: var(--text2); margin-top: 4px; }
+
+        .format-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .format-card {
+            background: var(--bg3); border: 2px solid var(--border);
+            border-radius: 10px; padding: 16px; cursor: pointer; transition: .2s;
+        }
+        .format-card:hover, .format-card.selected { border-color: var(--accent); }
+        .format-card.selected { background: rgba(108,99,255,.1); }
+        .format-name { font-weight: 600; margin-bottom: 4px; }
+        .format-desc { font-size: .78rem; color: var(--text2); }
+
+        .compatible-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .compat-badge {
+            font-size: .75rem; padding: 4px 10px; border-radius: 100px;
+            background: var(--bg3); border: 1px solid var(--border); color: var(--text2);
+        }
+
+        .preview-box {
+            background: #000; border-radius: 8px; padding: 16px;
+            font-family: 'Courier New', monospace; font-size: .8rem;
+            color: #88ccff; line-height: 1.6; max-height: 200px; overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            height: 4px; background: var(--border); border-radius: 100px;
+            overflow: hidden; margin-top: 12px; display: none;
+        }
+        .progress-fill {
+            height: 100%; background: var(--accent);
+            border-radius: 100px; transition: width .3s;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+        <div class="logo">🌳 Genealogia <span>Portugal</span></div>
+        <div class="nav-links">
+            <a href="index_pages.html" class="nav-link">📚 Livros</a>
+            <a href="review.html" class="nav-link">✅ Revisão</a>
+            <a href="gedcom.html" class="nav-link active">📤 Exportar</a>
+        </div>
+    </div>
+</nav>
+
+<div class="content">
+    <h1>📤 Exportar Dados</h1>
+    <p class="subtitle">Exporta os registos aprovados para software de árvore genealógica</p>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-num" id="stat-aprovados">—</div>
+            <div class="stat-label">Registos aprovados</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num" id="stat-pendentes">—</div>
+            <div class="stat-label">Pendentes revisão</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num" id="stat-anos">—</div>
+            <div class="stat-label">Anos cobertos</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num" id="stat-freguesias">—</div>
+            <div class="stat-label">Freguesias</div>
+        </div>
+    </div>
+
+    <!-- Formato -->
+    <div class="card">
+        <div class="card-title">📋 Formato de exportação</div>
+        <div class="format-cards">
+            <div class="format-card selected" onclick="selectFormat('gedcom')" id="fmt-gedcom">
+                <div class="format-name">📁 GEDCOM 5.5.1</div>
+                <div class="format-desc">Formato universal de genealogia. Ideal para importar em qualquer software.</div>
+            </div>
+            <div class="format-card" onclick="selectFormat('csv')" id="fmt-csv">
+                <div class="format-name">📊 CSV / Excel</div>
+                <div class="format-desc">Tabela simples com todos os campos. Abre no Excel ou Google Sheets.</div>
+            </div>
+        </div>
+        <div style="margin-top:16px;">
+            <div style="font-size:.78rem;color:var(--text2);margin-bottom:8px;">✅ Compatível com:</div>
+            <div class="compatible-list" id="compatible-list">
+                <span class="compat-badge">Gramps</span>
+                <span class="compat-badge">Ancestry.com</span>
+                <span class="compat-badge">MyHeritage</span>
+                <span class="compat-badge">FamilySearch</span>
+                <span class="compat-badge">MacFamilyTree</span>
+                <span class="compat-badge">Family Tree Maker</span>
+                <span class="compat-badge">RootsMagic</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card">
+        <div class="card-title">🔍 Filtros (opcional)</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Ano início</label>
+                <input type="number" class="form-input" id="ano-inicio" placeholder="ex: 1800" min="1600" max="1950">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Ano fim</label>
+                <input type="number" class="form-input" id="ano-fim" placeholder="ex: 1900" min="1600" max="1950">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Freguesia</label>
+            <select class="form-select" id="freguesia-filter">
+                <option value="">Todas as freguesias</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Preview GEDCOM -->
+    <div class="card" id="preview-card">
+        <div class="card-title">👁️ Prévia do ficheiro GEDCOM</div>
+        <div class="preview-box" id="preview-box">
+0 HEAD
+1 SOUR genealogia-portugal
+1 GEDC
+2 VERS 5.5.1
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME João /Silva da Costa/
+1 DEAT Y
+2 DATE 15 JAN 1864
+2 PLAC Celorico (Santa Maria), Celorico da Beira, Guarda, Portugal
+1 SOUR Livro: PCLB01-003-00014 | Pág. 253 | Digitarq/Tombo.pt
+0 TRLR</div>
+    </div>
+
+    <!-- Exportar -->
+    <div class="card">
+        <div class="card-title">⬇️ Descarregar</div>
+        <button class="btn btn-primary" onclick="exportar()" id="export-btn">
+            <span id="export-spinner" style="display:none">⏳</span>
+            <span id="export-label">📤 Exportar e Descarregar</span>
+        </button>
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div style="margin-top:12px;">
+            <button class="btn btn-secondary" onclick="exportarCSV()">
+                📊 Descarregar CSV (para Excel)
+            </button>
+        </div>
+    </div>
+
+    <!-- Instruções -->
+    <div class="card">
+        <div class="card-title">📖 Como importar no Gramps</div>
+        <ol style="color:var(--text2);font-size:.85rem;line-height:2;padding-left:20px;">
+            <li>Abre o <strong style="color:var(--text)">Gramps</strong> (descarrega em gramps-project.org)</li>
+            <li>Menu <strong style="color:var(--text)">Ficheiro → Importar</strong></li>
+            <li>Seleciona o ficheiro <strong style="color:var(--text)">.ged</strong> que descarregaste</li>
+            <li>Clica em <strong style="color:var(--text)">Importar</strong></li>
+            <li>Todos os registos aparecem como pessoas na árvore 🎉</li>
+        </ol>
+        <div style="margin-top:16px;padding:12px;background:var(--bg3);border-radius:8px;font-size:.82rem;color:var(--text2);">
+            💡 <strong style="color:var(--text)">Dica:</strong> Para criar a árvore genealógica visual, depois de importar liga as pessoas com relações de parentesco no Gramps.
+        </div>
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:5001';
+let selectedFormat = 'gedcom';
+
+async function init() {
+    try {
+        const r = await fetch(`${API}/api/stats`);
+        const s = await r.json();
+        document.getElementById('stat-aprovados').textContent = s.aprovados;
+        document.getElementById('stat-pendentes').textContent = s.pendentes;
+        const anos = s.por_ano;
+        if (anos.length) {
+            const range = anos[anos.length-1].ano - anos[0].ano + 1;
+            document.getElementById('stat-anos').textContent = `${anos[0].ano}–${anos[anos.length-1].ano}`;
+        }
+        document.getElementById('stat-freguesias').textContent = s.por_freguesia.length;
+
+        // Preencher select de freguesias
+        const sel = document.getElementById('freguesia-filter');
+        s.por_freguesia.forEach(f => {
+            if (!f.freguesia) return;
+            const o = document.createElement('option');
+            o.value = f.freguesia;
+            o.textContent = `${f.freguesia} (${f.total})`;
+            sel.appendChild(o);
+        });
+    } catch {
+        document.getElementById('stat-aprovados').textContent = '⚠️';
+    }
+}
+
+function selectFormat(fmt) {
+    selectedFormat = fmt;
+    document.querySelectorAll('.format-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById(`fmt-${fmt}`).classList.add('selected');
+
+    const previewCard = document.getElementById('preview-card');
+    const compatList = document.getElementById('compatible-list');
+
+    if (fmt === 'csv') {
+        previewCard.style.display = 'none';
+        compatList.innerHTML = `
+            <span class="compat-badge">Excel</span>
+            <span class="compat-badge">Google Sheets</span>
+            <span class="compat-badge">LibreOffice Calc</span>
+            <span class="compat-badge">Numbers (Mac)</span>
+        `;
+        document.getElementById('export-label').textContent = '📊 Exportar CSV';
+    } else {
+        previewCard.style.display = '';
+        compatList.innerHTML = `
+            <span class="compat-badge">Gramps</span>
+            <span class="compat-badge">Ancestry.com</span>
+            <span class="compat-badge">MyHeritage</span>
+            <span class="compat-badge">FamilySearch</span>
+            <span class="compat-badge">MacFamilyTree</span>
+            <span class="compat-badge">Family Tree Maker</span>
+            <span class="compat-badge">RootsMagic</span>
+        `;
+        document.getElementById('export-label').textContent = '📤 Exportar GEDCOM';
+    }
+}
+
+function buildParams() {
+    const params = new URLSearchParams();
+    const anoInicio = document.getElementById('ano-inicio').value;
+    const anoFim = document.getElementById('ano-fim').value;
+    const freguesia = document.getElementById('freguesia-filter').value;
+    if (anoInicio) params.set('ano_inicio', anoInicio);
+    if (anoFim) params.set('ano_fim', anoFim);
+    if (freguesia) params.set('freguesia', freguesia);
+    return params.toString();
+}
+
+function exportar() {
+    if (selectedFormat === 'csv') { exportarCSV(); return; }
+    const params = buildParams();
+    window.location.href = `${API}/api/export/gedcom?${params}`;
+}
+
+function exportarCSV() {
+    window.location.href = `${API}/api/export/csv`;
+}
+
+init();
+</script>
+</body>
+</html>

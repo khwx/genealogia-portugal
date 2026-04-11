@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisão de Registos — Genealogia Portugal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg2: #1a1d27;
+            --bg3: #22263a;
+            --border: #2e3347;
+            --text: #e8eaf6;
+            --text2: #8b93b8;
+            --accent: #6c63ff;
+            --accent2: #8b83ff;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── Top bar ── */
+        .topbar {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            color: var(--text2); font-size: 0.85rem; padding: 6px 12px;
+            border-radius: 8px; text-decoration: none; transition: all .2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--bg3); color: var(--text);
+        }
+
+        /* ── Stats bar ── */
+        .stats-bar {
+            display: flex; gap: 12px; padding: 16px 24px;
+            background: var(--bg2); border-bottom: 1px solid var(--border);
+        }
+        .stat-chip {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 100px;
+            font-size: 0.82rem; font-weight: 500; cursor: pointer;
+            border: 1px solid transparent; transition: all .2s;
+        }
+        .stat-chip:hover { border-color: var(--border); }
+        .stat-chip.active { border-color: var(--accent); background: rgba(108,99,255,.15); }
+        .stat-num { font-weight: 700; font-size: 1rem; }
+        .chip-total { background: var(--bg3); }
+        .chip-pendente { background: rgba(245,158,11,.08); color: var(--yellow); }
+        .chip-aprovado { background: rgba(34,197,94,.08); color: var(--green); }
+        .chip-rejeitado { background: rgba(239,68,68,.08); color: var(--red); }
+
+        /* ── Controls ── */
+        .controls {
+            display: flex; gap: 10px; align-items: center;
+            padding: 14px 24px; flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+        .search-box {
+            flex: 1; min-width: 200px;
+            background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 14px; color: var(--text);
+            font-size: 0.88rem; font-family: inherit; outline: none; transition: .2s;
+        }
+        .search-box:focus { border-color: var(--accent); }
+        .search-box::placeholder { color: var(--text2); }
+        .btn {
+            padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;
+            font-weight: 500; cursor: pointer; border: none;
+            font-family: inherit; transition: all .2s; white-space: nowrap;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: var(--accent2); }
+        .btn-ghost {
+            background: var(--bg3); color: var(--text2);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--text2); }
+        .btn-green { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+        .btn-green:hover { background: rgba(34,197,94,.25); }
+        .btn-red { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+        .btn-red:hover { background: rgba(239,68,68,.25); }
+
+        /* ── Main layout ── */
+        .main { display: flex; min-height: calc(100vh - 60px - 54px - 52px); }
+        .records-panel { flex: 1; overflow-y: auto; padding: 16px; }
+        .preview-panel {
+            width: 420px; min-width: 320px;
+            background: var(--bg2); border-left: 1px solid var(--border);
+            position: sticky; top: 60px; height: calc(100vh - 60px);
+            overflow-y: auto; display: flex; flex-direction: column;
+        }
+
+        /* ── Record card ── */
+        .record-card {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 14px;
+            margin-bottom: 8px; cursor: pointer;
+            transition: all .2s; position: relative;
+        }
+        .record-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .record-card.selected { border-color: var(--accent); background: rgba(108,99,255,.06); }
+        .record-card.aprovado { border-left: 3px solid var(--green); }
+        .record-card.rejeitado { border-left: 3px solid var(--red); opacity: .6; }
+        .record-card.pendente { border-left: 3px solid var(--yellow); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .card-nome { font-weight: 600; font-size: 0.95rem; color: var(--text); flex: 1; }
+        .card-status {
+            font-size: 0.72rem; font-weight: 600; padding: 2px 8px;
+            border-radius: 100px; flex-shrink: 0;
+        }
+        .status-pendente { background: rgba(245,158,11,.15); color: var(--yellow); }
+        .status-aprovado { background: rgba(34,197,94,.15); color: var(--green); }
+        .status-rejeitado { background: rgba(239,68,68,.15); color: var(--red); }
+
+        .card-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+        .card-meta-item { font-size: 0.8rem; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+
+        .card-actions {
+            display: flex; gap: 6px; margin-top: 10px;
+            opacity: 0; transition: .2s;
+        }
+        .record-card:hover .card-actions,
+        .record-card.selected .card-actions { opacity: 1; }
+        .action-btn {
+            font-size: 0.78rem; padding: 4px 10px; border-radius: 6px;
+            cursor: pointer; border: none; font-family: inherit;
+            font-weight: 500; transition: all .15s;
+        }
+        .action-aprovar { background: rgba(34,197,94,.15); color: var(--green); }
+        .action-aprovar:hover { background: rgba(34,197,94,.3); }
+        .action-rejeitar { background: rgba(239,68,68,.15); color: var(--red); }
+        .action-rejeitar:hover { background: rgba(239,68,68,.3); }
+        .action-editar { background: var(--bg3); color: var(--text2); }
+        .action-editar:hover { color: var(--text); }
+
+        /* ── Preview panel ── */
+        .preview-header {
+            padding: 16px; border-bottom: 1px solid var(--border);
+            font-weight: 600; font-size: 0.9rem;
+        }
+        .preview-image {
+            width: 100%; aspect-ratio: 4/3; object-fit: contain;
+            background: #000; border-bottom: 1px solid var(--border);
+        }
+        .preview-image-placeholder {
+            width: 100%; aspect-ratio: 4/3;
+            background: var(--bg3); display: flex; align-items: center;
+            justify-content: center; color: var(--text2); font-size: 0.85rem;
+            flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border);
+        }
+        .preview-body { padding: 16px; flex: 1; }
+        .preview-field { margin-bottom: 14px; }
+        .preview-label { font-size: 0.73rem; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+        .preview-value { font-size: 0.9rem; color: var(--text); }
+        .preview-input {
+            width: 100%; background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 12px; color: var(--text);
+            font-size: 0.88rem; font-family: inherit; outline: none; transition: .2s;
+        }
+        .preview-input:focus { border-color: var(--accent); }
+        .preview-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+        .preview-actions .btn { flex: 1; }
+
+        /* ── Pagination ── */
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; padding: 16px;
+        }
+        .page-btn {
+            padding: 6px 12px; border-radius: 8px; cursor: pointer;
+            border: 1px solid var(--border); background: var(--bg2);
+            color: var(--text2); font-size: 0.82rem; transition: .2s;
+        }
+        .page-btn:hover, .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+        /* ── Empty state ── */
+        .empty {
+            text-align: center; padding: 60px 20px; color: var(--text2);
+        }
+        .empty-emoji { font-size: 3rem; margin-bottom: 12px; }
+        .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+
+        /* ── Loading ── */
+        .loading {
+            display: flex; align-items: center; justify-content: center;
+            padding: 60px; color: var(--text2);
+        }
+        .spinner {
+            width: 24px; height: 24px; border: 2px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin .6s linear infinite; margin-right: 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Modal edição ── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: .2s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 16px; width: 480px; max-width: 95vw;
+            padding: 24px; transform: translateY(20px); transition: .2s;
+        }
+        .modal-overlay.open .modal { transform: translateY(0); }
+        .modal-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 0.78rem; color: var(--text2); margin-bottom: 6px; font-weight: 500; }
+        .form-input {
+            width: 100%; background: var(--bg3); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 14px; color: var(--text);
+            font-size: 0.9rem; font-family: inherit; outline: none; transition: .2s;
+        }
+        .form-input:focus { border-color: var(--accent); }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+        /* ── Toast ── */
+        .toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            background: var(--bg2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 16px; font-size: 0.85rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,.4); display: flex; gap: 10px;
+            animation: slideIn .2s ease; max-width: 300px;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .preview-panel { display: none; }
+            .main { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<nav class="topbar">
+    <div class="topbar-left">
+        <div class="logo">🌳 Genealogia <span>Portugal</span></div>
+        <div class="nav-links">
+            <a href="index_pages.html" class="nav-link">📚 Livros</a>
+            <a href="review.html" class="nav-link active">✅ Revisão</a>
+            <a href="gedcom.html" class="nav-link">📤 Exportar</a>
+        </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+        <button class="btn btn-green" onclick="aprovarTodos()">✅ Aprovar todos visíveis</button>
+        <a href="http://localhost:5001/api/export/csv" class="btn btn-ghost" download>⬇️ CSV</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip chip-total active" onclick="setFilter('todos')" id="chip-todos">
+        <span class="stat-num" id="num-total">—</span> Total
+    </div>
+    <div class="stat-chip chip-pendente" onclick="setFilter('pendente')" id="chip-pendente">
+        <span class="stat-num" id="num-pendente">—</span> Pendentes
+    </div>
+    <div class="stat-chip chip-aprovado" onclick="setFilter('aprovado')" id="chip-aprovado">
+        <span class="stat-num" id="num-aprovado">—</span> Aprovados
+    </div>
+    <div class="stat-chip chip-rejeitado" onclick="setFilter('rejeitado')" id="chip-rejeitado">
+        <span class="stat-num" id="num-rejeitado">—</span> Rejeitados
+    </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+    <input type="text" class="search-box" id="search-input" placeholder="🔍 Pesquisar nome..." 
+           oninput="debounceSearch()">
+    <select class="search-box" style="flex:0;width:auto;" id="livro-filter" onchange="loadRecords(1)">
+        <option value="">Todos os livros</option>
+    </select>
+    <span style="color:var(--text2);font-size:.82rem;" id="result-count"></span>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <!-- Records list -->
+    <div class="records-panel" id="records-panel">
+        <div class="loading"><div class="spinner"></div> A carregar...</div>
+    </div>
+
+    <!-- Preview panel -->
+    <div class="preview-panel" id="preview-panel">
+        <div class="preview-header">📋 Detalhe do registo</div>
+        <div class="preview-image-placeholder" id="preview-img-wrap">
+            <span style="font-size:2rem;">📷</span>
+            <span>Seleciona um registo para ver a imagem</span>
+        </div>
+        <div class="preview-body" id="preview-body">
+            <div style="color:var(--text2);font-size:.85rem;">← Clica num registo</div>
+        </div>
+        <div class="preview-actions" id="preview-actions" style="display:none;">
+            <button class="btn btn-green" onclick="aprovarSelected()">✅ Aprovar</button>
+            <button class="btn btn-ghost" onclick="openEditModal()">✏️ Editar</button>
+            <button class="btn btn-red" onclick="rejeitarSelected()">❌ Rejeitar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" id="pagination"></div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+        <div class="modal-title">✏️ Editar registo</div>
+        <div class="form-group">
+            <label class="form-label">Nome completo</label>
+            <input type="text" class="form-input" id="edit-nome">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Data de óbito (AAAA-MM-DD ou AAAA)</label>
+            <input type="text" class="form-input" id="edit-data">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Freguesia</label>
+            <input type="text" class="form-input" id="edit-freguesia">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Número de registo</label>
+            <input type="text" class="form-input" id="edit-numero">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeEditModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveEdit()">💾 Guardar e Aprovar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const API = 'http://localhost:5001';
+let currentPage = 1;
+let currentFilter = 'pendente';
+let currentLivro = '';
+let currentSearch = '';
+let selectedRecord = null;
+let searchTimeout = null;
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+
+async function init() {
+    await loadStats();
+    await loadLivros();
+    setFilter('pendente');
+}
+
+async function loadStats() {
+    try {
+        const r = await fetch(`${API}/api/stats`);
+        const s = await r.json();
+        document.getElementById('num-total').textContent = s.total;
+        document.getElementById('num-pendente').textContent = s.pendentes;
+        document.getElementById('num-aprovado').textContent = s.aprovados;
+        document.getElementById('num-rejeitado').textContent = s.rejeitados;
+    } catch {
+        showError('Servidor não disponível. Corre: python review_server.py');
+    }
+}
+
+async function loadLivros() {
+    try {
+        const r = await fetch(`${API}/api/livros`);
+        const livros = await r.json();
+        const sel = document.getElementById('livro-filter');
+        livros.forEach(l => {
+            const opt = document.createElement('option');
+            opt.value = l.codigo || l.id;
+            opt.textContent = `${l.freguesia || ''} (${l.codigo || l.id})`;
+            sel.appendChild(opt);
+        });
+    } catch {}
+}
+
+// ─── Filter ────────────────────────────────────────────────────────────────
+
+function setFilter(status) {
+    currentFilter = status;
+    document.querySelectorAll('.stat-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById(`chip-${status}`).classList.add('active');
+    loadRecords(1);
+}
+
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        currentSearch = document.getElementById('search-input').value;
+        loadRecords(1);
+    }, 300);
+}
+
+// ─── Records ───────────────────────────────────────────────────────────────
+
+async function loadRecords(page = 1) {
+    currentPage = page;
+    currentLivro = document.getElementById('livro-filter').value;
+
+    const panel = document.getElementById('records-panel');
+    panel.innerHTML = '<div class="loading"><div class="spinner"></div> A carregar...</div>';
+
+    const params = new URLSearchParams({
+        status: currentFilter,
+        page: currentPage,
+        per_page: 25,
+        livro: currentLivro,
+        q: currentSearch,
+    });
+
+    try {
+        const r = await fetch(`${API}/api/registos?${params}`);
+        const data = await r.json();
+        document.getElementById('result-count').textContent = `${data.total} registos`;
+        renderRecords(data.records);
+        renderPagination(data.total, data.per_page, data.page);
+    } catch (e) {
+        panel.innerHTML = `
+            <div class="empty">
+                <div class="empty-emoji">⚠️</div>
+                <div class="empty-title">Servidor não disponível</div>
+                <p>Corre no terminal: <code style="background:var(--bg3);padding:2px 8px;border-radius:4px;">python review_server.py</code></p>
+            </div>`;
+    }
+}
+
+function renderRecords(records) {
+    const panel = document.getElementById('records-panel');
+    if (!records.length) {
+        panel.innerHTML = `
+            <div class="empty">
+                <div class="empty-emoji">✨</div>
+                <div class="empty-title">Sem registos ${currentFilter === 'pendente' ? 'pendentes' : ''}</div>
+                <p style="color:var(--text2)">
+                    ${currentFilter === 'pendente'
+                        ? 'Todos os registos foram revistos!'
+                        : 'Nenhum registo encontrado com este filtro.'}
+                </p>
+            </div>`;
+        return;
+    }
+
+    panel.innerHTML = records.map(rec => `
+        <div class="record-card ${rec.status}" id="card-${rec.id}"
+             onclick="selectRecord(${rec.id})">
+            <div class="card-header">
+                <div class="card-nome">${esc(rec.nome)}</div>
+                <span class="card-status status-${rec.status}">${rec.status}</span>
+            </div>
+            <div class="card-meta">
+                ${rec.data_obito ? `<span class="card-meta-item">📅 ${rec.data_obito}</span>` : ''}
+                ${rec.freguesia ? `<span class="card-meta-item">📍 ${esc(rec.freguesia)}</span>` : ''}
+                ${rec.livro_id ? `<span class="card-meta-item">📖 ${esc(rec.livro_id)}</span>` : ''}
+                ${rec.pagina ? `<span class="card-meta-item">p.${rec.pagina}</span>` : ''}
+            </div>
+            <div class="card-actions">
+                <button class="action-btn action-aprovar" onclick="event.stopPropagation(); aprovar(${rec.id})">✅ Aprovar</button>
+                <button class="action-btn action-editar" onclick="event.stopPropagation(); selectRecord(${rec.id}); openEditModal()">✏️ Editar</button>
+                <button class="action-btn action-rejeitar" onclick="event.stopPropagation(); rejeitar(${rec.id})">❌ Rejeitar</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Store records globally for preview
+    window._records = Object.fromEntries(records.map(r => [r.id, r]));
+}
+
+function selectRecord(id) {
+    // Deselect previous
+    document.querySelectorAll('.record-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById(`card-${id}`);
+    if (card) card.classList.add('selected');
+
+    selectedRecord = window._records?.[id];
+    if (!selectedRecord) return;
+
+    renderPreview(selectedRecord);
+}
+
+function renderPreview(rec) {
+    const imgWrap = document.getElementById('preview-img-wrap');
+    const body = document.getElementById('preview-body');
+    const actions = document.getElementById('preview-actions');
+
+    if (rec.imagem_url) {
+        imgWrap.innerHTML = `<img class="preview-image" src="${esc(rec.imagem_url)}" alt="Imagem original" onerror="this.parentElement.innerHTML='<div class=preview-image-placeholder><span style=font-size:2rem>📷</span><span>Imagem não disponível</span></div>'">`;
+    } else {
+        imgWrap.innerHTML = `<div class="preview-image-placeholder"><span style="font-size:2rem;">📷</span><span>Sem URL de imagem</span></div>`;
+    }
+
+    body.innerHTML = `
+        <div class="preview-field">
+            <div class="preview-label">Nome</div>
+            <div class="preview-value">${esc(rec.nome)}</div>
+        </div>
+        <div class="preview-field">
+            <div class="preview-label">Data de Óbito</div>
+            <div class="preview-value">${rec.data_obito || '—'}</div>
+        </div>
+        <div class="preview-field">
+            <div class="preview-label">Freguesia</div>
+            <div class="preview-value">${rec.freguesia || '—'}</div>
+        </div>
+        <div class="preview-field">
+            <div class="preview-label">Livro / Página</div>
+            <div class="preview-value">${rec.livro_id || '—'} ${rec.pagina ? '· p.' + rec.pagina : ''}</div>
+        </div>
+        ${rec.numero_registo ? `
+        <div class="preview-field">
+            <div class="preview-label">Nº Registo</div>
+            <div class="preview-value">${esc(rec.numero_registo)}</div>
+        </div>` : ''}
+        <div class="preview-field">
+            <div class="preview-label">Status</div>
+            <span class="card-status status-${rec.status}">${rec.status}</span>
+        </div>
+    `;
+
+    actions.style.display = 'flex';
+}
+
+// ─── Actions ───────────────────────────────────────────────────────────────
+
+async function aprovar(id) {
+    await fetch(`${API}/api/registos/${id}/aprovar`, { method: 'POST' });
+    toast('✅ Aprovado!', 'green');
+    updateCard(id, 'aprovado');
+    loadStats();
+}
+
+async function rejeitar(id) {
+    await fetch(`${API}/api/registos/${id}/rejeitar`, { method: 'POST' });
+    toast('❌ Rejeitado', 'red');
+    updateCard(id, 'rejeitado');
+    loadStats();
+}
+
+async function aprovarSelected() {
+    if (!selectedRecord) return;
+    await aprovar(selectedRecord.id);
+}
+
+async function rejeitarSelected() {
+    if (!selectedRecord) return;
+    await rejeitar(selectedRecord.id);
+}
+
+async function aprovarTodos() {
+    if (!confirm(`Aprovar todos os ${currentFilter === 'pendente' ? 'pendentes' : 'visíveis'}?`)) return;
+    const body = currentLivro ? { livro_id: currentLivro } : {};
+    const r = await fetch(`${API}/api/registos/aprovar-todos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    });
+    const d = await r.json();
+    toast(`✅ ${d.aprovados} registos aprovados!`, 'green');
+    loadRecords(currentPage);
+    loadStats();
+}
+
+function updateCard(id, newStatus) {
+    const card = document.getElementById(`card-${id}`);
+    if (!card) return;
+    card.className = `record-card ${newStatus}`;
+    const statusEl = card.querySelector('.card-status');
+    if (statusEl) {
+        statusEl.className = `card-status status-${newStatus}`;
+        statusEl.textContent = newStatus;
+    }
+    if (window._records?.[id]) window._records[id].status = newStatus;
+}
+
+// ─── Edit Modal ────────────────────────────────────────────────────────────
+
+function openEditModal() {
+    if (!selectedRecord) return;
+    document.getElementById('edit-nome').value = selectedRecord.nome || '';
+    document.getElementById('edit-data').value = selectedRecord.data_obito || '';
+    document.getElementById('edit-freguesia').value = selectedRecord.freguesia || '';
+    document.getElementById('edit-numero').value = selectedRecord.numero_registo || '';
+    document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function saveEdit() {
+    if (!selectedRecord) return;
+    const data = {
+        nome: document.getElementById('edit-nome').value,
+        data_obito: document.getElementById('edit-data').value,
+        freguesia: document.getElementById('edit-freguesia').value,
+        numero_registo: document.getElementById('edit-numero').value,
+    };
+    await fetch(`${API}/api/registos/${selectedRecord.id}/editar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+    toast('💾 Editado e aprovado!', 'green');
+    closeEditModal();
+    loadRecords(currentPage);
+    loadStats();
+}
+
+// ─── Pagination ─────────────────────────────────────────────────────────────
+
+function renderPagination(total, perPage, page) {
+    const totalPages = Math.ceil(total / perPage);
+    if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+
+    const pages = [];
+    pages.push(`<button class="page-btn" onclick="loadRecords(${page - 1})" ${page === 1 ? 'disabled' : ''}>‹</button>`);
+    for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
+        pages.push(`<button class="page-btn ${i === page ? 'active' : ''}" onclick="loadRecords(${i})">${i}</button>`);
+    }
+    pages.push(`<button class="page-btn" onclick="loadRecords(${page + 1})" ${page === totalPages ? 'disabled' : ''}>›</button>`);
+    document.getElementById('pagination').innerHTML = pages.join('');
+}
+
+// ─── Toast ─────────────────────────────────────────────────────────────────
+
+function toast(msg, type = 'default') {
+    const colors = { green: '#22c55e', red: '#ef4444', default: '#6c63ff' };
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.style.borderLeftColor = colors[type] || colors.default;
+    t.style.borderLeftWidth = '3px';
+    t.textContent = msg;
+    document.getElementById('toasts').appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function showError(msg) {
+    toast('⚠️ ' + msg, 'red');
+}
+
+function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on overlay click
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.target.matches('input, textarea')) return;
+    if (e.key === 'a') aprovarSelected();
+    if (e.key === 'r') rejeitarSelected();
+    if (e.key === 'e') openEditModal();
+    if (e.key === 'Escape') closeEditModal();
+});
+
+init();
+</script>
+</body>
+</html>

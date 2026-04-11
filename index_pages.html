@@ -3,21 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Índices - Celorico da Beira</title>
+    <title>Editor de Índices — Genealogia Portugal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .book-item { transition: all 0.2s; }
         .book-item:hover { background-color: #f9fafb; }
+        .btn-gemini {
+            background: linear-gradient(135deg, #6c63ff, #a855f7);
+            color: white; border: none; border-radius: 6px;
+            padding: 4px 12px; font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: opacity .2s; white-space: nowrap;
+        }
+        .btn-gemini:hover { opacity: .85; }
+        .btn-gemini:disabled { opacity: .5; cursor: not-allowed; }
+        .cmd-box {
+            background: #1e1e2e; color: #a6e3a1; font-family: monospace;
+            font-size: 11px; padding: 8px 12px; border-radius: 8px;
+            margin-top: 8px; display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div class="max-w-4xl mx-auto p-4">
-        <header class="mb-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">📚 Editor de Índices</h1>
-                <p class="text-gray-600">Indica as páginas do índice de cada livro</p>
+    <div class="max-w-5xl mx-auto p-4">
+        <header class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">🌳 Genealogia Portugal</h1>
+                    <p class="text-gray-500 text-sm">Celorico da Beira · Registos paroquiais</p>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <a href="review.html" class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition">✅ Revisão</a>
+                    <a href="gedcom.html" class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">📤 Exportar</a>
+                </div>
             </div>
-            <a href="/" class="text-blue-600 hover:underline">← Voltar à Pesquisa</a>
+            <div class="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-600">
+                <strong>Como usar:</strong>
+                1. Define as páginas do índice (ex: <code class="bg-gray-100 px-1 rounded">249-255</code>) e guarda 💾
+                &nbsp;&nbsp;2. Clica em <strong>🤖 Processar</strong> → copia o comando e corre no terminal
+                &nbsp;&nbsp;3. Vai a <a href="review.html" class="text-blue-600 hover:underline">✅ Revisão</a> para aprovar os registos
+            </div>
         </header>
 
         <div class="mb-4">
@@ -49,31 +73,42 @@
             }
 
             container.innerHTML = books.map(book => `
-                <div class="book-item bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex-1">
-                            <h3 class="font-semibold text-gray-800">${book.freguesia}</h3>
-                            <p class="text-sm text-gray-600">${book.titulo}</p>
-                            <p class="text-xs text-gray-400">${book.datas || ''}</p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                            <a href="${book.url_viewer}" target="_blank" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
-                                🔗 Ver no Digitarq
-                            </a>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-medium text-gray-500">Pág. Índice:</span>
-                                <input type="text" id="pages-${book.id}" value="${book.paginas_indice || ''}" 
-                                       class="w-24 p-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                                       placeholder="ex: 249-255">
-                                <button onclick="savePages(${book.id})" 
-                                        class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded transition">
-                                    💾
-                                </button>
+                <div class="book-item bg-white p-4 rounded-lg shadow-sm border border-gray-200" id="book-${book.id}">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-800">${book.freguesia || '—'}</h3>
+                                <p class="text-sm text-gray-600">${book.titulo || ''}</p>
+                                <p class="text-xs text-gray-400">${book.data_inicio || ''} ${book.data_fim ? '→ ' + book.data_fim : ''}</p>
                             </div>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(book.status)}">
-                                ${book.status || 'pendente'}
-                            </span>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a href="${book.url_viewer || '#'}" target="_blank" 
+                                   class="text-blue-600 hover:underline text-xs flex items-center gap-1 ${!book.url_viewer ? 'opacity-40 pointer-events-none' : ''}">
+                                    🔗 Digitarq
+                                </a>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(book.status)}">
+                                    ${book.status || 'pendente'}
+                                </span>
+                            </div>
                         </div>
+                        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
+                            <span class="text-xs font-medium text-gray-500">Págs. do Índice:</span>
+                            <input type="text" id="pages-${book.id}" value="${book.paginas_indice || ''}" 
+                                   class="w-28 p-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                   placeholder="ex: 249-255"
+                                   onkeydown="if(event.key==='Enter') savePages(${book.id})">
+                            <button onclick="savePages(${book.id})" 
+                                    id="save-btn-${book.id}"
+                                    class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+                                💾 Guardar
+                            </button>
+                            <button onclick="showProcessCommand(${book.id}, '${escJs(book.codigo || book.id)}', '${escJs(book.paginas_indice || '')}')" 
+                                    class="btn-gemini" id="proc-btn-${book.id}"
+                                    ${!book.paginas_indice ? 'disabled title="Define as páginas de índice primeiro"' : ''}>
+                                🤖 Processar com Gemini
+                            </button>
+                        </div>
+                        <div class="cmd-box" id="cmd-${book.id}"></div>
                     </div>
                 </div>
             `).join('');
@@ -82,35 +117,74 @@
         function getStatusColor(status) {
             switch(status) {
                 case 'concluido': return 'bg-green-100 text-green-800';
+                case 'processado': return 'bg-green-100 text-green-800';
                 case 'processando': return 'bg-yellow-100 text-yellow-800';
+                case 'a_processar': return 'bg-blue-100 text-blue-800';
                 default: return 'bg-gray-100 text-gray-800';
             }
         }
 
+        function escJs(s) {
+            return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        function showProcessCommand(id, codigo, paginas) {
+            const box = document.getElementById(`cmd-${id}`);
+            const pages = document.getElementById(`pages-${id}`).value || paginas;
+            const cmd = `python pipeline.py --livro ${codigo || 'CODIGO_DO_LIVRO'}`;
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            box.innerHTML = `
+                <div style="color:#cdd6f4;font-size:10px;margin-bottom:4px;">▶ Corre este comando no terminal:</div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <code style="flex:1;"># Na pasta do projeto:
+cd caminho/para/genealogia-portugal
+python pipeline.py --livro ${codigo || 'CODIGO_DO_LIVRO'}</code>
+                    <button onclick="copyCmd('${codigo || 'CODIGO_DO_LIVRO'}')" 
+                            style="background:#6c63ff;border:none;color:white;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;">
+                        📋 Copiar
+                    </button>
+                </div>
+                <div style="color:#f38ba8;font-size:10px;margin-top:6px;">💡 Resultado → <a href="review.html" style="color:#89b4fa;">review.html</a> para aprovar os registos</div>
+            `;
+        }
+
+        function copyCmd(codigo) {
+            const cmd = `python pipeline.py --livro ${codigo}`;
+            navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado! Cola no terminal na pasta do projeto.'));
+        }
+
+        const LOCAL_API = 'http://localhost:5001';
+
         async function savePages(id) {
             const input = document.getElementById(`pages-${id}`);
             const pages = input.value.trim();
-            if (!pages) return;
 
-            const btn = input.nextElementSibling;
+            const btn = document.getElementById(`save-btn-${id}`);
+            const procBtn = document.getElementById(`proc-btn-${id}`);
             btn.disabled = true;
             btn.textContent = '⏳';
 
-            try {
-                const res = await fetch(`/api/livros/${id}`, {
-                    method: 'PATCH',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ paginas_indice: pages })
-                });
-                if (res.ok) {
-                    btn.textContent = '✅';
-                    setTimeout(() => { btn.textContent = '💾'; btn.disabled = false; }, 1500);
-                } else {
-                    throw new Error('Erro ao guardar');
-                }
-            } catch (err) {
-                btn.textContent = '❌';
-                setTimeout(() => { btn.textContent = '💾'; btn.disabled = false; }, 1500);
+            // Tenta servidor local primeiro, depois Vercel
+            const apis = [LOCAL_API, ''];
+            let saved = false;
+            for (const api of apis) {
+                try {
+                    const res = await fetch(`${api}/api/livros/${id}`, {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ paginas_indice: pages })
+                    });
+                    if (res.ok) { saved = true; break; }
+                } catch { continue; }
+            }
+
+            if (saved) {
+                btn.textContent = '✅ Guardado';
+                if (pages && procBtn) procBtn.removeAttribute('disabled');
+                setTimeout(() => { btn.textContent = '💾 Guardar'; btn.disabled = false; }, 2000);
+            } else {
+                btn.textContent = '❌ Erro';
+                setTimeout(() => { btn.textContent = '💾 Guardar'; btn.disabled = false; }, 2000);
             }
         }
 
