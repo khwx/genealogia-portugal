@@ -88,9 +88,9 @@
     </div>
 
     <script>
-    // ─── Dados dos livros embutidos (gerados do Digitarq/Tombo.pt) ─────────────
-    // Lista estática dos livros de Celorico da Beira - pode ser expandida
-    const BOOKS_DATA = [
+    // ─── Dados dos livros ────────────────────────────────────────────────────────
+    // Fallback estático (20 livros). O inventario.json tem todos os 1.077.
+    const BOOKS_FALLBACK = [
         // Açores
         { id: 1, codigo: "PT-ADGRD-PRQ-PCLB01-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Açores", data_inicio: "1726", data_fim: "1834", url_viewer: "https://digitarq.arquivos.pt/fileViewer/f3d1a2b3c4d5e6f7a8b9c0d1e2f3a4b5" },
         { id: 2, codigo: "PT-ADGRD-PRQ-PCLB01-003-00002", titulo: "Livro de Óbitos 2", freguesia: "Açores", data_inicio: "1835", data_fim: "1911", url_viewer: "" },
@@ -127,6 +127,27 @@
         // Carrapichana
         { id: 20, codigo: "PT-ADGRD-PRQ-PCLB05-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Carrapichana", data_inicio: "1725", data_fim: "1911", url_viewer: "" },
     ];
+
+    // ─── Carregar inventário ─────────────────────────────────────────────────────
+    // Tenta carregar inventario.json (gerado pelo gerar_inventario.js).
+    // Se não existir, usa o fallback estático.
+    let BOOKS_DATA = BOOKS_FALLBACK;
+
+    async function loadInventario() {
+        try {
+            const r = await fetch('inventario.json?v=' + Date.now());
+            if (!r.ok) throw new Error('não encontrado');
+            const data = await r.json();
+            if (Array.isArray(data) && data.length > 0) {
+                // Adiciona IDs sequenciais se não tiverem
+                BOOKS_DATA = data.map((b, i) => ({ id: b.id ?? i + 1, ...b }));
+                console.log(`✅ inventario.json carregado: ${BOOKS_DATA.length} livros`);
+            }
+        } catch {
+            console.log('ℹ️  inventario.json não disponível — a usar lista local (' + BOOKS_FALLBACK.length + ' livros)');
+        }
+        renderBooks();
+    }
 
     // ─── localStorage para guardar configurações ────────────────────────────────
     const STORAGE_KEY = 'genealogia_indices_v2';
@@ -370,7 +391,8 @@ python pipeline.py --livro ${esc(codigo)}</code></pre>
 
     // ─── Init ──────────────────────────────────────────────────────────────────────
 
-    renderBooks();
+    loadInventario();
+
     </script>
 </body>
 </html>
