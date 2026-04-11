@@ -38,13 +38,15 @@ def update_livro(livro_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/index_pages.html')
-def index_pages():
-    try:
-        with open('index_pages.html', 'r', encoding='utf-8') as f:
-            return f.read()
-    except Exception as e:
-        return "Error loading page: " + str(e), 500
+@app.route('/<path:filename>')
+def serve_html(filename):
+    if filename.endswith('.html'):
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                return f.read()
+        except Exception as e:
+            pass
+    return "Error loading page or not found", 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
