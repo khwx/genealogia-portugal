@@ -15,12 +15,33 @@ HEADERS = {
 
 @app.route('/')
 def home():
-    return '<h1>Genealogia Portugal - Server Online</h1><a href="/index_pages.html">Editor de Indices</a>'
+    try:
+        with open('index.html', 'r', encoding='utf-8') as f:
+            return f.read()
+    except Exception as e:
+        return "Error loading page: " + str(e), 500
 
 @app.route('/api/livros')
 def get_livros():
     try:
         resp = requests.get(SUPABASE_URL + '/rest/v1/livros?order=freguesia.asc', headers=HEADERS)
+        return jsonify(resp.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/pessoas')
+def get_pessoas():
+    try:
+        query = request.args.get('q', '')
+        url = SUPABASE_URL + '/rest/v1/pessoas?select=*'
+        
+        if query:
+            # Pesquisa simplificada no nome
+            url += f'&nome=ilike.*{query}*&limit=100'
+        else:
+            url += '&order=data_extracao.desc&limit=50'
+            
+        resp = requests.get(url, headers=HEADERS)
         return jsonify(resp.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500

@@ -6,63 +6,106 @@
     <title>Editor de Índices — Genealogia Portugal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .book-item { transition: all 0.2s; }
-        .book-item:hover { background-color: #f9fafb; }
+        :root {
+            --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a;
+            --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8;
+            --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e;
+            --radius: 12px;
+        }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
+        
+        .topbar {
+            background: var(--bg2); border-bottom: 1px solid var(--border);
+            padding: 0 24px; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 4px; }
+        .nav-link {
+            color: var(--text2); font-size: .85rem; padding: 6px 12px;
+            border-radius: 8px; text-decoration: none; transition: .2s;
+        }
+        .nav-link:hover, .nav-link.active { background: var(--bg3); color: var(--text); }
+
+        .book-item { background: var(--bg2); border: 1px solid var(--border); transition: all 0.2s; }
+        .book-item:hover { border-color: var(--accent); }
+        .text-gray-800 { color: var(--text) !important; }
+        .text-gray-600, .text-gray-500 { color: var(--text2) !important; }
+        .text-gray-400 { color: #5a638b !important; }
+        .bg-white { background-color: var(--bg2) !important; }
+        .border-gray-200, .border-gray-300 { border-color: var(--border) !important; }
+        .focus\:ring-blue-500:focus { --tw-ring-color: var(--accent) !important; }
+        
+        .badge-done { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+        .badge-pending { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+        .badge-marked { background: rgba(108,99,255,0.1); color: var(--accent2); border: 1px solid rgba(139,131,255,0.2); }
+        
+        input, select { background: var(--bg3) !important; color: var(--text) !important; border-color: var(--border) !important; }
+        .text-blue-600 { color: var(--accent2) !important; }
+        
         .btn-gemini {
-            background: linear-gradient(135deg, #6c63ff, #a855f7);
+            background: linear-gradient(135deg, var(--accent), #a855f7);
             color: white; border: none; border-radius: 6px;
             padding: 4px 12px; font-size: 12px; font-weight: 600;
             cursor: pointer; transition: opacity .2s; white-space: nowrap;
         }
         .btn-gemini:hover { opacity: .85; }
         .btn-gemini:disabled { opacity: .4; cursor: not-allowed; }
+        .bg-green-600 { background-color: var(--green) !important; }
+        
         .cmd-box {
-            background: #1e1e2e; color: #a6e3a1; font-family: monospace;
+            background: #000; color: #a6e3a1; font-family: monospace; border: 1px solid var(--border);
             font-size: 11px; padding: 10px 14px; border-radius: 8px;
             margin-top: 8px; display: none; line-height: 1.6;
         }
-        .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
-        .badge-done { background: #dcfce7; color: #16a34a; }
-        .badge-pending { background: #f3f4f6; color: #6b7280; }
-        .badge-marked { background: #dbeafe; color: #2563eb; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="max-w-5xl mx-auto p-4">
+<body class="min-h-screen">
+    <nav class="topbar">
+        <div style="display:flex;align-items:center;gap:16px;">
+            <a href="/" style="text-decoration:none;" class="logo">🌳 Genealogia <span>Portugal</span></a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">🔍 Pesquisar</a>
+                <a href="index_pages.html" class="nav-link active">📚 Livros</a>
+                <a href="review.html" class="nav-link">✅ Revisão</a>
+                <a href="gedcom.html" class="nav-link">📤 Exportar</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto p-4 mt-4">
 
         <header class="mb-5">
-            <div class="flex justify-between items-center mb-3">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">🌳 Genealogia Portugal</h1>
-                    <p class="text-gray-500 text-sm">Celorico da Beira · Registos paroquiais de óbitos</p>
-                </div>
-                <div class="flex gap-2 items-center">
-                    <a href="review.html" class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition">✅ Revisão</a>
-                    <a href="gedcom.html" class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">📤 Exportar</a>
-                </div>
+            <div class="mb-3">
+                <h1 class="text-2xl font-bold">📚 Editor de Índices</h1>
+                <p class="text-sm mt-1" style="color:var(--text2)">Celorico da Beira · Registos paroquiais de óbitos</p>
             </div>
 
             <!-- Instruções -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 mb-3">
-                <strong>📋 Como usar:</strong>
-                &nbsp;1. Para cada livro, escreve as páginas do índice e clica em 💾 &nbsp;&nbsp;
-                2. Clica em 🤖 para obter o comando a correr no terminal &nbsp;&nbsp;
-                3. Depois vai a <a href="review.html" class="underline">✅ Revisão</a> para aprovar os registos extraídos
+            <div class="border rounded-xl p-4 text-sm mb-4" style="background:var(--bg3); border-color:var(--border);">
+                <strong style="color:var(--text)">📋 Como usar o pipeline:</strong><br>
+                <span style="color:var(--text2)">
+                1. Escreve as páginas que contêm o índice e clica em 💾 Guardar.<br>
+                2. Clica em 🤖 Processar para obter o comando `pipeline.py` para correr no teu terminal.<br>
+                3. Vai ao separador <a href="review.html" style="color:var(--accent2);text-decoration:none;">✅ Revisão</a> para aprovares as pessoas identificadas pela IA!<br>
+                <em>O teu computador fará o trabalho e gravará nos teus ficheiros locais de origem. Deves fazer o push local se quiseres as coisas no servidor depois!</em>
+                </span>
             </div>
 
             <!-- Stats dinâmicas -->
             <div class="grid grid-cols-3 gap-3 text-center">
-                <div class="bg-white rounded-lg p-3 border border-gray-200">
-                    <div class="text-xl font-bold text-gray-800" id="stat-total">0</div>
-                    <div class="text-xs text-gray-500">Total de livros</div>
+                <div class="rounded-lg p-3 border" style="background:var(--bg2); border-color:var(--border);">
+                    <div class="text-xl font-bold" id="stat-total" style="color:var(--text)">0</div>
+                    <div class="text-xs" style="color:var(--text2)">Total de livros</div>
                 </div>
-                <div class="bg-white rounded-lg p-3 border border-gray-200">
-                    <div class="text-xl font-bold text-blue-700" id="stat-marcados">0</div>
-                    <div class="text-xs text-gray-500">Com índice marcado</div>
+                <div class="rounded-lg p-3 border" style="background:var(--bg2); border-color:var(--border);">
+                    <div class="text-xl font-bold" id="stat-marcados" style="color:var(--accent2)">0</div>
+                    <div class="text-xs" style="color:var(--text2)">Com índice marcado</div>
                 </div>
-                <div class="bg-white rounded-lg p-3 border border-gray-200">
-                    <div class="text-xl font-bold text-green-700" id="stat-processados">0</div>
-                    <div class="text-xs text-gray-500">Processados</div>
+                <div class="rounded-lg p-3 border" style="background:var(--bg2); border-color:var(--border);">
+                    <div class="text-xl font-bold" id="stat-processados" style="color:var(--green)">0</div>
+                    <div class="text-xs" style="color:var(--text2)">Processados</div>
                 </div>
             </div>
         </header>
@@ -70,8 +113,8 @@
         <!-- Pesquisa + toolbar -->
         <div class="flex gap-2 mb-4">
             <input type="text" id="search" placeholder="🔍 Pesquisar freguesia ou livro..."
-                   class="flex-1 p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
-            <select id="filter-status" onchange="applyFilters()" class="p-3 border border-gray-300 rounded-lg text-sm bg-white">
+                   class="flex-1 p-3 border rounded-lg shadow-sm focus:ring-2 focus:outline-none text-sm">
+            <select id="filter-status" onchange="applyFilters()" class="p-3 border rounded-lg text-sm">
                 <option value="todos">Todos</option>
                 <option value="marcados">Com índice</option>
                 <option value="sem_marcar">Sem índice</option>
