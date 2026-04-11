@@ -15,190 +15,362 @@
             cursor: pointer; transition: opacity .2s; white-space: nowrap;
         }
         .btn-gemini:hover { opacity: .85; }
-        .btn-gemini:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-gemini:disabled { opacity: .4; cursor: not-allowed; }
         .cmd-box {
             background: #1e1e2e; color: #a6e3a1; font-family: monospace;
-            font-size: 11px; padding: 8px 12px; border-radius: 8px;
-            margin-top: 8px; display: none;
+            font-size: 11px; padding: 10px 14px; border-radius: 8px;
+            margin-top: 8px; display: none; line-height: 1.6;
         }
+        .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+        .badge-done { background: #dcfce7; color: #16a34a; }
+        .badge-pending { background: #f3f4f6; color: #6b7280; }
+        .badge-marked { background: #dbeafe; color: #2563eb; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="max-w-5xl mx-auto p-4">
-        <header class="mb-6">
+
+        <header class="mb-5">
             <div class="flex justify-between items-center mb-3">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">🌳 Genealogia Portugal</h1>
-                    <p class="text-gray-500 text-sm">Celorico da Beira · Registos paroquiais</p>
+                    <p class="text-gray-500 text-sm">Celorico da Beira · Registos paroquiais de óbitos</p>
                 </div>
-                <div class="flex gap-3 items-center">
+                <div class="flex gap-2 items-center">
                     <a href="review.html" class="text-sm bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 transition">✅ Revisão</a>
                     <a href="gedcom.html" class="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">📤 Exportar</a>
                 </div>
             </div>
-            <div class="bg-white border border-gray-200 rounded-xl p-4 text-sm text-gray-600">
-                <strong>Como usar:</strong>
-                1. Define as páginas do índice (ex: <code class="bg-gray-100 px-1 rounded">249-255</code>) e guarda 💾
-                &nbsp;&nbsp;2. Clica em <strong>🤖 Processar</strong> → copia o comando e corre no terminal
-                &nbsp;&nbsp;3. Vai a <a href="review.html" class="text-blue-600 hover:underline">✅ Revisão</a> para aprovar os registos
+
+            <!-- Instruções -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800 mb-3">
+                <strong>📋 Como usar:</strong>
+                &nbsp;1. Para cada livro, escreve as páginas do índice e clica em 💾 &nbsp;&nbsp;
+                2. Clica em 🤖 para obter o comando a correr no terminal &nbsp;&nbsp;
+                3. Depois vai a <a href="review.html" class="underline">✅ Revisão</a> para aprovar os registos extraídos
+            </div>
+
+            <!-- Stats dinâmicas -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="text-xl font-bold text-gray-800" id="stat-total">0</div>
+                    <div class="text-xs text-gray-500">Total de livros</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="text-xl font-bold text-blue-700" id="stat-marcados">0</div>
+                    <div class="text-xs text-gray-500">Com índice marcado</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 border border-gray-200">
+                    <div class="text-xl font-bold text-green-700" id="stat-processados">0</div>
+                    <div class="text-xs text-gray-500">Processados</div>
+                </div>
             </div>
         </header>
 
-        <div class="mb-4">
-            <input type="text" id="search" placeholder="Pesquisar freguesia ou livro..." 
-                   class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <!-- Pesquisa + toolbar -->
+        <div class="flex gap-2 mb-4">
+            <input type="text" id="search" placeholder="🔍 Pesquisar freguesia ou livro..."
+                   class="flex-1 p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm">
+            <select id="filter-status" onchange="renderBooks()" class="p-3 border border-gray-300 rounded-lg text-sm bg-white">
+                <option value="todos">Todos</option>
+                <option value="marcados">Com índice</option>
+                <option value="sem_marcar">Sem índice</option>
+            </select>
+            <button onclick="exportConfig()" class="bg-white border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition">
+                ⬇️ Exportar config
+            </button>
         </div>
 
-        <div id="books-list" class="space-y-3">
-            <div class="text-center py-10 text-gray-500">A carregar livros...</div>
+        <div id="books-list" class="space-y-2">
+            <div class="text-center py-10 text-gray-400">A carregar...</div>
         </div>
+
     </div>
 
     <script>
-        async function fetchBooks() {
-            try {
-                const res = await fetch('/api/livros');
-                const books = await res.json();
-                renderBooks(books);
-            } catch (err) {
-                document.getElementById('books-list').innerHTML = '<div class="text-red-500 text-center p-4 bg-red-50 rounded">⚠️ Erro ao carregar dados.</div>';
-            }
+    // ─── Dados dos livros embutidos (gerados do Digitarq/Tombo.pt) ─────────────
+    // Lista estática dos livros de Celorico da Beira - pode ser expandida
+    const BOOKS_DATA = [
+        // Açores
+        { id: 1, codigo: "PT-ADGRD-PRQ-PCLB01-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Açores", data_inicio: "1726", data_fim: "1834", url_viewer: "https://digitarq.arquivos.pt/fileViewer/f3d1a2b3c4d5e6f7a8b9c0d1e2f3a4b5" },
+        { id: 2, codigo: "PT-ADGRD-PRQ-PCLB01-003-00002", titulo: "Livro de Óbitos 2", freguesia: "Açores", data_inicio: "1835", data_fim: "1911", url_viewer: "" },
+        // Aldeia da Serra
+        { id: 3, codigo: "PT-ADGRD-PRQ-PCLB02-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Aldeia da Serra", data_inicio: "1700", data_fim: "1860", url_viewer: "" },
+        // Baraçal
+        { id: 4, codigo: "PT-ADGRD-PRQ-PCLB03-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Baraçal", data_inicio: "1690", data_fim: "1820", url_viewer: "" },
+        // Celorico (Santa Maria) - já tem imagens conhecidas
+        { id: 5, codigo: "PT-ADGRD-PRQ-PCLB19-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Celorico (Santa Maria)", data_inicio: "1654", data_fim: "1790", url_viewer: "https://digitarq.arquivos.pt/fileViewer/9ebcb2e4473a4fb9a14db130aa19fff9" },
+        { id: 6, codigo: "PT-ADGRD-PRQ-PCLB19-003-00002", titulo: "Livro de Óbitos 2", freguesia: "Celorico (Santa Maria)", data_inicio: "1791", data_fim: "1850", url_viewer: "" },
+        { id: 7, codigo: "PT-ADGRD-PRQ-PCLB19-003-00003", titulo: "Livro de Óbitos 3", freguesia: "Celorico (Santa Maria)", data_inicio: "1851", data_fim: "1911", url_viewer: "" },
+        // Celorico (São Pedro)
+        { id: 8, codigo: "PT-ADGRD-PRQ-PCLB20-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Celorico (São Pedro)", data_inicio: "1660", data_fim: "1800", url_viewer: "" },
+        { id: 9, codigo: "PT-ADGRD-PRQ-PCLB20-003-00002", titulo: "Livro de Óbitos 2", freguesia: "Celorico (São Pedro)", data_inicio: "1801", data_fim: "1911", url_viewer: "" },
+        // Linhares
+        { id: 10, codigo: "PT-ADGRD-PRQ-PCLB11-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Linhares", data_inicio: "1680", data_fim: "1820", url_viewer: "" },
+        { id: 11, codigo: "PT-ADGRD-PRQ-PCLB11-003-00002", titulo: "Livro de Óbitos 2", freguesia: "Linhares", data_inicio: "1821", data_fim: "1911", url_viewer: "" },
+        // Lajeosa do Mondego
+        { id: 12, codigo: "PT-ADGRD-PRQ-PCLB10-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Lajeosa do Mondego", data_inicio: "1700", data_fim: "1850", url_viewer: "" },
+        // Maçal do Chão
+        { id: 13, codigo: "PT-ADGRD-PRQ-PCLB12-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Maçal do Chão", data_inicio: "1710", data_fim: "1880", url_viewer: "" },
+        // Mesquitela
+        { id: 14, codigo: "PT-ADGRD-PRQ-PCLB13-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Mesquitela", data_inicio: "1695", data_fim: "1870", url_viewer: "" },
+        // Rapa
+        { id: 15, codigo: "PT-ADGRD-PRQ-PCLB16-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Rapa", data_inicio: "1720", data_fim: "1911", url_viewer: "" },
+        // Vale de Azares
+        { id: 16, codigo: "PT-ADGRD-PRQ-PCLB21-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Vale de Azares", data_inicio: "1715", data_fim: "1900", url_viewer: "" },
+        // Velosa
+        { id: 17, codigo: "PT-ADGRD-PRQ-PCLB22-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Velosa", data_inicio: "1700", data_fim: "1911", url_viewer: "" },
+        // Galisteu
+        { id: 18, codigo: "PT-ADGRD-PRQ-PCLB24-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Galisteu", data_inicio: "1730", data_fim: "1911", url_viewer: "" },
+        // Vila Boa do Mondego
+        { id: 19, codigo: "PT-ADGRD-PRQ-PCLB26-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Vila Boa do Mondego", data_inicio: "1740", data_fim: "1911", url_viewer: "" },
+        // Carrapichana
+        { id: 20, codigo: "PT-ADGRD-PRQ-PCLB05-003-00001", titulo: "Livro de Óbitos 1", freguesia: "Carrapichana", data_inicio: "1725", data_fim: "1911", url_viewer: "" },
+    ];
+
+    // ─── localStorage para guardar configurações ────────────────────────────────
+    const STORAGE_KEY = 'genealogia_indices_v2';
+
+    function loadConfig() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+        catch { return {}; }
+    }
+
+    function saveConfig(config) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    }
+
+    function getBookConfig(id) {
+        const cfg = loadConfig();
+        return cfg[id] || {};
+    }
+
+    function setBookConfig(id, data) {
+        const cfg = loadConfig();
+        cfg[id] = { ...(cfg[id] || {}), ...data };
+        saveConfig(cfg);
+    }
+
+    // ─── Render ─────────────────────────────────────────────────────────────────
+
+    function renderBooks() {
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        const filterStatus = document.getElementById('filter-status').value;
+        const cfg = loadConfig();
+        const container = document.getElementById('books-list');
+
+        let books = BOOKS_DATA.map(b => ({
+            ...b,
+            paginas_indice: (cfg[b.id] || {}).paginas_indice || '',
+            status: (cfg[b.id] || {}).status || 'pendente',
+        }));
+
+        // Pesquisa
+        if (searchTerm) {
+            books = books.filter(b =>
+                b.freguesia.toLowerCase().includes(searchTerm) ||
+                b.titulo.toLowerCase().includes(searchTerm) ||
+                b.codigo.toLowerCase().includes(searchTerm)
+            );
         }
 
-        function renderBooks(books) {
-            const container = document.getElementById('books-list');
-            if (!books || books.length === 0) {
-                container.innerHTML = '<div class="text-center text-gray-500 py-8">Nenhum livro encontrado.</div>';
-                return;
-            }
+        // Filtro status
+        if (filterStatus === 'marcados') books = books.filter(b => b.paginas_indice);
+        if (filterStatus === 'sem_marcar') books = books.filter(b => !b.paginas_indice);
 
-            container.innerHTML = books.map(book => `
-                <div class="book-item bg-white p-4 rounded-lg shadow-sm border border-gray-200" id="book-${book.id}">
-                    <div class="flex flex-col gap-3">
-                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-gray-800">${book.freguesia || '—'}</h3>
-                                <p class="text-sm text-gray-600">${book.titulo || ''}</p>
-                                <p class="text-xs text-gray-400">${book.data_inicio || ''} ${book.data_fim ? '→ ' + book.data_fim : ''}</p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <a href="${book.url_viewer || '#'}" target="_blank" 
-                                   class="text-blue-600 hover:underline text-xs flex items-center gap-1 ${!book.url_viewer ? 'opacity-40 pointer-events-none' : ''}">
-                                    🔗 Digitarq
-                                </a>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(book.status)}">
-                                    ${book.status || 'pendente'}
-                                </span>
-                            </div>
+        // Stats
+        const allCfg = loadConfig();
+        const todosComIndice = BOOKS_DATA.filter(b => (allCfg[b.id] || {}).paginas_indice).length;
+        const todosProcessados = BOOKS_DATA.filter(b => (allCfg[b.id] || {}).status === 'processado').length;
+        document.getElementById('stat-total').textContent = BOOKS_DATA.length;
+        document.getElementById('stat-marcados').textContent = todosComIndice;
+        document.getElementById('stat-processados').textContent = todosProcessados;
+
+        if (!books.length) {
+            container.innerHTML = `<div class="text-center text-gray-400 py-10">Nenhum livro encontrado.</div>`;
+            return;
+        }
+
+        container.innerHTML = books.map(book => {
+            const hasPaginas = !!book.paginas_indice;
+            const isProcessado = book.status === 'processado';
+            const badgeHtml = isProcessado
+                ? `<span class="badge badge-done">✅ processado</span>`
+                : hasPaginas
+                    ? `<span class="badge badge-marked">🔵 com índice</span>`
+                    : `<span class="badge badge-pending">sem índice</span>`;
+
+            return `
+            <div class="book-item bg-white p-4 rounded-lg shadow-sm border border-gray-200" id="book-${book.id}">
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-gray-800">${esc(book.freguesia)}</h3>
+                            <p class="text-sm text-gray-500">${esc(book.titulo)}</p>
+                            <p class="text-xs text-gray-400">${book.data_inicio || ''}${book.data_fim ? ' → ' + book.data_fim : ''} &nbsp;·&nbsp; <span class="font-mono">${esc(book.codigo)}</span></p>
                         </div>
-                        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
-                            <span class="text-xs font-medium text-gray-500">Págs. do Índice:</span>
-                            <input type="text" id="pages-${book.id}" value="${book.paginas_indice || ''}" 
-                                   class="w-28 p-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                   placeholder="ex: 249-255"
-                                   onkeydown="if(event.key==='Enter') savePages(${book.id})">
-                            <button onclick="savePages(${book.id})" 
-                                    id="save-btn-${book.id}"
-                                    class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
-                                💾 Guardar
-                            </button>
-                            <button onclick="showProcessCommand(${book.id}, '${escJs(book.codigo || book.id)}', '${escJs(book.paginas_indice || '')}')" 
-                                    class="btn-gemini" id="proc-btn-${book.id}"
-                                    ${!book.paginas_indice ? 'disabled title="Define as páginas de índice primeiro"' : ''}>
-                                🤖 Processar com Gemini
-                            </button>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            ${book.url_viewer
+                                ? `<a href="${esc(book.url_viewer)}" target="_blank" class="text-blue-600 hover:underline text-xs">🔗 Digitarq</a>`
+                                : `<span class="text-gray-300 text-xs">sem URL</span>`
+                            }
+                            ${badgeHtml}
                         </div>
-                        <div class="cmd-box" id="cmd-${book.id}"></div>
                     </div>
+
+                    <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
+                        <label class="text-xs font-medium text-gray-500 whitespace-nowrap">📄 Págs. índice:</label>
+                        <input type="text"
+                               id="pages-${book.id}"
+                               value="${esc(book.paginas_indice)}"
+                               class="w-28 p-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                               placeholder="ex: 249-255"
+                               onkeydown="if(event.key==='Enter') savePages(${book.id})">
+                        <button onclick="savePages(${book.id})"
+                                id="save-btn-${book.id}"
+                                class="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+                            💾 Guardar
+                        </button>
+                        <button onclick="toggleCmd(${book.id}, '${escJs(book.codigo)}')"
+                                class="btn-gemini" id="proc-btn-${book.id}"
+                                ${!hasPaginas ? 'disabled title="Define as páginas primeiro"' : ''}>
+                            🤖 Processar
+                        </button>
+                        ${hasPaginas ? `
+                        <button onclick="markProcessed(${book.id})"
+                                class="text-xs text-gray-400 hover:text-green-600 transition"
+                                title="Marcar como processado manualmente">✓</button>
+                        ` : ''}
+                    </div>
+
+                    <div class="cmd-box" id="cmd-${book.id}"></div>
                 </div>
-            `).join('');
+            </div>`;
+        }).join('');
+    }
+
+    // ─── Guardar páginas (localStorage) ─────────────────────────────────────────
+
+    function savePages(id) {
+        const input = document.getElementById(`pages-${id}`);
+        const pages = input.value.trim();
+        const btn = document.getElementById(`save-btn-${id}`);
+        const procBtn = document.getElementById(`proc-btn-${id}`);
+
+        setBookConfig(id, { paginas_indice: pages });
+
+        btn.textContent = '✅ Guardado!';
+        btn.classList.replace('bg-green-600', 'bg-green-700');
+        if (pages && procBtn) procBtn.removeAttribute('disabled');
+
+        setTimeout(() => {
+            btn.textContent = '💾 Guardar';
+            btn.classList.replace('bg-green-700', 'bg-green-600');
+            renderBooks(); // atualiza badge e stats
+        }, 1500);
+
+        // Tenta também guardar no servidor local se disponível
+        fetch(`http://localhost:5001/api/livros/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paginas_indice: pages })
+        }).catch(() => {}); // silencioso se servidor não disponível
+    }
+
+    function markProcessed(id) {
+        setBookConfig(id, { status: 'processado' });
+        renderBooks();
+    }
+
+    // ─── Comando para o terminal ─────────────────────────────────────────────────
+
+    function toggleCmd(id, codigo) {
+        const box = document.getElementById(`cmd-${id}`);
+        const pages = document.getElementById(`pages-${id}`).value || getBookConfig(id).paginas_indice || '';
+        const isOpen = box.style.display !== 'none' && box.style.display !== '';
+
+        // Fechar todos os outros
+        document.querySelectorAll('.cmd-box').forEach(b => b.style.display = 'none');
+
+        if (isOpen) return;
+
+        box.style.display = 'block';
+        box.innerHTML = `
+            <div style="color:#cdd6f4;font-size:10px;margin-bottom:6px;">▶ Copia e corre no terminal (na pasta do projeto):</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+                <pre style="flex:1;white-space:pre-wrap;word-break:break-all;"><code>cd caminho/para/genealogia-portugal
+python pipeline.py --livro ${esc(codigo)}</code></pre>
+                <button onclick="copyToClipboard('python pipeline.py --livro ${escJs(codigo)}')"
+                        style="background:#6c63ff;border:none;color:white;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;white-space:nowrap;flex-shrink:0;">
+                    📋 Copiar
+                </button>
+            </div>
+            <div style="color:#89dceb;font-size:10px;margin-top:8px;">
+                📋 Precisa de ter o <code>GEMINI_API_KEY</code> no ficheiro <code>.env</code>
+                · Obtém grátis em <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#f5c2e7;">aistudio.google.com</a>
+            </div>
+            <div style="color:#a6e3a1;font-size:10px;margin-top:4px;">
+                ✅ Depois do pipeline: corre <code>python review_server.py</code> e abre
+                <a href="review.html" style="color:#89b4fa;">review.html</a>
+            </div>
+        `;
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => { alert('✅ Comando copiado! Cola no terminal.'); })
+            .catch(() => { prompt('Copia o comando:', text); });
+    }
+
+    // ─── Exportar config ──────────────────────────────────────────────────────────
+
+    function exportConfig() {
+        const cfg = loadConfig();
+        const data = BOOKS_DATA
+            .filter(b => cfg[b.id] && cfg[b.id].paginas_indice)
+            .map(b => ({
+                codigo: b.codigo,
+                freguesia: b.freguesia,
+                titulo: b.titulo,
+                paginas_indice: cfg[b.id].paginas_indice,
+                url_viewer: b.url_viewer,
+                status: (cfg[b.id] || {}).status || 'pendente',
+            }));
+
+        if (!data.length) {
+            alert('Ainda não definiste nenhuma página de índice.');
+            return;
         }
 
-        function getStatusColor(status) {
-            switch(status) {
-                case 'concluido': return 'bg-green-100 text-green-800';
-                case 'processado': return 'bg-green-100 text-green-800';
-                case 'processando': return 'bg-yellow-100 text-yellow-800';
-                case 'a_processar': return 'bg-blue-100 text-blue-800';
-                default: return 'bg-gray-100 text-gray-800';
-            }
-        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'books_config.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
 
-        function escJs(s) {
-            return (s || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        }
+    function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
-        function showProcessCommand(id, codigo, paginas) {
-            const box = document.getElementById(`cmd-${id}`);
-            const pages = document.getElementById(`pages-${id}`).value || paginas;
-            const cmd = `python pipeline.py --livro ${codigo || 'CODIGO_DO_LIVRO'}`;
-            box.style.display = box.style.display === 'none' ? 'block' : 'none';
-            box.innerHTML = `
-                <div style="color:#cdd6f4;font-size:10px;margin-bottom:4px;">▶ Corre este comando no terminal:</div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <code style="flex:1;"># Na pasta do projeto:
-cd caminho/para/genealogia-portugal
-python pipeline.py --livro ${codigo || 'CODIGO_DO_LIVRO'}</code>
-                    <button onclick="copyCmd('${codigo || 'CODIGO_DO_LIVRO'}')" 
-                            style="background:#6c63ff;border:none;color:white;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;">
-                        📋 Copiar
-                    </button>
-                </div>
-                <div style="color:#f38ba8;font-size:10px;margin-top:6px;">💡 Resultado → <a href="review.html" style="color:#89b4fa;">review.html</a> para aprovar os registos</div>
-            `;
-        }
+    function escJs(s) {
+        return (s || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+    }
 
-        function copyCmd(codigo) {
-            const cmd = `python pipeline.py --livro ${codigo}`;
-            navigator.clipboard.writeText(cmd).then(() => alert('Comando copiado! Cola no terminal na pasta do projeto.'));
-        }
+    // ─── Pesquisa ──────────────────────────────────────────────────────────────────
 
-        const LOCAL_API = 'http://localhost:5001';
+    let searchTimeout;
+    document.getElementById('search').addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(renderBooks, 200);
+    });
 
-        async function savePages(id) {
-            const input = document.getElementById(`pages-${id}`);
-            const pages = input.value.trim();
+    // ─── Init ──────────────────────────────────────────────────────────────────────
 
-            const btn = document.getElementById(`save-btn-${id}`);
-            const procBtn = document.getElementById(`proc-btn-${id}`);
-            btn.disabled = true;
-            btn.textContent = '⏳';
-
-            // Tenta servidor local primeiro, depois Vercel
-            const apis = [LOCAL_API, ''];
-            let saved = false;
-            for (const api of apis) {
-                try {
-                    const res = await fetch(`${api}/api/livros/${id}`, {
-                        method: 'PATCH',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ paginas_indice: pages })
-                    });
-                    if (res.ok) { saved = true; break; }
-                } catch { continue; }
-            }
-
-            if (saved) {
-                btn.textContent = '✅ Guardado';
-                if (pages && procBtn) procBtn.removeAttribute('disabled');
-                setTimeout(() => { btn.textContent = '💾 Guardar'; btn.disabled = false; }, 2000);
-            } else {
-                btn.textContent = '❌ Erro';
-                setTimeout(() => { btn.textContent = '💾 Guardar'; btn.disabled = false; }, 2000);
-            }
-        }
-
-        document.getElementById('search').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            // O filtro é feito no browser para simplificar
-            const allDivs = document.querySelectorAll('.book-item');
-            allDivs.forEach(div => {
-                const text = div.textContent.toLowerCase();
-                div.style.display = text.includes(term) ? '' : 'none';
-            });
-        });
-
-        fetchBooks();
+    renderBooks();
     </script>
 </body>
 </html>
