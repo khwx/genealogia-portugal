@@ -41,7 +41,7 @@ ENV/
 *.sqlite
 
 # Output files (large)
-output/images/
+# output/images/  # Descomentar para ignorar imagens
 output/text/
 
 # Keep output JSON/CSV/Excel

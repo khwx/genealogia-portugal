@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validar Registo - Celorico da Beira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Validar Registo</h1>
+        {% if registo %}
+        <div class="bg-white p-6 rounded shadow">
+            <p><strong>Nome extraído:</strong> {{ registo.nome }}</p>
+            <p><strong>Data:</strong> {{ registo.data_obito }}</p>
+            <p><strong>Freguesia:</strong> {{ registo.freguesia }}</p>
+            
+            <form id="form-validacao" class="mt-4">
+                <input type="hidden" id="id" value="{{ registo.id }}">
+                <label class="block mb-2">Nome correto:</label>
+                <input type="text" id="nome" value="{{ registo.nome }}" class="w-full p-2 border mb-4">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Validar</button>
+            </form>
+        </div>
+        <script>
+            document.getElementById('form-validacao').onsubmit = async (e) => {
+                e.preventDefault();
+                const dados = {
+                    id: document.getElementById('id').value,
+                    nome: document.getElementById('nome').value
+                };
+                const resp = await fetch('/api/validar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(dados)
+                });
+                if (resp.ok) window.location.reload();
+            };
+        </script>
+        {% else %}
+        <p>Não há registos pendentes de validação.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

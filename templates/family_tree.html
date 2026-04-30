@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árvore Genealógica - Celorico da Beira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/reactflow@11.7.0/dist/style.js"></script>
+    <script src="https://unpkg.com/reactflow@11.7.0/dist/bundle.js"></script>
+    <style>
+        .reactflow-wrapper {
+            height: 80vh;
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+        }
+        .node-person {
+            background: white;
+            border: 2px solid #10b981;
+            border-radius: 0.5rem;
+            padding: 12px;
+            min-width: 200px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .node-person.male {
+            border-color: #3b82f6;
+        }
+        .node-person.female {
+            border-color: #ec4899;
+        }
+        .edge-connection {
+            stroke: #6b7280;
+            stroke-width: 2;
+        }
+        .search-container {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+        const ReactFlow = window.ReactFlow;
+
+        // API Configuration
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+
+        // Node Types
+        const PersonNode = ({ data }) => {
+            const { name, birthDate, deathDate, gender, freguesia } = data;
+            
+            return (
+                <div className={`node-person ${gender === 'M' ? 'male' : 'female'}`}>
+                    <div className="font-semibold text-sm text-gray-900">{name}</div>
+                    <div className="text-xs text-gray-600 mt-1">
+                        {birthDate && <div>Nascimento: {birthDate}</div>}
+                        {deathDate && <div>Falecimento: {deathDate}</div>}
+                        {freguesia && <div>Freguesia: {freguesia}</div>}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                        {gender === 'M' ? '♂ Masculino' : '♀ Feminino'}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Component
+        const FamilyTreeApp = () => {
+            const [searchTerm, setSearchTerm] = useState('');
+            const [selectedPerson, setSelectedPerson] = useState(null);
+            const [nodes, setNodes] = useState([]);
+            const [edges, setEdges] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [stats, setStats] = useState({
+                total: 0,
+                families: 0,
+                generations: 0
+            });
+
+            // Fetch data from Supabase
+            const fetchFamilyData = useCallback(async (searchTerm = '') => {
+                setLoading(true);
+                try {
+                    let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*`;
+                    if (searchTerm) {
+                        url += `&nome=ilike.*${searchTerm}*`;
+                    }
+                    url += '&order=data_obito';
+
+                    const response = await fetch(url, {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        processFamilyData(data);
+                    } else {
+                        console.error('Error fetching data:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    setLoading(false);
+                }
+            }, []);
+
+            // Process data and create family tree structure
+            const processFamilyData = (people) => {
+                const newNodes = [];
+                const newEdges = [];
+                const processedNames = new Set();
+
+                // Create nodes for each person
+                people.forEach((person, index) => {
+                    if (!processedNames.has(person.nome)) {
+                        const nodeId = `person-${index}`;
+                        const gender = Math.random() > 0.5 ? 'M' : 'F'; // Placeholder - should be extracted from records
+                        
+                        newNodes.push({
+                            id: nodeId,
+                            type: 'person',
+                            position: { x: Math.random() * 800, y: index * 100 },
+                            data: {
+                                name: person.nome,
+                                birthDate: person.data_nascimento || 'Desconhecida',
+                                deathDate: person.data_obito || 'Desconhecida',
+                                gender: gender,
+                                freguesia: person.freguesia || 'Desconhecida'
+                            }
+                        });
+                        processedNames.add(person.nome);
+                    }
+                });
+
+                // Create edges based on family relationships (simplified)
+                // In a real implementation, this would use family relationship data
+                for (let i = 0; i < newNodes.length - 1; i++) {
+                    if (Math.random() > 0.7) { // Random connections for demo
+                        newEdges.push({
+                            id: `edge-${i}-${i + 1}`,
+                            source: newNodes[i].id,
+                            target: newNodes[i + 1].id,
+                            type: 'smoothstep',
+                            animated: false,
+                            style: { stroke: '#6b7280' }
+                        });
+                    }
+                }
+
+                setNodes(newNodes);
+                setEdges(newEdges);
+                
+                // Update stats
+                setStats({
+                    total: people.length,
+                    families: Math.floor(people.length / 4),
+                    generations: Math.floor(people.length / 10) + 1
+                });
+            };
+
+            // Handle search
+            const handleSearch = (e) => {
+                const term = e.target.value;
+                setSearchTerm(term);
+                if (term.length > 2) {
+                    fetchFamilyData(term);
+                }
+            };
+
+            // Initial load
+            useEffect(() => {
+                fetchFamilyData();
+            }, []);
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {/* Header */}
+                    <nav className="bg-green-800 text-white p-4">
+                        <div className="container mx-auto">
+                            <div className="flex justify-between items-center">
+                                <h1 className="text-2xl font-bold">🌳 Árvore Genealógica de Celorico da Beira</h1>
+                                <div className="flex gap-4">
+                                    <a href="/" className="text-white hover:text-green-200">Pesquisa</a>
+                                    <a href="/stats" className="text-white hover:text-green-200">Estatísticas</a>
+                                    <a href="/about" className="text-white hover:text-green-200">Sobre</a>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Search Bar */}
+                    <div className="search-container p-4">
+                        <div className="container mx-auto">
+                            <div className="flex gap-4 items-center">
+                                <div className="flex-1">
+                                    <input
+                                        type="text"
+                                        placeholder="Pesquisar por nome..."
+                                        value={searchTerm}
+                                        onChange={handleSearch}
+                                        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    />
+                                </div>
+                                <button
+                                    onClick={() => fetchFamilyData()}
+                                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
+                                >
+                                    Buscar Todos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="container mx-auto p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div className="bg-white rounded-lg shadow p-4 text-center">
+                                <div className="text-3xl font-bold text-green-600">{stats.total}</div>
+                                <div className="text-gray-500">Total de Pessoas</div>
+                            </div>
+                            <div className="bg-white rounded-lg shadow p-4 text-center">
+                                <div className="text-3xl font-bold text-blue-600">{stats.families}</div>
+                                <div className="text-gray-500">Famílias</div>
+                            </div>
+                            <div className="bg-white rounded-lg shadow p-4 text-center">
+                                <div className="text-3xl font-bold text-purple-600">{stats.generations}</div>
+                                <div className="text-gray-500">Gerações</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Flow Container */}
+                    <div className="container mx-auto p-4">
+                        <div className="bg-white rounded-lg shadow-lg p-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold">Visualização da Árvore Genealógica</h2>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            const newNodes = nodes.map(node => ({
+                                                ...node,
+                                                position: { 
+                                                    x: node.position.x + 50, 
+                                                    y: node.position.y 
+                                                }
+                                            }));
+                                            setNodes(newNodes);
+                                        }}
+                                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                    >
+                                        Mover Direita
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const newNodes = nodes.map(node => ({
+                                                ...node,
+                                                position: { 
+                                                    x: node.position.x - 50, 
+                                                    y: node.position.y 
+                                                }
+                                            }));
+                                            setNodes(newNodes);
+                                        }}
+                                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                                    >
+                                        Mover Esquerda
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {loading ? (
+                                <div className="flex justify-center items-center h-96">
+                                    <div className="text-center">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+                                        <p className="mt-4 text-gray-600">Carregando dados da árvore...</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="reactflow-wrapper">
+                                    <ReactFlow
+                                        nodes={nodes}
+                                        edges={edges}
+                                        onNodeClick={(_, node) => setSelectedPerson(node.data)}
+                                        nodeTypes={{ person: PersonNode }}
+                                        fitView
+                                        attributionPosition="bottom-left"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Selected Person Details */}
+                    {selectedPerson && (
+                        <div className="container mx-auto p-4">
+                            <div className="bg-white rounded-lg shadow-lg p-6">
+                                <h3 className="text-lg font-semibold mb-4">Detalhes da Pessoa</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <strong>Nome:</strong> {selectedPerson.name}
+                                    </div>
+                                    <div>
+                                        <strong>Gênero:</strong> {selectedPerson.gender === 'M' ? 'Masculino' : 'Feminino'}
+                                    </div>
+                                    <div>
+                                        <strong>Data de Nascimento:</strong> {selectedPerson.birthDate}
+                                    </div>
+                                    <div>
+                                        <strong>Data de Falecimento:</strong> {selectedPerson.deathDate}
+                                    </div>
+                                    <div>
+                                        <strong>Freguesia:</strong> {selectedPerson.freguesia}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedPerson(null)}
+                                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                >
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Legend */}
+                    <div className="container mx-auto p-4">
+                        <div className="bg-white rounded-lg shadow p-4">
+                            <h3 className="text-lg font-semibold mb-3">Legenda</h3>
+                            <div className="flex gap-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-blue-500 rounded"></div>
+                                    <span>Homem</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-pink-500 rounded"></div>
+                                    <span>Mulher</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-1 bg-gray-500"></div>
+                                    <span>Relação Familiar</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<FamilyTreeApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>

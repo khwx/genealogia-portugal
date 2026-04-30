@@ -68,8 +68,9 @@ def cmd_download(args):
 
                 # Procurar links para imagens ou fileViewer
                 for a in soup.find_all("a", href=True):
-                    if "fileViewer" in a["href"] or ".jpg" in a["href"] or ".png" in a["href"]:
-                        img_url = a["href"]
+                    href = str(a.get("href", ""))
+                    if "fileViewer" in href or ".jpg" in href or ".png" in href:
+                        img_url = href
                         if not img_url.startswith("http"):
                             img_url = f"https://digitarq.arquivos.pt{img_url}"
 

@@ -73,13 +73,24 @@ def normalize_date(date_str):
     
     return None
 
-def extract_names_from_ocr(ocr_text):
+def extract_names_from_ocr(ocr_text, use_enhanced=True):
     """
     Extrai nomes e datas de texto OCR usando NVIDIA API.
     Retorna lista de dicionários com 'nome' e 'data_obito'.
     """
     if not ocr_text or not ocr_text.strip():
         return []
+    
+    # Use enhanced OCR validator if enabled
+    if use_enhanced:
+        try:
+            import enhanced_ocr
+            validator = enhanced_ocr.OCRValidator()
+            return validator.enhance_ocr_results(ocr_text)
+        except ImportError:
+            print("⚠️  Enhanced OCR não disponível, usando método padrão")
+        except Exception as e:
+            print(f"⚠️  Erro no Enhanced OCR: {e}, usando método padrão")
     
     payload = {
         "model": "meta/llama-3.1-8b-instruct",
@@ -124,6 +135,29 @@ Rules:
                 
                 data = json.loads(content)
                 if isinstance(data, list):
+                    # Apply validation to NVIDIA results
+                    if use_enhanced:
+                        try:
+                            import enhanced_ocr
+                            validator = enhanced_ocr.OCRValidator()
+                            validated_data = []
+                            for record in data:
+                                if 'nome' in record:
+                                    valid_name, clean_name = validator.validate_name(record['nome'])
+                                    if valid_name:
+                                        record['nome'] = clean_name
+                                        if 'data_obito' in record:
+                                            valid_date, clean_date = validator.validate_date(record['data_obito'])
+                                            if valid_date:
+                                                record['data_obito'] = clean_date
+                                                record['qualidade'] = validator.get_quality_score(record)
+                                                validated_data.append(record)
+                                        else:
+                                            record['qualidade'] = 0.7  # Default quality
+                                            validated_data.append(record)
+                            return validated_data
+                        except Exception as e:
+                            print(f"⚠️  Erro na validação: {e}")
                     return data
                 else:
                     print(f"⚠️  Resposta não é uma lista: {type(data)}")

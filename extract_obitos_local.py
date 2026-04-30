@@ -19,6 +19,9 @@ import os
 import time
 import re
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -61,7 +64,7 @@ def setup_browser():
     chrome_options.add_argument("--disable-software-rasterizer")
     
     try:
-        driver = webdriver.Chrome(options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)  # type: ignore
         print("✅ Browser iniciado com Chrome padrão")
         return driver
     except Exception as e:
@@ -87,70 +90,73 @@ def get_image_urls_from_digitarq(doc_id, page_numbers=None, max_pages=10):
         print(f"   A carregar: {url}")
         driver.get(url)
         
-        # Aguardar carregamento da página
-        print("   A aguardar carregamento (30s)...")
-        time.sleep(30)
+        # Aguardar carregamento completo (JavaScript + imagens)
+        print("   A aguardar carregamento (10s)...")
+        time.sleep(10)
         
-        # Capturar logs de rede para encontrar URLs de imagens
-        logs = driver.get_log('performance')
+        # Tentar esperar pelo visor de imagens
+        try:
+            WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "img, canvas, .viewer, [data-testid]"))
+            )
+        except:
+            pass
         
         image_urls = []
-        for log in logs:
-            try:
-                message = json.loads(log['message'])
-                method = message['message'].get('method', '')
-                if method == 'Network.responseReceived':
-                    response = message['message']['params']['response']
-                    resp_url = response.get('url', '')
-                    content_type = response.get('mimeType', '')
-                    
-                    if 'image' in content_type and doc_id in resp_url:
-                        if resp_url not in image_urls:
-                            image_urls.append(resp_url)
-                            print(f"   🖼️  Imagem encontrada: {resp_url[:80]}...")
-            except:
-                pass
         
-        # Se não encontrou nos logs, tentar encontrar elementos de imagem no DOM
+        # 1. Capturar logs de rede para encontrar URLs de imagens
+        try:
+            logs = driver.get_log('performance')
+            for log in logs:
+                try:
+                    message = json.loads(log['message'])
+                    method = message['message'].get('method', '')
+                    if method == 'Network.responseReceived':
+                        response = message['message']['params']['response']
+                        resp_url = response.get('url', '')
+                        content_type = response.get('mimeType', '')
+                        
+                        if 'image' in content_type:
+                            if resp_url not in image_urls:
+                                image_urls.append(resp_url)
+                                print(f"   🖼️  Log: {resp_url[:80]}...")
+                except:
+                    pass
+        except:
+            pass
+        
+        # 2. Procurar elementos de imagem no DOM (Next.js selectors)
         if not image_urls:
             print("   A procurar imagens no DOM...")
-            imgs = driver.find_elements(By.TAG_NAME, 'img')
-            for img in imgs:
-                src = img.get_attribute('src')
-                if src and doc_id in src and 'image' in src.lower():
-                    if src not in image_urls:
-                        image_urls.append(src)
-                        print(f"   🖼️  Imagem no DOM: {src[:80]}...")
-        
-        # Se ainda não encontrou, tentar fazer screenshot das páginas
-        if not image_urls:
-            print("   A tentar capturar screenshots das páginas...")
+            selectors = [
+                "img[src*='image']",
+                "img[src*='jpg']", 
+                "img[src*='jpeg']",
+                "canvas",
+                "[data-testid*='image']",
+                ".viewer img",
+                ".digitool img",
+                "div[role='img'] img",
+                "img"
+            ]
             
-            # Tentar navegar para as últimas páginas (índice)
-            if page_numbers:
-                pages_to_capture = page_numbers
-            else:
-                # Capturar as últimas max_pages páginas
-                pages_to_capture = list(range(max_pages, 0, -1))[:max_pages]
-            
-            for page_num in pages_to_capture:
+            for selector in selectors:
                 try:
-                    # Tentar navegar para a página específica
-                    # O digitarq pode ter botões de navegação
-                    next_buttons = driver.find_elements(By.CSS_SELECTOR, 'button, [role="button"]')
-                    for btn in next_buttons:
-                        if 'next' in btn.get_attribute('class', '').lower() or 'próxima' in btn.text.lower():
-                            btn.click()
-                            time.sleep(5)
-                            break
-                    
-                    # Capturar screenshot
-                    screenshot_path = IMAGES_DIR / f"{doc_id}_page_{page_num}.png"
-                    driver.save_screenshot(str(screenshot_path))
-                    print(f"   📸 Screenshot guardado: {screenshot_path}")
-                    
-                except Exception as e:
-                    print(f"   ⚠️  Erro ao capturar página {page_num}: {e}")
+                    imgs = driver.find_elements(By.CSS_SELECTOR, selector)
+                    for img in imgs:
+                        src = img.get_attribute('src') or img.get_attribute('data-src')
+                        if src and src.startswith('http') and src not in image_urls:
+                            # Verificar se é uma URL de imagem válida
+                            if any(ext in src.lower() for ext in ['.jpg', '.jpeg', '.png', '.tiff', '.gif', 'image']):
+                                image_urls.append(src)
+                                print(f"   🖼️  DOM: {src[:80]}...")
+                except:
+                    pass
+        
+        # 3. Se ainda não encontrou, fazer screenshot das páginas
+        if not image_urls:
+            print("   A capturar screenshots das páginas...")
+            capture_screenshots(driver, doc_id, max_pages)
         
         print(f"\n✅ Encontradas {len(image_urls)} imagens")
         return image_urls
@@ -162,26 +168,111 @@ def get_image_urls_from_digitarq(doc_id, page_numbers=None, max_pages=10):
         driver.quit()
 
 
+def capture_screenshots(driver, doc_id, max_pages=10):
+    """
+    Captura screenshots de múltiplas páginas navigando no viewer.
+    """
+    print("   A navegar e capturar páginas...")
+    
+    try:
+        # Tentar encontrar e clicar no botão de última página (para ver índice)
+        # O Digitarq novo pode ter diferentes botões
+        page_navigation_attempts = 0
+        
+        while page_navigation_attempts < max_pages:
+            try:
+                # Procurar botão de próximo/última página
+                buttons = driver.find_elements(By.CSS_SELECTOR, "button")
+                
+                clicked = False
+                for btn in buttons:
+                    btn_text = btn.text.lower()
+                    if any(term in btn_text for term in ['próxima', 'next', 'ultima', 'last', '>', '>>']):
+                        try:
+                            btn.click()
+                            time.sleep(3)
+                            clicked = True
+                            break
+                        except:
+                            continue
+                
+                if not clicked:
+                    break
+                    
+                page_navigation_attempts += 1
+                
+                # Capturar screenshot
+                screenshot_path = IMAGES_DIR / f"{doc_id}_page_{page_navigation_attempts}.png"
+                driver.save_screenshot(str(screenshot_path))
+                print(f"   📸 Página {page_navigation_attempts}: {screenshot_path.name}")
+                
+            except Exception as e:
+                print(f"   ⚠️  Erro navegação: {e}")
+                break
+        
+        # Se não navegou, tirar pelo menos 1 screenshot da página atual
+        if page_navigation_attempts == 0:
+            screenshot_path = IMAGES_DIR / f"{doc_id}_page_1.png"
+            driver.save_screenshot(str(screenshot_path))
+            print(f"   📸 Screenshot: {screenshot_path.name}")
+            
+    except Exception as e:
+        print(f"   ⚠️  Erro ao capturar: {e}")
+
+
+def create_session():
+    """Cria sessão requests com retry logic."""
+    session = requests.Session()
+    retry = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[500, 502, 503, 504]
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('https://', adapter)
+    session.mount('http://', adapter)
+    return session
+
+
+def download_single_image(args):
+    """Descarrega uma única imagem (para uso com thread pool)."""
+    url, filename, session = args
+    try:
+        resp = session.get(url, timeout=60, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        })
+        if resp.status_code == 200 and len(resp.content) > 10000:
+            with open(filename, 'wb') as f:
+                f.write(resp.content)
+            return filename, len(resp.content)
+        return None, 0
+    except Exception as e:
+        return None, str(e)
+
+
 def download_images(image_urls):
     """
-    Descarrega as imagens para a pasta local.
+    Descarrega as imagens para a pasta local com concurrent downloads.
     """
-    print(f"\n💾 A descarregar {len(image_urls)} imagens...")
+    print(f"\n💾 A descarregar {len(image_urls)} imagens (5 em paralelo)...")
     
+    session = create_session()
     downloaded = []
-    for i, url in enumerate(image_urls):
-        try:
-            resp = requests.get(url, timeout=30)
-            if resp.status_code == 200:
-                filename = IMAGES_DIR / f"page_{i+1}.jpg"
-                with open(filename, 'wb') as f:
-                    f.write(resp.content)
+    
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        args_list = [
+            (url, IMAGES_DIR / f"page_{i+1}.jpg", session)
+            for i, url in enumerate(image_urls)
+        ]
+        
+        results = list(executor.map(download_single_image, args_list))
+        
+        for filename, size in results:
+            if filename:
                 downloaded.append(filename)
-                print(f"   ✅ {filename.name} ({len(resp.content)} bytes)")
+                print(f"   ✅ {filename.name} ({size} bytes)")
             else:
-                print(f"   ❌ Erro HTTP {resp.status_code}")
-        except Exception as e:
-            print(f"   ❌ Erro ao descarregar: {e}")
+                print(f"   ❌ Erro: {size}")
     
     return downloaded
 
@@ -458,13 +549,77 @@ def process_local_images():
     return all_records
 
 
+def process_book_from_inventory(inventory_file, freguesia_filter=None):
+    """
+    Processa um livro do inventário obtendo imagens via Selenium.
+    """
+    import json
+    
+    # Ler inventário
+    with open(inventory_file, 'r', encoding='utf-8') as f:
+        books = json.load(f)
+    
+    # Filtrar por freguesia se especificado
+    if freguesia_filter:
+        books = [b for b in books if freguesia_filter.lower() in b.get('freguesia', '').lower()]
+    
+    print(f"\n=== A PROCESSAR {len(books)} LIVROS ===")
+    
+    for i, book in enumerate(books):
+        freguesia = book.get('freguesia', 'Desconhecido')
+        titulo = book.get('titulo', '')
+        dates = book.get('datas', '')
+        url = book.get('url_viewer', '')
+        
+        # Extrair doc_id da URL
+        if 'fileViewer/' in url:
+            doc_id = url.split('fileViewer/')[1].split('?')[0]
+        else:
+            continue
+        
+        print(f"\n[{i+1}/{len(books)}] {freguesia} ({dates})")
+        print(f"   {titulo}")
+        
+        # Obter imagens
+        image_urls = get_image_urls_from_digitarq(doc_id, max_pages=5)
+        
+        if image_urls:
+            # Descarregar imagens
+            downloaded = download_images(image_urls)
+            print(f"   ✅ {len(downloaded)} imagens guardadas")
+        else:
+            print("   ⚠️  Sem imagens - a verificar screenshots...")
+        
+        # Rate limiting entre livros
+        time.sleep(2)
+    
+    print("\n✅ Processamento concluído!")
+
+
 def main():
     """
     Função principal.
     """
+    import sys
+    
     print("=" * 60)
     print("EXTRAÇÃO DE NOMES DE REGISTOS DE ÓBITOS")
     print("=" * 60)
+    
+    # Verificar argumentos da linha de comandos
+    if len(sys.argv) > 1:
+        if sys.argv[1] == '--book':
+            # Processar livro do inventário
+            inventory_file = Path(__file__).parent / 'output' / 'obitos_inventario.json'
+            freguesia_filter = sys.argv[2] if len(sys.argv) > 2 else None
+            process_book_from_inventory(inventory_file, freguesia_filter)
+            return
+        elif sys.argv[1] == '--help':
+            print("\nUso:")
+            print("  python extract_obitos_local.py                    # Processar imagens locais")
+            print("  python extract_obitos_local.py --book           # Processar todos os livros")
+            print("  python extract_obitos_local.py --book 'Santa Maria'  # Processar livros filtrados")
+            return
     
     # Verificar se já existem imagens na pasta
     existing_images = list(IMAGES_DIR.glob("*.jpg")) + \
@@ -477,10 +632,8 @@ def main():
         all_records = process_local_images()
     else:
         print("\n⚠️  Nenhuma imagem encontrada na pasta output/images/")
-        print("Para extrair imagens do digitarq, precisas de:")
-        print("1. Instalar Selenium: pip install selenium")
-        print("2. Instalar ChromeDriver")
-        print("3. Executar este script")
+        print("\nPara extrair imagens do digitarq, executa:")
+        print("  python extract_obitos_local.py --book")
         print("\nOu podes descarregar manualmente as imagens do índice")
         print("e colocá-las na pasta output/images/")
         return

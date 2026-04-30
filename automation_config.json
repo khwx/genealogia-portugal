@@ -1,0 +1,52 @@
+{
+  "google_drive": {
+    "credentials_file": "credentials.json",
+    "folder_id": "YOUR_GOOGLE_DRIVE_FOLDER_ID",
+    "supported_file_types": [".jpg", ".jpeg", ".png", ".tiff", ".bmp"]
+  },
+  "colab": {
+    "notebook_path": "colab/ocr_processing.ipynb",
+    "max_batch_size": 10,
+    "timeout_minutes": 60
+  },
+  "nvidia_ocr": {
+    "api_key": "${NVIDIA_API_KEY}",
+    "model": "meta/llama-3.1-8b-instruct",
+    "temperature": 0.1,
+    "max_tokens": 2000,
+    "use_enhanced_validation": true
+  },
+  "supabase": {
+    "url": "${SUPABASE_URL}",
+    "key": "${SUPABASE_KEY}",
+    "table": "pessoas",
+    "batch_size": 100,
+    "retry_attempts": 3
+  },
+  "processing": {
+    "max_concurrent_jobs": 5,
+    "retry_delay_seconds": 30,
+    "quality_threshold": 0.5,
+    "temp_directory": "temp",
+    "output_directory": "output"
+  },
+  "notifications": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "sender_email": "your-email@gmail.com",
+      "sender_password": "your-app-password"
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "${WEBHOOK_URL}"
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/automation.log",
+    "max_file_size": "10MB",
+    "backup_count": 5
+  }
+}

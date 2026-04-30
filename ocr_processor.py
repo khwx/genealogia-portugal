@@ -32,7 +32,7 @@ def preprocess_image(image_path):
 
     # Binarização simples
     threshold = 128
-    img = img.point(lambda x: 0 if x < threshold else 255, "1")
+    img = img.convert('1')
 
     return img
 
