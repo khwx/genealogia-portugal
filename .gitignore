@@ -58,3 +58,9 @@ Thumbs.db
 
 # Scraping cache
 .cache/
+
+# Raw images are too large for GitHub
+output/full_images/
+
+# OCR text (can be regenerated)
+output/ocr_text/

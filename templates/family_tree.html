@@ -4,364 +4,329 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Árvore Genealógica - Celorico da Beira</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/reactflow@11.7.0/dist/style.js"></script>
-    <script src="https://unpkg.com/reactflow@11.7.0/dist/bundle.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        .reactflow-wrapper {
-            height: 80vh;
-            width: 100%;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-        }
-        .node-person {
-            background: white;
-            border: 2px solid #10b981;
-            border-radius: 0.5rem;
-            padding: 12px;
-            min-width: 200px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .node-person.male {
-            border-color: #3b82f6;
-        }
-        .node-person.female {
-            border-color: #ec4899;
-        }
-        .edge-connection {
-            stroke: #6b7280;
-            stroke-width: 2;
-        }
-        .search-container {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; }
+        .header { background: linear-gradient(135deg, #1e293b, #334155); padding: 20px; border-bottom: 1px solid #475569; }
+        .header h1 { font-size: 24px; color: #f8fafc; }
+        .header .subtitle { color: #94a3b8; font-size: 14px; margin-top: 4px; }
+        .stats { display: flex; gap: 24px; margin-top: 12px; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #38bdf8; }
+        .stat-label { font-size: 12px; color: #94a3b8; }
+        .controls { background: #1e293b; padding: 12px 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid #334155; flex-wrap: wrap; }
+        .controls label { font-size: 13px; color: #94a3b8; }
+        .controls select, .controls input { background: #0f172a; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 6px; font-size: 13px; }
+        .controls button { background: #2563eb; color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .controls button:hover { background: #1d4ed8; }
+        #tree-container { width: 100%; height: calc(100vh - 140px); overflow: hidden; position: relative; }
+        #tree-container svg { width: 100%; height: 100%; }
+        .node { cursor: pointer; }
+        .node circle { stroke-width: 2px; }
+        .node text { font-size: 11px; fill: #e2e8f0; }
+        .node--obito circle { fill: #ef4444; stroke: #dc2626; }
+        .node--person circle { fill: #3b82f6; stroke: #2563eb; }
+        .node--family circle { fill: #22c55e; stroke: #16a34a; }
+        .link { fill: none; stroke: #475569; stroke-width: 1.5px; stroke-opacity: 0.6; }
+        .tooltip { position: absolute; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 12px; font-size: 13px; pointer-events: none; z-index: 100; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .tooltip h3 { color: #38bdf8; margin-bottom: 6px; font-size: 15px; }
+        .tooltip .field { color: #94a3b8; margin: 3px 0; }
+        .tooltip .field span { color: #e2e8f0; }
+        .sidebar { position: absolute; right: 0; top: 0; width: 350px; height: 100%; background: #1e293b; border-left: 1px solid #334155; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s; z-index: 50; }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar-header { padding: 16px; background: #334155; display: flex; justify-content: space-between; align-items: center; }
+        .sidebar-header h2 { font-size: 16px; color: #f8fafc; }
+        .sidebar-close { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 20px; }
+        .sidebar-content { padding: 16px; }
+        .detail-section { margin-bottom: 16px; }
+        .detail-section h4 { color: #38bdf8; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; }
+        .detail-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+        .detail-label { color: #94a3b8; font-size: 13px; }
+        .detail-value { color: #e2e8f0; font-size: 13px; text-align: right; }
+        .search-results { margin-top: 12px; }
+        .search-result { padding: 8px; margin: 4px 0; background: #0f172a; border-radius: 6px; cursor: pointer; }
+        .search-result:hover { background: #334155; }
+        .search-result .name { color: #38bdf8; font-weight: 500; }
+        .search-result .info { color: #94a3b8; font-size: 12px; }
+        .loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .loading .spinner { width: 40px; height: 40px; border: 3px solid #334155; border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .image-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: none; justify-content: center; align-items: center; }
+        .image-viewer.open { display: flex; }
+        .image-viewer img { max-width: 95%; max-height: 95%; }
+        .image-viewer-close { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; background: none; border: none; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div id="root"></div>
+<body>
+    <div class="header">
+        <h1>Árvore Genealógica - Celorico da Beira</h1>
+        <div class="subtitle">Registos de Óbitos do Arquivo Distrital da Guarda | Séculos XVIII-XX</div>
+        <div class="stats">
+            <div class="stat"><div class="stat-value" id="stat-docs">119</div><div class="stat-label">Documentos</div></div>
+            <div class="stat"><div class="stat-value" id="stat-images">4152</div><div class="stat-label">Imagens</div></div>
+            <div class="stat"><div class="stat-value" id="stat-people">7</div><div class="stat-label">Pessoas</div></div>
+            <div class="stat"><div class="stat-value" id="stat-families">3</div><div class="stat-label">Freguesias</div></div>
+        </div>
+    </div>
+    <div class="controls">
+        <label>Freguesia:</label>
+        <select id="freguesia-filter">
+            <option value="">Todas</option>
+            <option value="Celorico (Santa Maria)">Santa Maria</option>
+            <option value="Celorico (São Pedro)">São Pedro</option>
+            <option value="São Martinho de Celorico">S. Martinho</option>
+        </select>
+        <label>Período:</label>
+        <select id="period-filter">
+            <option value="">Todos</option>
+            <option value="1700-1750">1700-1750</option>
+            <option value="1750-1800">1750-1800</option>
+            <option value="1800-1850">1800-1850</option>
+            <option value="1850-1900">1850-1900</option>
+            <option value="1900-1950">1900-1950</option>
+        </select>
+        <label>Pesquisar:</label>
+        <input type="text" id="search-input" placeholder="Nome de pessoa...">
+        <button onclick="searchPeople()">Pesquisar</button>
+        <button onclick="loadFromSupabase()">Recarregar BD</button>
+    </div>
+    <div id="tree-container">
+        <div class="loading"><div class="spinner"></div><div>A carregar dados...</div></div>
+    </div>
+    <div class="tooltip" id="tooltip" style="display:none;"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 id="sidebar-title">Detalhes</h2>
+            <button class="sidebar-close" onclick="closeSidebar()">&times;</button>
+        </div>
+        <div class="sidebar-content" id="sidebar-content"></div>
+    </div>
+    <div class="image-viewer" id="image-viewer">
+        <button class="image-viewer-close" onclick="closeImageViewer()">&times;</button>
+        <img id="viewer-image" src="">
+    </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
-        const ReactFlow = window.ReactFlow;
+<script>
+const SUPABASE_URL = 'https://qljopxbxgflozrcdblrl.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
+const DIGITARQ_BASE = 'https://digitarq.arquivos.pt';
 
-        // API Configuration
-        const SUPABASE_URL = 'https://your-project.supabase.co';
-        const SUPABASE_KEY = 'your-anon-key';
+let allPeople = [];
+let allBooks = [];
+let treeData = null;
 
-        // Node Types
-        const PersonNode = ({ data }) => {
-            const { name, birthDate, deathDate, gender, freguesia } = data;
-            
-            return (
-                <div className={`node-person ${gender === 'M' ? 'male' : 'female'}`}>
-                    <div className="font-semibold text-sm text-gray-900">{name}</div>
-                    <div className="text-xs text-gray-600 mt-1">
-                        {birthDate && <div>Nascimento: {birthDate}</div>}
-                        {deathDate && <div>Falecimento: {deathDate}</div>}
-                        {freguesia && <div>Freguesia: {freguesia}</div>}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                        {gender === 'M' ? '♂ Masculino' : '♀ Feminino'}
-                    </div>
-                </div>
-            );
-        };
+async function loadFromSupabase() {
+    document.querySelector('.loading').style.display = 'block';
+    try {
+        const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+        
+        const [pplRes, booksRes] = await Promise.all([
+            fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*`, { headers }),
+            fetch(`${SUPABASE_URL}/rest/v1/livros?select=*&freguesia=like.*Celorico*`, { headers })
+        ]);
+        
+        allPeople = await pplRes.json();
+        allBooks = await booksRes.json();
+        
+        document.getElementById('stat-people').textContent = allPeople.length;
+        document.getElementById('stat-docs').textContent = allBooks.length;
+        
+        buildTree();
+        document.querySelector('.loading').style.display = 'none';
+    } catch (e) {
+        console.error('Error loading from Supabase:', e);
+        loadLocalData();
+    }
+}
 
-        // Main Component
-        const FamilyTreeApp = () => {
-            const [searchTerm, setSearchTerm] = useState('');
-            const [selectedPerson, setSelectedPerson] = useState(null);
-            const [nodes, setNodes] = useState([]);
-            const [edges, setEdges] = useState([]);
-            const [loading, setLoading] = useState(false);
-            const [stats, setStats] = useState({
-                total: 0,
-                families: 0,
-                generations: 0
+async function loadLocalData() {
+    try {
+        const res = await fetch('output/data/celorico_completo.json');
+        const data = await res.json();
+        allBooks = data.documentos || [];
+        buildTree();
+    } catch (e) {
+        console.error('Error loading local data:', e);
+    }
+    document.querySelector('.loading').style.display = 'none';
+}
+
+function buildTree() {
+    const container = document.getElementById('tree-container');
+    container.innerHTML = '';
+    
+    if (allPeople.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;"><h3>Sem dados de pessoas</h3><p>As imagens estão a ser processadas por OCR. Quando estiverem prontas, os nomes aparecerão aqui.</p><p style="margin-top:20px;">Ficheiros de imagens: 4152</p></div>';
+        return;
+    }
+    
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    const svg = d3.select('#tree-container').append('svg')
+        .attr('width', width).attr('height', height);
+    
+    const g = svg.append('g');
+    
+    svg.call(d3.zoom().scaleExtent([0.1, 4]).on('zoom', (event) => {
+        g.attr('transform', event.transform);
+    }));
+    
+    const root = buildHierarchy();
+    const treeLayout = d3.tree().size([width - 200, height - 200]);
+    treeLayout(root);
+    
+    g.selectAll('.link')
+        .data(root.links())
+        .join('path')
+        .attr('class', 'link')
+        .attr('d', d3.linkVertical().x(d => d.x + 100).y(d => d.y + 100));
+    
+    const node = g.selectAll('.node')
+        .data(root.descendants())
+        .join('g')
+        .attr('class', d => `node node--${d.data.type || 'person'}`)
+        .attr('transform', d => `translate(${d.x + 100},${d.y + 100})`)
+        .on('click', (event, d) => showDetails(d.data))
+        .on('mouseover', (event, d) => showTooltip(event, d.data))
+        .on('mouseout', hideTooltip);
+    
+    node.append('circle').attr('r', d => d.data.type === 'family' ? 12 : 8);
+    node.append('text').attr('dy', '0.31em').attr('x', d => d.children ? -16 : 16)
+        .attr('text-anchor', d => d.children ? 'end' : 'start')
+        .text(d => d.data.name || 'Desconhecido');
+}
+
+function buildHierarchy() {
+    const families = {};
+    allPeople.forEach(p => {
+        const key = p.freguesia || 'Desconhecida';
+        if (!families[key]) families[key] = { name: key, type: 'family', children: [] };
+        families[key].children.push({
+            name: p.nome || 'Desconhecido',
+            type: 'obito',
+            data: p
+        });
+    });
+    
+    return d3.hierarchy({
+        name: 'Celorico da Beira',
+        type: 'family',
+        children: Object.values(families)
+    });
+}
+
+function showTooltip(event, data) {
+    const tooltip = document.getElementById('tooltip');
+    tooltip.style.display = 'block';
+    tooltip.style.left = (event.pageX + 10) + 'px';
+    tooltip.style.top = (event.pageY - 10) + 'px';
+    
+    let html = `<h3>${data.name || 'Desconhecido'}</h3>`;
+    if (data.data) {
+        if (data.data.data_obito) html += `<div class="field">Óbito: <span>${data.data.data_obito}</span></div>`;
+        if (data.data.freguesia) html += `<div class="field">Freguesia: <span>${data.data.freguesia}</span></div>`;
+    }
+    tooltip.innerHTML = html;
+}
+
+function hideTooltip() {
+    document.getElementById('tooltip').style.display = 'none';
+}
+
+function showDetails(data) {
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('sidebar-content');
+    document.getElementById('sidebar-title').textContent = data.name || 'Detalhes';
+    
+    let html = '';
+    if (data.type === 'family') {
+        html += `<div class="detail-section"><h4>Freguesia</h4>`;
+        html += `<div class="detail-row"><span class="detail-label">Nome</span><span class="detail-value">${data.name}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Pessoas</span><span class="detail-value">${data.children ? data.children.length : 0}</span></div>`;
+        html += `</div>`;
+        
+        if (data.children) {
+            html += `<div class="detail-section"><h4>Pessoas</h4>`;
+            data.children.forEach(c => {
+                html += `<div class="search-result" onclick="showDetails(${JSON.stringify(c).replace(/"/g, '&quot;')})">`;
+                html += `<div class="name">${c.name}</div>`;
+                if (c.data && c.data.data_obito) html += `<div class="info">Óbito: ${c.data.data_obito}</div>`;
+                html += `</div>`;
             });
+            html += `</div>`;
+        }
+    } else if (data.data) {
+        const p = data.data;
+        html += `<div class="detail-section"><h4>Dados Pessoais</h4>`;
+        html += `<div class="detail-row"><span class="detail-label">Nome</span><span class="detail-value">${p.nome || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Óbito</span><span class="detail-value">${p.data_obito || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Nascimento</span><span class="detail-value">${p.data_nascimento || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Casamento</span><span class="detail-value">${p.data_casamento || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Freguesia</span><span class="detail-value">${p.freguesia || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Concelho</span><span class="detail-value">${p.concelho || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Fonte</span><span class="detail-value">${p.fonte || '-'}</span></div>`;
+        html += `</div>`;
+        
+        if (p.imagem_url) {
+            html += `<div class="detail-section"><h4>Imagem Original</h4>`;
+            html += `<img src="${p.imagem_url}" style="width:100%;border-radius:6px;cursor:pointer" onclick="openImageViewer('${p.imagem_url}')">`;
+            html += `</div>`;
+        }
+    }
+    
+    content.innerHTML = html;
+    sidebar.classList.add('open');
+}
 
-            // Fetch data from Supabase
-            const fetchFamilyData = useCallback(async (searchTerm = '') => {
-                setLoading(true);
-                try {
-                    let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*`;
-                    if (searchTerm) {
-                        url += `&nome=ilike.*${searchTerm}*`;
-                    }
-                    url += '&order=data_obito';
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+}
 
-                    const response = await fetch(url, {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Content-Type': 'application/json'
-                        }
-                    });
+function openImageViewer(url) {
+    document.getElementById('viewer-image').src = url;
+    document.getElementById('image-viewer').classList.add('open');
+}
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        processFamilyData(data);
-                    } else {
-                        console.error('Error fetching data:', response.status);
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    setLoading(false);
-                }
-            }, []);
+function closeImageViewer() {
+    document.getElementById('image-viewer').classList.remove('open');
+}
 
-            // Process data and create family tree structure
-            const processFamilyData = (people) => {
-                const newNodes = [];
-                const newEdges = [];
-                const processedNames = new Set();
+async function searchPeople() {
+    const query = document.getElementById('search-input').value.trim();
+    if (!query) return;
+    
+    try {
+        const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?nome=like.*${query}*&select=*`, { headers });
+        const results = await res.json();
+        
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('sidebar-content');
+        document.getElementById('sidebar-title').textContent = `Resultados: "${query}"`;
+        
+        let html = `<div class="detail-section"><h4>${results.length} resultado(s)</h4>`;
+        results.forEach(p => {
+            html += `<div class="search-result" onclick='showDetails({name:"${p.nome}", type:"obito", data:${JSON.stringify(p).replace(/'/g, "\\'")}})'>`;
+            html += `<div class="name">${p.nome}</div>`;
+            html += `<div class="info">${p.data_obito || 'Data desconhecida'} | ${p.freguesia || ''}</div>`;
+            html += `</div>`;
+        });
+        html += `</div>`;
+        
+        content.innerHTML = html;
+        sidebar.classList.add('open');
+    } catch (e) {
+        console.error('Search error:', e);
+    }
+}
 
-                // Create nodes for each person
-                people.forEach((person, index) => {
-                    if (!processedNames.has(person.nome)) {
-                        const nodeId = `person-${index}`;
-                        const gender = Math.random() > 0.5 ? 'M' : 'F'; // Placeholder - should be extracted from records
-                        
-                        newNodes.push({
-                            id: nodeId,
-                            type: 'person',
-                            position: { x: Math.random() * 800, y: index * 100 },
-                            data: {
-                                name: person.nome,
-                                birthDate: person.data_nascimento || 'Desconhecida',
-                                deathDate: person.data_obito || 'Desconhecida',
-                                gender: gender,
-                                freguesia: person.freguesia || 'Desconhecida'
-                            }
-                        });
-                        processedNames.add(person.nome);
-                    }
-                });
+document.getElementById('search-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') searchPeople();
+});
 
-                // Create edges based on family relationships (simplified)
-                // In a real implementation, this would use family relationship data
-                for (let i = 0; i < newNodes.length - 1; i++) {
-                    if (Math.random() > 0.7) { // Random connections for demo
-                        newEdges.push({
-                            id: `edge-${i}-${i + 1}`,
-                            source: newNodes[i].id,
-                            target: newNodes[i + 1].id,
-                            type: 'smoothstep',
-                            animated: false,
-                            style: { stroke: '#6b7280' }
-                        });
-                    }
-                }
-
-                setNodes(newNodes);
-                setEdges(newEdges);
-                
-                // Update stats
-                setStats({
-                    total: people.length,
-                    families: Math.floor(people.length / 4),
-                    generations: Math.floor(people.length / 10) + 1
-                });
-            };
-
-            // Handle search
-            const handleSearch = (e) => {
-                const term = e.target.value;
-                setSearchTerm(term);
-                if (term.length > 2) {
-                    fetchFamilyData(term);
-                }
-            };
-
-            // Initial load
-            useEffect(() => {
-                fetchFamilyData();
-            }, []);
-
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    {/* Header */}
-                    <nav className="bg-green-800 text-white p-4">
-                        <div className="container mx-auto">
-                            <div className="flex justify-between items-center">
-                                <h1 className="text-2xl font-bold">🌳 Árvore Genealógica de Celorico da Beira</h1>
-                                <div className="flex gap-4">
-                                    <a href="/" className="text-white hover:text-green-200">Pesquisa</a>
-                                    <a href="/stats" className="text-white hover:text-green-200">Estatísticas</a>
-                                    <a href="/about" className="text-white hover:text-green-200">Sobre</a>
-                                </div>
-                            </div>
-                        </div>
-                    </nav>
-
-                    {/* Search Bar */}
-                    <div className="search-container p-4">
-                        <div className="container mx-auto">
-                            <div className="flex gap-4 items-center">
-                                <div className="flex-1">
-                                    <input
-                                        type="text"
-                                        placeholder="Pesquisar por nome..."
-                                        value={searchTerm}
-                                        onChange={handleSearch}
-                                        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => fetchFamilyData()}
-                                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
-                                >
-                                    Buscar Todos
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="container mx-auto p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <div className="bg-white rounded-lg shadow p-4 text-center">
-                                <div className="text-3xl font-bold text-green-600">{stats.total}</div>
-                                <div className="text-gray-500">Total de Pessoas</div>
-                            </div>
-                            <div className="bg-white rounded-lg shadow p-4 text-center">
-                                <div className="text-3xl font-bold text-blue-600">{stats.families}</div>
-                                <div className="text-gray-500">Famílias</div>
-                            </div>
-                            <div className="bg-white rounded-lg shadow p-4 text-center">
-                                <div className="text-3xl font-bold text-purple-600">{stats.generations}</div>
-                                <div className="text-gray-500">Gerações</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Flow Container */}
-                    <div className="container mx-auto p-4">
-                        <div className="bg-white rounded-lg shadow-lg p-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-semibold">Visualização da Árvore Genealógica</h2>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => {
-                                            const newNodes = nodes.map(node => ({
-                                                ...node,
-                                                position: { 
-                                                    x: node.position.x + 50, 
-                                                    y: node.position.y 
-                                                }
-                                            }));
-                                            setNodes(newNodes);
-                                        }}
-                                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                                    >
-                                        Mover Direita
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const newNodes = nodes.map(node => ({
-                                                ...node,
-                                                position: { 
-                                                    x: node.position.x - 50, 
-                                                    y: node.position.y 
-                                                }
-                                            }));
-                                            setNodes(newNodes);
-                                        }}
-                                        className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                                    >
-                                        Mover Esquerda
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {loading ? (
-                                <div className="flex justify-center items-center h-96">
-                                    <div className="text-center">
-                                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-                                        <p className="mt-4 text-gray-600">Carregando dados da árvore...</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="reactflow-wrapper">
-                                    <ReactFlow
-                                        nodes={nodes}
-                                        edges={edges}
-                                        onNodeClick={(_, node) => setSelectedPerson(node.data)}
-                                        nodeTypes={{ person: PersonNode }}
-                                        fitView
-                                        attributionPosition="bottom-left"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Selected Person Details */}
-                    {selectedPerson && (
-                        <div className="container mx-auto p-4">
-                            <div className="bg-white rounded-lg shadow-lg p-6">
-                                <h3 className="text-lg font-semibold mb-4">Detalhes da Pessoa</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <strong>Nome:</strong> {selectedPerson.name}
-                                    </div>
-                                    <div>
-                                        <strong>Gênero:</strong> {selectedPerson.gender === 'M' ? 'Masculino' : 'Feminino'}
-                                    </div>
-                                    <div>
-                                        <strong>Data de Nascimento:</strong> {selectedPerson.birthDate}
-                                    </div>
-                                    <div>
-                                        <strong>Data de Falecimento:</strong> {selectedPerson.deathDate}
-                                    </div>
-                                    <div>
-                                        <strong>Freguesia:</strong> {selectedPerson.freguesia}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setSelectedPerson(null)}
-                                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                >
-                                    Fechar
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Legend */}
-                    <div className="container mx-auto p-4">
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <h3 className="text-lg font-semibold mb-3">Legenda</h3>
-                            <div className="flex gap-6">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-blue-500 rounded"></div>
-                                    <span>Homem</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-pink-500 rounded"></div>
-                                    <span>Mulher</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-1 bg-gray-500"></div>
-                                    <span>Relação Familiar</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // Render the app
-        ReactDOM.render(<FamilyTreeApp />, document.getElementById('root'));
-    </script>
+loadFromSupabase();
+</script>
 </body>
 </html>
