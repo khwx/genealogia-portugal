@@ -1,0 +1,26 @@
+{
+  "file_id": "25848609",
+  "source_file": "25848609.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 840,
+  "tokens": 251,
+  "duration_ms": 0,
+  "wall_time_s": 12.39668083190918,
+  "processed_at": "2026-05-02T15:22:01.415415",
+  "names_found": [
+    "Lugar de Espinheiro",
+    "mez de Junho",
+    "Collegiada de\nSanta",
+    "Villa de Celorico",
+    "Correa de Lacerda",
+    "mez de Outubro",
+    "menos de\nsetenta"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "Igreja Matriz"
+  ]
+}

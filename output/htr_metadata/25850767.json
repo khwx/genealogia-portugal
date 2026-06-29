@@ -1,0 +1,23 @@
+{
+  "file_id": "25850767",
+  "source_file": "25850767.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.502380847930908,
+  "processed_at": "2026-05-02T18:00:40.333489",
+  "names_found": [
+    "lugar de Casal",
+    "anno de mil",
+    "Pedro de villa",
+    "mes\nde Dezembro",
+    "freguezia de Sam"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

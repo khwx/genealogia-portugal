@@ -1,0 +1,20 @@
+{
+  "file_id": "25847939",
+  "source_file": "25847939.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 260,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.992652654647827,
+  "processed_at": "2026-05-02T14:19:20.031699",
+  "names_found": [
+    "mes de Junho",
+    "Maria de nome",
+    "menor de idade",
+    "filha de Manoel"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

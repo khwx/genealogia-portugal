@@ -1,0 +1,21 @@
+{
+  "file_id": "25848615",
+  "raw_text": "Este é um registo de óbitos da freguesia de Santa Maria, na vila de Celorico da Beira, datado de 1831 e 1832.\n\n---TRANSCRIPTION---\n\n[Página da Esquerda]\n\nCel.o\nAgost.o\nRiz\n\nAos vinte e hum dias do mez de Dez",
+  "structured": {
+    "names": [
+      "mez de Dez",
+      "vila de Celorico",
+      "registo de óbitos",
+      "datado de 1831 e 1832",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1831",
+      "1832"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

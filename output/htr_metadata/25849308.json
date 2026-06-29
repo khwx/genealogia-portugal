@@ -1,0 +1,21 @@
+{
+  "file_id": "25849308",
+  "source_file": "25849308.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.254689931869507,
+  "processed_at": "2026-05-02T16:52:11.234254",
+  "names_found": [
+    "freguezia de Santa",
+    "mez de Abril",
+    "Maria de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

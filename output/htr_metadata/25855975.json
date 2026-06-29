@@ -1,0 +1,32 @@
+{
+  "file_id": "25855975",
+  "source_file": "25855975.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1016,
+  "tokens": 332,
+  "duration_ms": 0,
+  "wall_time_s": 10.329293727874756,
+  "processed_at": "2026-05-02T18:06:36.858333",
+  "names_found": [
+    "Gomes de Almeida",
+    "freguezia de S",
+    "nor de hum",
+    "doze de Fevereiro",
+    "oito de Janeiro",
+    "Maria de Jesus",
+    "era de mil",
+    "era de Santo",
+    "filha de Jozé",
+    "Martinho de Celorico",
+    "tinho de Celorico",
+    "dez de Dezembro",
+    "Manoel de S",
+    "Luiz de Almeida"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

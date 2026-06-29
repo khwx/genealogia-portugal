@@ -1,0 +1,17 @@
+{
+  "file_id": "45283400",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 43 Julia da Fonseca\\nAos oito dias do mez de Outubro do anno de mil oitocentos setenta e quatro, ao meio dia, no lugar de Espinheiro d'esta freguezia de Santa Maria, e Villa de Celorico da Beira, concelho da mesma Villa",
+  "structured": {
+    "names": [
+      "lugar de Espinheiro",
+      "anno de mil",
+      "mez de Outubro",
+      "freguezia de Santa",
+      "Villa de Celorico"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

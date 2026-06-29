@@ -1,0 +1,25 @@
+{
+  "file_id": "25850691",
+  "source_file": "25850691.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 232,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.814203023910522,
+  "processed_at": "2026-05-02T17:39:35.098219",
+  "names_found": [
+    "datados de 1751 e 1752",
+    "registos de óbitos",
+    "freguesia de São"
+  ],
+  "dates_found": [
+    "1752",
+    "1751"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

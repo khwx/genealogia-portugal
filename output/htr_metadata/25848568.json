@@ -1,0 +1,20 @@
+{
+  "file_id": "25848568",
+  "source_file": "25848568.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 262,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.704277753829956,
+  "processed_at": "2026-05-02T15:10:35.568016",
+  "names_found": [
+    "Maria de Oliveira",
+    "Matrimonio de Miguel",
+    "faleceu de idade",
+    "mez de Fevereiro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

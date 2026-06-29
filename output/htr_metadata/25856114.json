@@ -1,0 +1,20 @@
+{
+  "file_id": "25856114",
+  "source_file": "25856114.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 271,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.146684169769287,
+  "processed_at": "2026-05-02T18:29:46.071542",
+  "names_found": [
+    "mes de Dezembro",
+    "Izabel de Oliveira",
+    "villa de Pinhel",
+    "bispado de Vizeu"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

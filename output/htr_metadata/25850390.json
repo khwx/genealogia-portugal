@@ -1,0 +1,20 @@
+{
+  "file_id": "25850390",
+  "source_file": "25850390.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 268,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 9.985512018203735,
+  "processed_at": "2026-05-02T17:25:00.307376",
+  "names_found": [
+    "mes de Julho",
+    "exposto de idade",
+    "villa de que",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

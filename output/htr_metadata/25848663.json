@@ -1,0 +1,26 @@
+{
+  "file_id": "25848663",
+  "source_file": "25848663.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1302,
+  "tokens": 420,
+  "duration_ms": 0,
+  "wall_time_s": 10.791221380233765,
+  "processed_at": "2026-05-02T15:36:54.348190",
+  "names_found": [
+    "bro de 1850",
+    "Outubro de mil",
+    "legitimo de João",
+    "Outubro de\n185",
+    "depois de lhe"
+  ],
+  "dates_found": [
+    "1850"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico"
+  ]
+}

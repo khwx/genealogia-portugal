@@ -1,0 +1,15 @@
+{
+  "file_id": "45284240",
+  "source_file": "45284240.tiff",
+  "backend": "gemini",
+  "model": "",
+  "status": "error",
+  "text_length": 0,
+  "tokens": 0,
+  "duration_ms": 0,
+  "wall_time_s": 247.33536767959595,
+  "processed_at": "2026-05-26T13:15:00.862378",
+  "names_found": [],
+  "dates_found": [],
+  "places_found": []
+}

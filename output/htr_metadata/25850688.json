@@ -1,0 +1,24 @@
+{
+  "file_id": "25850688",
+  "source_file": "25850688.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 292,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.95795488357544,
+  "processed_at": "2026-05-02T17:38:46.651726",
+  "names_found": [
+    "Aldea de Jozo",
+    "mulher de\nMiguel",
+    "freguesia de São",
+    "registos de óbitos",
+    "transcrição de um"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

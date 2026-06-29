@@ -1,0 +1,16 @@
+{
+  "file_id": "45283135",
+  "raw_text": "```json\n{\n  \"transcription\": \"1876 ~\\nLivro de Óbitos da freguesia de\\nSanta Maria de Celorico da Beira,\\nBispado da Guarda\",\n  \"deceased\": []\n}\n```",
+  "structured": {
+    "names": [
+      "Maria de Celorico",
+      "nLivro de Óbitos"
+    ],
+    "dates": [
+      "1876"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

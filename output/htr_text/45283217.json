@@ -1,0 +1,16 @@
+{
+  "file_id": "45283217",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 1 Josefa Torres\\nAos quinze dias do mez de Janeiro do anno de mil oitocentos setenta e cinco, pela meia noite, na Quinta dos Chãos d'Olveira desta freguezia de Santa Maria da Villa de Celorico da Beira, Concelho da mesma",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "freguezia de Santa",
+      "Villa de Celorico",
+      "mez de Janeiro"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

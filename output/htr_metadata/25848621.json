@@ -1,0 +1,27 @@
+{
+  "file_id": "25848621",
+  "source_file": "25848621.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 259,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.396368980407715,
+  "processed_at": "2026-05-02T15:25:16.676349",
+  "names_found": [
+    "datados de 1832 e 1833",
+    "Manoel de Amaral e com",
+    "tura de Cruz",
+    "registos de óbitos",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1833",
+    "1832"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

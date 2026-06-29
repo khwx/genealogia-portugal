@@ -1,0 +1,24 @@
+{
+  "file_id": "25848662",
+  "source_file": "25848662.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.474533557891846,
+  "processed_at": "2026-05-02T15:36:38.553835",
+  "names_found": [
+    "datados de 1851",
+    "freguesia de Santa",
+    "registos de óbito"
+  ],
+  "dates_found": [
+    "1851"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

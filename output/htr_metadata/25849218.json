@@ -1,0 +1,24 @@
+{
+  "file_id": "25849218",
+  "source_file": "25849218.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 295,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.028955459594727,
+  "processed_at": "2026-05-02T16:27:01.695227",
+  "names_found": [
+    "mes\nde Agosto",
+    "ficou de Francisco",
+    "morada de Maria",
+    "Villa de Celorico e casas",
+    "Almeida de que",
+    "Anno de mil e sete"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

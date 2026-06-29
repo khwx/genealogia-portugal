@@ -1,0 +1,18 @@
+{
+  "file_id": "25847950",
+  "source_file": "25847950.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash-lite",
+  "status": "success",
+  "text_length": 2883,
+  "tokens": 2000,
+  "duration_ms": 0,
+  "wall_time_s": 7.4952521324157715,
+  "processed_at": "2026-05-02T13:35:35.047785",
+  "names_found": [
+    "gralio de L",
+    "canno de L"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

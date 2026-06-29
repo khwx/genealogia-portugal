@@ -1,0 +1,17 @@
+{
+  "file_id": "45283262",
+  "raw_text": "```json\n{\n  \"transcription\": \"primeiro termo que se segue. Celorico da Beira nove de Setembro de 1886.\\n\\nCelorico. Aos quinze dias do mez de Setembro de mil outo centos oitenta e seis annos, faleceu da vida presente com todos os sacramentos, e de",
+  "structured": {
+    "names": [
+      "nove de Setembro",
+      "mez de Setembro"
+    ],
+    "dates": [
+      "1886"
+    ],
+    "places": [
+      "Celorico",
+      "Celorico da Beira"
+    ]
+  }
+}

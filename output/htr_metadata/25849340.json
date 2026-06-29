@@ -1,0 +1,19 @@
+{
+  "file_id": "25849340",
+  "source_file": "25849340.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 269,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 8.92327356338501,
+  "processed_at": "2026-05-02T17:00:49.173687",
+  "names_found": [
+    "idade de trinta e oito",
+    "mes de Maio",
+    "freguezia\nde Santa"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

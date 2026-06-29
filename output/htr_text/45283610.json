@@ -1,0 +1,17 @@
+{
+  "file_id": "45283610",
+  "raw_text": "```json\n{\n  \"transcription\": \"Nº 73. Aos seis dias de mey d'Outubro do anno de mil oitocentos setenta e tres, ás tres horas da tarde, no lugar da Lameira, desta freguesia de Santa Maria, e Villa de Celorico da Beira, Concelho da mesma, falleceu",
+  "structured": {
+    "names": [
+      "dias de mey",
+      "Villa de Celorico",
+      "freguesia de Santa",
+      "anno de mil"
+    ],
+    "dates": [],
+    "places": [
+      "freguesia de Santa",
+      "Celorico da Beira"
+    ]
+  }
+}

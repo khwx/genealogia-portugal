@@ -1,0 +1,18 @@
+{
+  "file_id": "25856582",
+  "source_file": "25856582.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 261,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.18692135810852,
+  "processed_at": "2026-05-02T19:23:57.464291",
+  "names_found": [
+    "Igreja de S",
+    "Lugar de Cavadoude"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

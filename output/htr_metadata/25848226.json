@@ -1,0 +1,19 @@
+{
+  "file_id": "25848226",
+  "source_file": "25848226.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 317,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.697703123092651,
+  "processed_at": "2026-05-02T14:53:27.273694",
+  "names_found": [
+    "lista de legados",
+    "registo de óbitos",
+    "estado de conservação"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

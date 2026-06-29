@@ -1,0 +1,27 @@
+{
+  "file_id": "25849324",
+  "source_file": "25849324.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 232,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.377539873123169,
+  "processed_at": "2026-05-02T16:56:35.317378",
+  "names_found": [
+    "datado de finais",
+    "mes de\nDez",
+    "registo de óbitos",
+    "início de 1808",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1808",
+    "1807"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "file_id": "25849189",
+  "source_file": "25849189.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 288,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 12.71530818939209,
+  "processed_at": "2026-05-02T16:19:03.776168",
+  "names_found": [
+    "ficou de Amaro",
+    "dias de Septembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

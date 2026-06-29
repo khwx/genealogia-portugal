@@ -1,0 +1,27 @@
+{
+  "file_id": "25848619",
+  "source_file": "25848619.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.88846492767334,
+  "processed_at": "2026-05-02T15:24:43.194262",
+  "names_found": [
+    "Capella de Nossa",
+    "Maria de Celorico",
+    "datados de 1832",
+    "mes de Setembro",
+    "registos de óbitos",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1832"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

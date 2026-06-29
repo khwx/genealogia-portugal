@@ -1,0 +1,17 @@
+{
+  "file_id": "25849145",
+  "source_file": "25849145.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.172452211380005,
+  "processed_at": "2026-05-02T16:06:40.404455",
+  "names_found": [
+    "mes\nde Setembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

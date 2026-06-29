@@ -1,0 +1,19 @@
+{
+  "file_id": "25849288",
+  "source_file": "25849288.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 13.150558948516846,
+  "processed_at": "2026-05-02T16:46:30.147053",
+  "names_found": [
+    "Cópia de Testamento",
+    "Estando de\npé",
+    "nome de Deos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

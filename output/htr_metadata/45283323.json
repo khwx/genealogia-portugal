@@ -1,0 +1,19 @@
+{
+  "file_id": "45283323",
+  "source_file": "45283323.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 272,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 12.735561847686768,
+  "processed_at": "2026-05-02T21:36:08.582209",
+  "names_found": [
+    "lugar de Respinheiro",
+    "continuação de assento",
+    "legitima de\nJoze"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

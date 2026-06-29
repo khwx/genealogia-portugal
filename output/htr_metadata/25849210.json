@@ -1,0 +1,25 @@
+{
+  "file_id": "25849210",
+  "source_file": "25849210.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 278,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 12.209691286087036,
+  "processed_at": "2026-05-02T16:24:50.420762",
+  "names_found": [
+    "Maria de Monte",
+    "lugar de Quintas",
+    "Maria de Almeida",
+    "Igreja de Santa",
+    "la de Celorico",
+    "viuva de Antonio",
+    "nome de Santa"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

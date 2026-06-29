@@ -1,0 +1,26 @@
+{
+  "file_id": "25856142",
+  "source_file": "25856142.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 308,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.352103233337402,
+  "processed_at": "2026-05-02T18:37:19.220026",
+  "names_found": [
+    "viúva de Manoel",
+    "datados de 1781",
+    "registos de óbito",
+    "Maria de Jesus",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1781"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

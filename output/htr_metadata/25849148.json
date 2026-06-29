@@ -1,0 +1,19 @@
+{
+  "file_id": "25849148",
+  "source_file": "25849148.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 245,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.023204803466797,
+  "processed_at": "2026-05-02T16:07:25.723981",
+  "names_found": [
+    "filha de Joze",
+    "mes\nde Julho",
+    "menor de tres"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "25856593",
+  "source_file": "25856593.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 263,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.299793481826782,
+  "processed_at": "2026-05-02T19:26:45.440404",
+  "names_found": [
+    "Lugar de San",
+    "Agosto de mil",
+    "legitimo de Joze"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

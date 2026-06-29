@@ -1,0 +1,20 @@
+{
+  "file_id": "45283337",
+  "source_file": "45283337.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 198,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 26.558048009872437,
+  "processed_at": "2026-05-02T21:42:17.054763",
+  "names_found": [
+    "no de mil",
+    "mez de Junho"
+  ],
+  "dates_found": [
+    "1860"
+  ],
+  "places_found": []
+}

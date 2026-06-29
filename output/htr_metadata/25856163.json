@@ -1,0 +1,19 @@
+{
+  "file_id": "25856163",
+  "source_file": "25856163.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 214,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.34579849243164,
+  "processed_at": "2026-05-02T18:43:00.348586",
+  "names_found": [
+    "Maria de Jesus",
+    "filho de Manoel",
+    "em de hontem"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

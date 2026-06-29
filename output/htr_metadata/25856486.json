@@ -1,0 +1,20 @@
+{
+  "file_id": "25856486",
+  "source_file": "25856486.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 218,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.7183678150177,
+  "processed_at": "2026-05-02T18:59:32.216481",
+  "names_found": [
+    "Agosto de mil",
+    "ta de 16"
+  ],
+  "dates_found": [
+    "1815"
+  ],
+  "places_found": []
+}

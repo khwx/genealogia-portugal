@@ -1,0 +1,21 @@
+{
+  "file_id": "25856102",
+  "source_file": "25856102.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 215,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.099747657775879,
+  "processed_at": "2026-05-02T18:26:16.577499",
+  "names_found": [
+    "Junho de\n1765"
+  ],
+  "dates_found": [
+    "1765"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

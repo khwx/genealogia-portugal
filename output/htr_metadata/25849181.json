@@ -1,0 +1,21 @@
+{
+  "file_id": "25849181",
+  "source_file": "25849181.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 9.64502239227295,
+  "processed_at": "2026-05-02T16:16:55.122459",
+  "names_found": [
+    "Bernarda de Luiza",
+    "viuva de Domingos",
+    "Lopes de Santa",
+    "viuva de prezente",
+    "mes de Janeyro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

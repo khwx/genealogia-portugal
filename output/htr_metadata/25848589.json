@@ -1,0 +1,18 @@
+{
+  "file_id": "25848589",
+  "source_file": "25848589.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 282,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.428247213363647,
+  "processed_at": "2026-05-02T15:16:34.037353",
+  "names_found": [
+    "Authoridades de Sua",
+    "dentro de hum"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

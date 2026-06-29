@@ -1,0 +1,19 @@
+{
+  "file_id": "25849277",
+  "source_file": "25849277.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 242,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.988288640975952,
+  "processed_at": "2026-05-02T16:43:23.585791",
+  "names_found": [
+    "coutou de testam",
+    "morte\nde q",
+    "tres de Julho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

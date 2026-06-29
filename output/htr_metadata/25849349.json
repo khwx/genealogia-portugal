@@ -1,0 +1,19 @@
+{
+  "file_id": "25849349",
+  "source_file": "25849349.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.046218156814575,
+  "processed_at": "2026-05-02T17:03:16.125859",
+  "names_found": [
+    "reino de qui",
+    "morte de seu",
+    "bens de que"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

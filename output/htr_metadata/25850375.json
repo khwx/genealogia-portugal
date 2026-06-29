@@ -1,0 +1,20 @@
+{
+  "file_id": "25850375",
+  "source_file": "25850375.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 262,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.392921209335327,
+  "processed_at": "2026-05-02T17:20:52.623048",
+  "names_found": [
+    "filho de Jozé",
+    "mes de Setembro",
+    "villa de que",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

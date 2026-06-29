@@ -1,0 +1,18 @@
+{
+  "file_id": "25856553",
+  "source_file": "25856553.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 260,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.612547397613525,
+  "processed_at": "2026-05-02T19:16:39.088697",
+  "names_found": [
+    "reça de seus",
+    "interceção de seu"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

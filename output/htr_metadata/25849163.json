@@ -1,0 +1,23 @@
+{
+  "file_id": "25849163",
+  "source_file": "25849163.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 261,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 13.532943964004517,
+  "processed_at": "2026-05-02T16:11:49.585695",
+  "names_found": [
+    "Pedro de Araújo",
+    "natural de Celorico",
+    "codicilo de Manoel",
+    "transcrição de um"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "natural de Celorico"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25848650",
+  "source_file": "25848650.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 270,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.444067478179932,
+  "processed_at": "2026-05-02T15:33:26.014750",
+  "names_found": [
+    "bairro de fora"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

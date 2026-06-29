@@ -1,0 +1,19 @@
+{
+  "file_id": "25848600",
+  "source_file": "25848600.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 267,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.743619680404663,
+  "processed_at": "2026-05-02T15:19:36.813366",
+  "names_found": [
+    "dezaseis de Janeiro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

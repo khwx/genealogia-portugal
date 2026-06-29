@@ -1,0 +1,15 @@
+{
+  "file_id": "45283210",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 15 Alzira dos Santos / Aos vinte e tres dias do mez d'Abril do anno de mil oitocentos e oitenta, ás quatro horas da tarde, na rua do Castello desta freguezia de Santa Maria da Villa de Celorico da Beira, concelho da mesma",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "Villa de Celorico",
+      "freguezia de Santa"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "file_id": "45283178",
+  "source_file": "45283178.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 986,
+  "tokens": 274,
+  "duration_ms": 0,
+  "wall_time_s": 10.042240142822266,
+  "processed_at": "2026-05-25T02:30:51.888419",
+  "names_found": [
+    "viuvo de Ignacia",
+    "idade de cincoenta e tantos",
+    "freguezia de Santa",
+    "Villa de Cellorico",
+    "legitimo de Antonio",
+    "Mendes de Almeida",
+    "anno de mil",
+    "mez de Janeiro"
+  ],
+  "dates_found": [
+    "1853"
+  ],
+  "places_found": []
+}

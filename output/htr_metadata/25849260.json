@@ -1,0 +1,17 @@
+{
+  "file_id": "25849260",
+  "source_file": "25849260.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 231,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.464235067367554,
+  "processed_at": "2026-05-02T16:38:34.475475",
+  "names_found": [
+    "Mes de Agosto"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

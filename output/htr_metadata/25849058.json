@@ -1,0 +1,25 @@
+{
+  "file_id": "25849058",
+  "source_file": "25849058.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.768852710723877,
+  "processed_at": "2026-05-02T15:42:20.810638",
+  "names_found": [
+    "nome de Deos",
+    "registo de óbito",
+    "vila de Celorico",
+    "datado de 1789",
+    "Luiz de Souza e Castro"
+  ],
+  "dates_found": [
+    "1789"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

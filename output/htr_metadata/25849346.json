@@ -1,0 +1,28 @@
+{
+  "file_id": "25849346",
+  "source_file": "25849346.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 275,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.827733039855957,
+  "processed_at": "2026-05-02T17:02:25.653528",
+  "names_found": [
+    "Caetano de Britto",
+    "final de um",
+    "páginas de um",
+    "livro de registos",
+    "testamento de 1803",
+    "assento de óbito",
+    "paroquiais de Celorico"
+  ],
+  "dates_found": [
+    "1810",
+    "1803"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

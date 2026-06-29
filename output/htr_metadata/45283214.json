@@ -1,0 +1,19 @@
+{
+  "file_id": "45283214",
+  "source_file": "45283214.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 265,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 78.16472816467285,
+  "processed_at": "2026-05-27T02:40:19.661828",
+  "names_found": [
+    "lugar de Espinheiro",
+    "legitimo de Manuel",
+    "dias de exis"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

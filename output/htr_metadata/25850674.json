@@ -1,0 +1,23 @@
+{
+  "file_id": "25850674",
+  "source_file": "25850674.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 401,
+  "tokens": 168,
+  "duration_ms": 0,
+  "wall_time_s": 8.747491359710693,
+  "processed_at": "2026-05-02T17:34:54.427797",
+  "names_found": [
+    "Pedro de\nCelorico",
+    "Pedro de Celorico"
+  ],
+  "dates_found": [
+    "1746",
+    "1772"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

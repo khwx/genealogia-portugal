@@ -1,0 +1,20 @@
+{
+  "file_id": "45283185",
+  "source_file": "45283185.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.721694231033325,
+  "processed_at": "2026-05-25T02:38:51.893782",
+  "names_found": [
+    "freguezia de Santa",
+    "abadia de Cello",
+    "mez de outubro",
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

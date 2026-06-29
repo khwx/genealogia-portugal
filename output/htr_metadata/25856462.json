@@ -1,0 +1,42 @@
+{
+  "file_id": "25856462",
+  "source_file": "25856462.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 2071,
+  "tokens": 671,
+  "duration_ms": 0,
+  "wall_time_s": 10.245175123214722,
+  "processed_at": "2026-05-02T18:53:30.370889",
+  "names_found": [
+    "mez de Janeiro",
+    "Janeiro de 1813",
+    "D. Gertrudes\nde Moura",
+    "Norberta\nde Jesus",
+    "Gertrudes\nde Moura",
+    "faleceu de maligna",
+    "freguezia de S",
+    "D. Gertrudes de Moura",
+    "freguezia de Santa",
+    "idade de sessenta",
+    "enaidade de cincoenta e sete",
+    "enaidade de quarenta",
+    "freguezia de Sua",
+    "mez de Fevereiro",
+    "Fevereiro de 1813",
+    "Igreja de S",
+    "filha de Anna",
+    "Gertrudes de Moura",
+    "Viuva de Antonio",
+    "enaidade de dezoito"
+  ],
+  "dates_found": [
+    "1813",
+    "13 de Fevereiro de 1813",
+    "28 de Janeiro de 1813"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

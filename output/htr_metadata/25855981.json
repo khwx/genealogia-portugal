@@ -1,0 +1,18 @@
+{
+  "file_id": "25855981",
+  "source_file": "25855981.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 296,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.19198989868164,
+  "processed_at": "2026-05-02T18:08:13.470549",
+  "names_found": [
+    "sobrevier de e",
+    "depois\nde pagos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

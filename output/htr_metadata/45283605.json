@@ -1,0 +1,23 @@
+{
+  "file_id": "45283605",
+  "source_file": "45283605.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.162834644317627,
+  "processed_at": "2026-05-26T08:04:36.399040",
+  "names_found": [
+    "freguezia de Santa",
+    "rua de baixo",
+    "Villa de Celorico",
+    "anno de mil",
+    "mez de Maio"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "file_id": "25849254",
+  "raw_text": "\n- Wait, this is getting ridiculous. Let me look at the text again. It's not a list of 60 generations.\n- Let's re-read carefully.\n- \"Em os dezaseis dias do mes de Dezembro de mil sette centos e trinta e nove annos nesta villa de Celorico faleceo da vida",
+  "structured": {
+    "names": [
+      "mes de Dezembro",
+      "villa de Celorico"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

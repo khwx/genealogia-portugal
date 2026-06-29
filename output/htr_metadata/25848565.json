@@ -1,0 +1,19 @@
+{
+  "file_id": "25848565",
+  "source_file": "25848565.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 227,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.965176820755005,
+  "processed_at": "2026-05-02T15:09:43.504787",
+  "names_found": [
+    "bre de mil",
+    "doze de 8",
+    "chorincado\nde idade"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

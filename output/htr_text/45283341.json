@@ -1,0 +1,13 @@
+{
+  "file_id": "45283341",
+  "raw_text": "```json\n{\n  \"transcription\": \"No. 60~\\nDia 18~\\nMez Agosto~\\nAnno 1860~\\nAos dezoito dias do mez d'Agosto do anno de mil\\noitocentos e sessenta, ás oito horas da noite, no lugar\\nda Roda dos Expostos",
+  "structured": {
+    "names": [
+      "anno de mil"
+    ],
+    "dates": [
+      "1860"
+    ],
+    "places": []
+  }
+}

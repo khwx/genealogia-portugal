@@ -1,0 +1,17 @@
+{
+  "file_id": "25847877",
+  "source_file": "25847877.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 278,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.165785551071167,
+  "processed_at": "2026-05-02T12:56:09.100561",
+  "names_found": [
+    "morte de seu"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

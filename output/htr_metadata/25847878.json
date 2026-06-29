@@ -1,0 +1,24 @@
+{
+  "file_id": "25847878",
+  "source_file": "25847878.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 288,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 9.428650140762329,
+  "processed_at": "2026-05-02T12:56:20.531353",
+  "names_found": [
+    "Villa de Celorico",
+    "Sete de Ferreiro",
+    "freguesia de Santa",
+    "Era de mil",
+    "mez\nDe Julho"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de Santa",
+    "Celorico"
+  ]
+}

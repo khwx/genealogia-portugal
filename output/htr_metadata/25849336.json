@@ -1,0 +1,21 @@
+{
+  "file_id": "25849336",
+  "source_file": "25849336.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 276,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.932681560516357,
+  "processed_at": "2026-05-02T16:59:46.057648",
+  "names_found": [
+    "Igreja de Santa",
+    "mes de Novembro",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "45283137",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 1. Aos dez dias do mez de Janeiro do anno de mil oitocentos setenta e seis, ás tres horas da madrugada, na rua de Santo Innocente d'esta freguezia de Santa Maria, Villa de Celorico da Beira, bispado da Guarda, falleceu um",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "mez de Janeiro",
+      "freguezia de Santa",
+      "rua de Santo",
+      "Villa de Celorico"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

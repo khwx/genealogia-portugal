@@ -1,0 +1,18 @@
+{
+  "file_id": "25856073",
+  "source_file": "25856073.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.976206302642822,
+  "processed_at": "2026-05-02T18:18:27.925671",
+  "names_found": [
+    "dera de esmola",
+    "Tome de Mattos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

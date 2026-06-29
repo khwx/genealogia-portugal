@@ -7,17 +7,22 @@
 ### Fontes de dados
 - **Tombo.pt / Digitarq** — Imagens digitalizadas de registos paroquiais
 - **FamilySearch** — Índices já transcritos
-- **Transkribus** — Transcrição HTR de manuscritos antigos
+- **Transkribus / HTR** — Transcrição de manuscritos antigos (CHURRO-3B, TrOCR, Gemini)
 - **Contribuições da comunidade**
 
 ### Tipos de registos
-- **Nascimentos / Batismos**
-- **Casamentos**
-- **Óbitos**
+- **Nascimentos / Batismos** (236 livros em Celorico da Beira)
+- **Casamentos** (1030 livros em Celorico da Beira)
+- **Óbitos** (1077 livros em Celorico da Beira)
 
 ### Período
 - Registos paroquiais: **1654 — 1911**
 - Registo civil: **1911 — presente**
+
+### Cobertura atual
+- **Celorico da Beira**: 2343 livros inventariados (nascimentos, casamentos, óbitos)
+- Imagens descarregadas: 4185 ficheiros (3.8GB) para óbitos
+- OCR processado: óbitos (Gemini API / Tesseract)
 
 ---
 
@@ -61,32 +66,58 @@ cp .env.example .env
 
 ## Uso
 
-### 1. Extrair inventário de um concelho
+### 1. Extrair inventário completo (nascimentos, casamentos, óbitos)
 ```bash
-python extract_inventory.py
+python extract_all_records.py --concelho clb    # Celorico da Beira
+python extract_all_records.py --concelho cbr    # Coimbra
+python extract_all_records.py --concelho ctb    # Castelo Branco
+# Filtrar por tipo: --tipo BIRT (nascimentos) | MARR (casamentos) | DEAT (óbitos)
 ```
 
-### 2. Iniciar interface web
+### 2. Inicializar base de dados
+```bash
+python database.py
+# Cria output/genealogia.db com tabelas para todos os tipos de registos
+```
+
+### 3. Descarregar imagens dos livros
+```bash
+python pipeline_obitos.py --url <url_digitarq>     # Processa uma imagem específica
+python get_images.py                                # Descarrega imagens de índices
+python pipeline_obitos.py                           # Pipeline completo para óbitos
+```
+
+### 4. Processar OCR e extrair entidades
+```bash
+python htr_cloud.py          # Usa Gemini API para OCR
+python extract_obitos_local.py  # Extrai nomes e relações familiares
+```
+
+### 5. Iniciar interface web
 ```bash
 python web_app.py
 ```
 Aceda a: http://localhost:5000
 
-### 3. Pesquisar registos
+### 6. Pesquisar registos
 ```bash
 python -c "
-from database import search_by_name
+from database import search_by_name, get_all_registos
+# Pesquisar por nome
 results = search_by_name('Maria Silva')
-for r in results:
-    print(f'{r[\"nome\"]} - {r[\"data_obito\"]} - {r[\"freguesia\"]}')
+# Filtrar por tipo: 'BIRT', 'MARR', 'DEAT'
+obitos = get_all_registos(tipo='DEAT')
+nascimentos = get_all_registos(tipo='BIRT')
+casamentos = get_all_registos(tipo='MARR')
 "
 ```
 
-### 4. Sincronizar com FamilySearch
+### 7. Exportar árvore genealógica
 ```bash
+python gedcom_export.py   # Exporta para formato GEDCOM
 python -c "
-from database import sync_with_familysearch
-sync_with_familysearch()
+from database import get_all_registos
+# Criar ligações familiares (pai, mãe, cônjuge)
 "
 ```
 

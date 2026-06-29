@@ -1,0 +1,18 @@
+{
+  "file_id": "45283215",
+  "raw_text": "{\n  \"transcription\": \"Tem este Livro quatorze meias folhas, que vaõ numeradas e rubricadas com o meu apelido, Mendes, de que uzo. Celorico da Beira 1 de Janeiro de 1881\\n\\nO Juiz de Direito interino\\nJoze Mendes de Almeida\",\n  \"deceased\": []\n}",
+  "structured": {
+    "names": [
+      "Juiz de Direito",
+      "Mendes de Almeida",
+      "Janeiro de 1881"
+    ],
+    "dates": [
+      "1 de Janeiro de 1881",
+      "1881"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "file_id": "25856093",
+  "source_file": "25856093.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 301,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.240310907363892,
+  "processed_at": "2026-05-02T18:23:46.619400",
+  "names_found": [
+    "passagens de difícil",
+    "livro de óbitos",
+    "freguesia de Santa"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

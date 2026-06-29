@@ -1,0 +1,22 @@
+{
+  "file_id": "45283265",
+  "source_file": "45283265.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 230,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 14.373234510421753,
+  "processed_at": "2026-05-25T08:08:49.456296",
+  "names_found": [
+    "Livro de Óbitos",
+    "mez de Janeiro"
+  ],
+  "dates_found": [
+    "1857"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

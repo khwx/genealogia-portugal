@@ -1,0 +1,20 @@
+{
+  "file_id": "25849095",
+  "source_file": "25849095.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 249,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.360172271728516,
+  "processed_at": "2026-05-02T15:52:40.433923",
+  "names_found": [
+    "mes de Jan",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

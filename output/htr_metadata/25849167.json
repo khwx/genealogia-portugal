@@ -1,0 +1,27 @@
+{
+  "file_id": "25849167",
+  "source_file": "25849167.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 230,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.410351276397705,
+  "processed_at": "2026-05-02T16:12:55.511539",
+  "names_found": [
+    "Agosto de 1776",
+    "Maria de Celorico",
+    "datados de 1776",
+    "registos de óbito",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1776",
+    "21 de Agosto de 1776"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

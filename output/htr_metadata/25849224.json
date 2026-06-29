@@ -1,0 +1,27 @@
+{
+  "file_id": "25849224",
+  "source_file": "25849224.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.742555618286133,
+  "processed_at": "2026-05-02T16:28:43.106388",
+  "names_found": [
+    "Rodrigues de Brito",
+    "testamento de Manoel",
+    "datado de 1789",
+    "mes de Junho",
+    "registo de óbito e o",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1789"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

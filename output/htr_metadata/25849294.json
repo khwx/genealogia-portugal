@@ -1,0 +1,20 @@
+{
+  "file_id": "25849294",
+  "source_file": "25849294.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 335,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.640791893005371,
+  "processed_at": "2026-05-02T16:48:13.851052",
+  "names_found": [
+    "mes de Outubro",
+    "solteira de idade"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

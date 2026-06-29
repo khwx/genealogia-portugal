@@ -1,0 +1,24 @@
+{
+  "file_id": "45281968",
+  "source_file": "45281968.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 388,
+  "tokens": 133,
+  "duration_ms": 0,
+  "wall_time_s": 7.924341678619385,
+  "processed_at": "2026-05-02T19:31:03.434649",
+  "names_found": [
+    "Mendes de Almeida",
+    "Prior de Santa",
+    "Janeiro de 1877"
+  ],
+  "dates_found": [
+    "1877",
+    "1 de Janeiro de 1877"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "file_id": "45283342",
+  "raw_text": "```json\n{\n  \"transcription\": \"No. 64. Dia 7. Mez Setembro. Anno 1860. Aos sete dias do mez de Setembro do anno de mil oitocentos e sessenta, pelas cinco da tarde, no lugar do Espinheiro desta freguezia de Santa Maria, e Villa de Celorico",
+  "structured": {
+    "names": [
+      "mez de Setembro",
+      "Villa de Celorico",
+      "freguezia de Santa",
+      "anno de mil"
+    ],
+    "dates": [
+      "1860"
+    ],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

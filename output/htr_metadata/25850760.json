@@ -1,0 +1,21 @@
+{
+  "file_id": "25850760",
+  "source_file": "25850760.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 273,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.391418218612671,
+  "processed_at": "2026-05-02T17:58:45.682030",
+  "names_found": [
+    "missa de prezente",
+    "mulher de Manoel",
+    "anno de mil e sette",
+    "Catharina de Almeyda",
+    "mes de Janeyro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

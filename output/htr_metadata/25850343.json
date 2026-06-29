@@ -1,0 +1,18 @@
+{
+  "file_id": "25850343",
+  "source_file": "25850343.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 265,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.562322854995728,
+  "processed_at": "2026-05-02T17:12:03.788242",
+  "names_found": [
+    "anno de mil",
+    "mes de Março"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

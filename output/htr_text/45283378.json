@@ -1,0 +1,17 @@
+{
+  "file_id": "45283378",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 7 - Aos dois dias do mez de Março do anno de mil oitocentos oitenta e seis, ás nove horas da manhãa, n'uma casa sita no lugar de Respinheiro d'esta freguezia de Santa Maria, da Villa de Celorico da Be",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "lugar de Respinheiro",
+      "mez de Março",
+      "freguezia de Santa",
+      "Villa de Celorico"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

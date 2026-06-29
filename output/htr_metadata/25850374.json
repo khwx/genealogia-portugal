@@ -1,0 +1,19 @@
+{
+  "file_id": "25850374",
+  "source_file": "25850374.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 174,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.051365852355957,
+  "processed_at": "2026-05-02T17:20:35.227818",
+  "names_found": [
+    "ro de mil",
+    "era de v",
+    "mes de Feverei"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

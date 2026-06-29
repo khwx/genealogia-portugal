@@ -1,0 +1,22 @@
+{
+  "file_id": "25856129",
+  "source_file": "25856129.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 255,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.298368453979492,
+  "processed_at": "2026-05-02T18:33:47.063982",
+  "names_found": [
+    "freguezia de Santa",
+    "cinco de Abril",
+    "villa de Celorico",
+    "villa de que"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "file_id": "25850387",
+  "source_file": "25850387.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.210485935211182,
+  "processed_at": "2026-05-02T17:24:13.725817",
+  "names_found": [
+    "registo de óbito",
+    "vila de Celorico",
+    "datado de 1734",
+    "mes de Mayo"
+  ],
+  "dates_found": [
+    "1734"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

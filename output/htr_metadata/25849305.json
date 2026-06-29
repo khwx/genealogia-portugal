@@ -1,0 +1,18 @@
+{
+  "file_id": "25849305",
+  "source_file": "25849305.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 262,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.785503149032593,
+  "processed_at": "2026-05-02T16:51:19.440278",
+  "names_found": [
+    "freguezia de Santa",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

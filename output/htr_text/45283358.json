@@ -1,0 +1,16 @@
+{
+  "file_id": "45283358",
+  "raw_text": "```json\n{\n  \"transcription\": \"No. 8 Mariana d'Almeida Aos vinte e um dias do mez de Julho do anno de mil oito centos setenta e tres, ás onze horas do dia, n'uma caza sita na rua do Castello desta freguezia de Santa Maria, da Villa de Celorico da Beira",
+  "structured": {
+    "names": [
+      "mez de Julho",
+      "Villa de Celorico",
+      "freguezia de Santa",
+      "anno de mil"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

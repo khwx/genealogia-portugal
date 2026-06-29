@@ -1,0 +1,26 @@
+{
+  "file_id": "25849252",
+  "source_file": "25849252.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 257,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.812393426895142,
+  "processed_at": "2026-05-02T16:36:23.442129",
+  "names_found": [
+    "assentos de óbito",
+    "transcrição de um",
+    "quarta de aze",
+    "alqueires de centeio e huma",
+    "freguesia de Fornos",
+    "hum de nos",
+    "concelho de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de Fornos",
+    "Celorico da Beira"
+  ]
+}

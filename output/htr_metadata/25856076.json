@@ -1,0 +1,27 @@
+{
+  "file_id": "25856076",
+  "source_file": "25856076.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 236,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.900314569473267,
+  "processed_at": "2026-05-02T18:19:13.739524",
+  "names_found": [
+    "datados de 1753 e 1754",
+    "Maria de Al",
+    "freguesia de São",
+    "registos de óbitos",
+    "mes de Março"
+  ],
+  "dates_found": [
+    "1753",
+    "1754"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

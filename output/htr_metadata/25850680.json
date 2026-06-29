@@ -1,0 +1,19 @@
+{
+  "file_id": "25850680",
+  "source_file": "25850680.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 289,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.734954118728638,
+  "processed_at": "2026-05-02T17:36:35.775010",
+  "names_found": [
+    "villa de Cellorico",
+    "villa de Trancoso",
+    "rigo de Ordens"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

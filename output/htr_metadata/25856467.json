@@ -1,0 +1,18 @@
+{
+  "file_id": "25856467",
+  "source_file": "25856467.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.785599946975708,
+  "processed_at": "2026-05-02T18:54:46.819295",
+  "names_found": [
+    "se de\nminha",
+    "agrado de D"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

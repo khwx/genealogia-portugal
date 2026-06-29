@@ -1,0 +1,23 @@
+{
+  "file_id": "25848604",
+  "source_file": "25848604.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 260,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.085405588150024,
+  "processed_at": "2026-05-02T15:20:41.071286",
+  "names_found": [
+    "Collegiada de Santa",
+    "Villa de Celorico",
+    "filha de\nLinda",
+    "mes de Novembro",
+    "Paes de Andrade"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "25850383",
+  "source_file": "25850383.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.154648303985596,
+  "processed_at": "2026-05-02T17:23:02.772463",
+  "names_found": [
+    "filha de Bonifacio",
+    "dez de Setembro",
+    "Rodrigues de Borja"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,32 @@
+{
+  "file_id": "45282994",
+  "source_file": "45282994.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 749,
+  "tokens": 252,
+  "duration_ms": 0,
+  "wall_time_s": 7.0118408203125,
+  "processed_at": "2026-05-02T19:34:30.170328",
+  "names_found": [
+    "Prior de Santa",
+    "freguezia de Santa",
+    "Villa de Celorico",
+    "Janeiro de\n1888",
+    "assentos de Obito",
+    "Setembro de 1862",
+    "Termo de abertura",
+    "Ha de servir",
+    "Portaria de\n28"
+  ],
+  "dates_found": [
+    "1862",
+    "1 de Janeiro de\n1888",
+    "1888",
+    "28 de Setembro de 1862"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

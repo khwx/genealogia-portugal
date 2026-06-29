@@ -1,0 +1,20 @@
+{
+  "file_id": "25850686",
+  "source_file": "25850686.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 272,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.25435185432434,
+  "processed_at": "2026-05-02T17:38:13.217273",
+  "names_found": [
+    "livros de óbitos",
+    "partilha de bens",
+    "disposição de últimas",
+    "missas de ten"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

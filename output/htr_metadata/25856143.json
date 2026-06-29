@@ -1,0 +1,17 @@
+{
+  "file_id": "25856143",
+  "source_file": "25856143.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 159,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 12.083617210388184,
+  "processed_at": "2026-05-02T18:37:36.305113",
+  "names_found": [
+    "amor de Deos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

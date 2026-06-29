@@ -1,0 +1,20 @@
+{
+  "file_id": "25848613",
+  "source_file": "25848613.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 270,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.629719972610474,
+  "processed_at": "2026-05-02T15:23:06.766782",
+  "names_found": [
+    "freguezia de Santa",
+    "Villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

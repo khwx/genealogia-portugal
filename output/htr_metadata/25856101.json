@@ -1,0 +1,23 @@
+{
+  "file_id": "25856101",
+  "source_file": "25856101.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 273,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.32691216468811,
+  "processed_at": "2026-05-02T18:25:59.475505",
+  "names_found": [
+    "mes\nde Agosto",
+    "mulher de Manoel",
+    "Igreja de Sam",
+    "Maria de Jesus",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

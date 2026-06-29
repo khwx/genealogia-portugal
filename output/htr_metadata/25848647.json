@@ -1,0 +1,19 @@
+{
+  "file_id": "25848647",
+  "source_file": "25848647.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 243,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.346346855163574,
+  "processed_at": "2026-05-02T15:32:36.961982",
+  "names_found": [
+    "quinze de Julho",
+    "anno de mil",
+    "idade de quarenta"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

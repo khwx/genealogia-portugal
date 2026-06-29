@@ -1,0 +1,20 @@
+{
+  "file_id": "25849092",
+  "source_file": "25849092.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 209,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.037635087966919,
+  "processed_at": "2026-05-02T15:51:49.553505",
+  "names_found": [
+    "Junho de 1765",
+    "mes\nde Julho"
+  ],
+  "dates_found": [
+    "1765"
+  ],
+  "places_found": []
+}

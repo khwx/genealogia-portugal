@@ -1,0 +1,17 @@
+{
+  "file_id": "25850324",
+  "source_file": "25850324.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 295,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 12.246764421463013,
+  "processed_at": "2026-05-02T17:06:47.543824",
+  "names_found": [
+    "poder de Maria"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

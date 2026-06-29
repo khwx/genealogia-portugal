@@ -1,0 +1,26 @@
+{
+  "file_id": "25850715",
+  "source_file": "25850715.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 238,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.027353286743164,
+  "processed_at": "2026-05-02T17:46:24.338257",
+  "names_found": [
+    "datados de 1756",
+    "freguesia de São",
+    "missa de corpo",
+    "mes de Junho",
+    "registos de óbitos"
+  ],
+  "dates_found": [
+    "1756"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

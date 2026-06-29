@@ -1,0 +1,19 @@
+{
+  "file_id": "25849351",
+  "source_file": "25849351.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.633810997009277,
+  "processed_at": "2026-05-02T17:03:49.967685",
+  "names_found": [
+    "mite de Antonio",
+    "composto de huma",
+    "servir de commua"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

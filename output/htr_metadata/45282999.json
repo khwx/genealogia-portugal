@@ -1,0 +1,27 @@
+{
+  "file_id": "45282999",
+  "source_file": "45282999.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 250,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.09231686592102,
+  "processed_at": "2026-05-02T19:35:45.962874",
+  "names_found": [
+    "mez de Agosto",
+    "assentos de óbito",
+    "anno de mil",
+    "datados de agosto",
+    "freguesia de Santa",
+    "concelho de Celorico"
+  ],
+  "dates_found": [
+    "1888"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

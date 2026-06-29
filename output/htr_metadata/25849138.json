@@ -1,0 +1,24 @@
+{
+  "file_id": "25849138",
+  "source_file": "25849138.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 256,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 13.466481685638428,
+  "processed_at": "2026-05-02T16:04:40.084789",
+  "names_found": [
+    "nome de Deos",
+    "vila\nde Celorico",
+    "freguesia de Sam",
+    "Testamento de Joze",
+    "legitimo de seu"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de Sam",
+    "Celorico"
+  ]
+}

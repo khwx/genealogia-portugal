@@ -1,0 +1,21 @@
+{
+  "file_id": "25850692",
+  "source_file": "25850692.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 264,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.908950567245483,
+  "processed_at": "2026-05-02T17:39:53.009499",
+  "names_found": [
+    "sete de Janeiro",
+    "Villa de Santa",
+    "Lugar de\nCelorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

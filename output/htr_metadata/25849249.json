@@ -1,0 +1,18 @@
+{
+  "file_id": "25849249",
+  "source_file": "25849249.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 315,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 8.912354230880737,
+  "processed_at": "2026-05-02T16:35:35.048868",
+  "names_found": [
+    "mes de Janeiro",
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25856597",
+  "source_file": "25856597.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.615834712982178,
+  "processed_at": "2026-05-02T19:27:50.990066",
+  "names_found": [
+    "freguezia de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

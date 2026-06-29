@@ -1,0 +1,21 @@
+{
+  "file_id": "25850406",
+  "raw_text": "Aqui está a transcrição e a extração de dados dos registos de óbito presentes na imagem. O documento refere-se à freguesia de São Pedro, na vila de Celorico da Beira, no ano de 1799.\n\n---TRANSCRIPTION---\n\n[Página da Esquerda]\n\nEvangelista\nCapotto.\nAos",
+  "structured": {
+    "names": [
+      "extração de dados",
+      "ano de 1799",
+      "vila de Celorico",
+      "freguesia de São",
+      "registos de óbito"
+    ],
+    "dates": [
+      "1799",
+      "ano de 1799"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de São"
+    ]
+  }
+}

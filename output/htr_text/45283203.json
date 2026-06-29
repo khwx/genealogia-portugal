@@ -1,0 +1,17 @@
+{
+  "file_id": "45283203",
+  "raw_text": "{\n  \"transcription\": \"Tem este livro sincoenta meias folhas, que vaõ nume-\\nradas e rubricadas com o meu apelido, Mendes, de que\\nuzo. Celorico da Beira 1 de Janeiro de 1884.\\n\\nO Prior de Santa Maria\\nJoze Mendes d'Almeida\",\n  \"deceased\": []\n}",
+  "structured": {
+    "names": [
+      "Prior de Santa",
+      "Janeiro de 1884"
+    ],
+    "dates": [
+      "1884",
+      "1 de Janeiro de 1884"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

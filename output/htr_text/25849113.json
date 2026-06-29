@@ -1,0 +1,21 @@
+{
+  "file_id": "25849113",
+  "raw_text": "Este documento contém quatro registos de óbito da freguesia de Santa Maria de Celorico da Beira, datados de 1779. Abaixo encontra-se a transcrição e a extração de dados estruturados.\n\n---TRANSCRIPTION---\n\n[Página da esquerda - Superior]\nManoel\ninocente\nfilho de Anto",
+  "structured": {
+    "names": [
+      "extração de dados",
+      "Maria de Celorico",
+      "registos de óbito",
+      "filho de Anto",
+      "datados de 1779",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1779"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "file_id": "45284181",
+  "raw_text": "```json\n{\n  \"transcription\": \"que affigno. Apreço de [ilegível] Pedro, aos vinte e dous\\nde Outubro de 1829.\\nO Parrocho Encomendado Manuel da Fonseca.\\n\\nAos doze dias do mez de Fevereiro de mil oito centos\\ne trinta e dous",
+  "structured": {
+    "names": [
+      "mez de Fevereiro",
+      "Outubro de 1829"
+    ],
+    "dates": [
+      "1829"
+    ],
+    "places": []
+  }
+}

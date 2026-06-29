@@ -1,0 +1,26 @@
+{
+  "file_id": "25848655",
+  "source_file": "25848655.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.044396877288818,
+  "processed_at": "2026-05-02T15:34:44.329866",
+  "names_found": [
+    "mulher de Francisco",
+    "registos de óbitos",
+    "freguesia de Santa",
+    "datados de 1849 e 1850"
+  ],
+  "dates_found": [
+    "1849",
+    "1850"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

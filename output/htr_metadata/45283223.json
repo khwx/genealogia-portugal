@@ -1,0 +1,22 @@
+{
+  "file_id": "45283223",
+  "source_file": "45283223.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 285,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.083092451095581,
+  "processed_at": "2026-05-27T02:50:43.532550",
+  "names_found": [
+    "menorzinho de sexo",
+    "freguesia de Santa",
+    "Villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

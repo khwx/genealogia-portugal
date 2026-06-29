@@ -1,0 +1,27 @@
+{
+  "file_id": "25856134",
+  "source_file": "25856134.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 13.159708738327026,
+  "processed_at": "2026-05-02T18:35:10.439866",
+  "names_found": [
+    "Manoel de Fig",
+    "datado de 3",
+    "Igra de S",
+    "Manoel de Figueiredo",
+    "vila de Celorico",
+    "setembro de 1776"
+  ],
+  "dates_found": [
+    "1776",
+    "3 de setembro de 1776"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

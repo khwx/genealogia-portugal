@@ -1,0 +1,19 @@
+{
+  "file_id": "25849111",
+  "source_file": "25849111.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 276,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.76637578010559,
+  "processed_at": "2026-05-02T15:57:09.340148",
+  "names_found": [
+    "Lopes de Carvalho",
+    "que de sua",
+    "doença de que"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

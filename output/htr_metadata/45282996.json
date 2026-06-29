@@ -1,0 +1,22 @@
+{
+  "file_id": "45282996",
+  "source_file": "45282996.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.753330707550049,
+  "processed_at": "2026-05-02T19:35:02.592423",
+  "names_found": [
+    "anno de mil",
+    "mez de Janeiro",
+    "freguezia de Santa",
+    "Villa de\nCelorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

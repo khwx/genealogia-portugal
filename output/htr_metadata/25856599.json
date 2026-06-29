@@ -1,0 +1,19 @@
+{
+  "file_id": "25856599",
+  "source_file": "25856599.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.505903959274292,
+  "processed_at": "2026-05-02T19:28:21.352455",
+  "names_found": [
+    "assento de óbito",
+    "livro de registos",
+    "termo de encerramento"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

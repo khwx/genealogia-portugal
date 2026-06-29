@@ -1,0 +1,18 @@
+{
+  "file_id": "25850672",
+  "source_file": "25850672.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 13.12605357170105,
+  "processed_at": "2026-05-02T17:34:25.799229",
+  "names_found": [
+    "Desensam de esmalla",
+    "trabalho de virem"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

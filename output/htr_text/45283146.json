@@ -1,0 +1,16 @@
+{
+  "file_id": "45283146",
+  "raw_text": "```json\n{\n  \"transcription\": \"que da Meza, Concelho da mesma Villa, Freg.a da Guarda,\\nfalleceu, acabada de o Sacramento da Extremaunção por uma\\nmolestia nervosa, aos vinte e oito dias de Junho, por nome\\nMaria Carneiro, proprietaria, que tinha trinta e cinco annos\\nde idade, natural e moradora nesta freguezia,\\nfilha legitima de Francisco da Silva Carneiro, e Maria\\nCarneiro, já defuntos, tambem desta Villa, a qual deixou\\ndous filhos, para seu testamento, e foi sepultada no cemiterio publico\\ndesta dita Villa. Para constar lavrei em duplicado este\\nassento que assigno. Era ut supra.\\nJ. Roiz. Lage Mendes, Sacerdote.\\n\\nN.ta. Lix.a 27 de 8.bro de 1873.\\nM.l. Manso.\",\n  \"deceased\": [\n    {\n      \"name\": \"Maria Carneiro\",\n      \"death_date\": \"1873-06-28\",\n      \"age\": \"35\",\n      \"father\": \"Francisco da Silva Carneiro\",\n      \"mother\": \"Maria Carneiro\",\n      \"spouse\": null\n    }\n  ]\n}\n```",
+  "structured": {
+    "names": [
+      "acabada de o",
+      "dias de Junho",
+      "legitima de Francisco",
+      "bro de 1873"
+    ],
+    "dates": [
+      "1873"
+    ],
+    "places": []
+  }
+}

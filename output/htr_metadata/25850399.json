@@ -1,0 +1,20 @@
+{
+  "file_id": "25850399",
+  "source_file": "25850399.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 9.700937509536743,
+  "processed_at": "2026-05-02T17:27:26.639529",
+  "names_found": [
+    "Agueda de Jesus",
+    "mes de Agosto",
+    "Joze de Jesus",
+    "filha de Manoel"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

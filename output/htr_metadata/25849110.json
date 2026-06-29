@@ -1,0 +1,26 @@
+{
+  "file_id": "25849110",
+  "source_file": "25849110.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 275,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.806187629699707,
+  "processed_at": "2026-05-02T15:56:53.572277",
+  "names_found": [
+    "registo de óbito",
+    "datado de 1749",
+    "paróquia de Santa",
+    "vila de Celorico",
+    "falecimento de Maria",
+    "mes de Mayo"
+  ],
+  "dates_found": [
+    "1749"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

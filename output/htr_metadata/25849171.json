@@ -1,0 +1,20 @@
+{
+  "file_id": "25849171",
+  "source_file": "25849171.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 250,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 12.155210018157959,
+  "processed_at": "2026-05-02T16:13:58.816442",
+  "names_found": [
+    "ser de repente",
+    "Maria de Jesus",
+    "ficou de Manoel",
+    "mes de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

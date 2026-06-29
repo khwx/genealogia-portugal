@@ -1,0 +1,18 @@
+{
+  "file_id": "25850745",
+  "source_file": "25850745.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 276,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.482850790023804,
+  "processed_at": "2026-05-02T17:54:39.618420",
+  "names_found": [
+    "Escritura de todos",
+    "amor de Deos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

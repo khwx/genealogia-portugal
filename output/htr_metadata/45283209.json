@@ -1,0 +1,17 @@
+{
+  "file_id": "45283209",
+  "source_file": "45283209.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.651941299438477,
+  "processed_at": "2026-05-27T02:32:57.880177",
+  "names_found": [
+    "annos de idade"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

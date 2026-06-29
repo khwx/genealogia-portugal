@@ -1,0 +1,18 @@
+{
+  "file_id": "25849212",
+  "source_file": "25849212.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.196193933486938,
+  "processed_at": "2026-05-02T16:25:23.454734",
+  "names_found": [
+    "mes de Septembro",
+    "filho de Manoel"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

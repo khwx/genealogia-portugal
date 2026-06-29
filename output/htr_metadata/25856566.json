@@ -1,0 +1,20 @@
+{
+  "file_id": "25856566",
+  "source_file": "25856566.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 261,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.141206502914429,
+  "processed_at": "2026-05-02T19:19:56.314627",
+  "names_found": [
+    "sobrinhos de minha",
+    "Filho de sua",
+    "quantia\nde vinte e quatro",
+    "se de aos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

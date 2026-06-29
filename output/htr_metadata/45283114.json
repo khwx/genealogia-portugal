@@ -1,0 +1,21 @@
+{
+  "file_id": "45283114",
+  "source_file": "45283114.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 298,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.331048727035522,
+  "processed_at": "2026-05-02T23:19:28.044612",
+  "names_found": [
+    "gitimo de Francisco",
+    "Maria de Souza",
+    "natural\nde Fornos"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "natural\nde Fornos"
+  ]
+}

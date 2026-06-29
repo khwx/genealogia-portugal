@@ -1,0 +1,21 @@
+{
+  "file_id": "25850750",
+  "source_file": "25850750.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 13.198867797851562,
+  "processed_at": "2026-05-02T17:56:01.410098",
+  "names_found": [
+    "anno de mil",
+    "nove de Março",
+    "Villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

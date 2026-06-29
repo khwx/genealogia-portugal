@@ -1,0 +1,32 @@
+{
+  "file_id": "25855990",
+  "source_file": "25855990.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1352,
+  "tokens": 395,
+  "duration_ms": 0,
+  "wall_time_s": 9.423372268676758,
+  "processed_at": "2026-05-02T18:10:42.407518",
+  "names_found": [
+    "dezaseis de Dezembro",
+    "freguesia de S",
+    "ficou de Joze",
+    "verdade de tudo",
+    "tinha de que",
+    "hum de Janeiro",
+    "Xavier de Moraes",
+    "ficou de Theodora",
+    "idade de cincoenta",
+    "Martinho de Celorico",
+    "Sarmento de Vasconcellos",
+    "idade de trinta",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de S"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "file_id": "25856148",
+  "source_file": "25856148.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 237,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.485952138900757,
+  "processed_at": "2026-05-02T18:38:58.780191",
+  "names_found": [
+    "foi de Joze",
+    "sete de Junho",
+    "registo de óbitos",
+    "freguesia de São",
+    "datado de 1787 e 1788"
+  ],
+  "dates_found": [
+    "1787",
+    "1788"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

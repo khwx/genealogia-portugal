@@ -1,0 +1,18 @@
+{
+  "file_id": "25849150",
+  "source_file": "25849150.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 259,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.235025882720947,
+  "processed_at": "2026-05-02T16:07:57.064523",
+  "names_found": [
+    "Simpra de Lima",
+    "Testamento de Figueredo"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

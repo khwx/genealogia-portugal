@@ -1,0 +1,19 @@
+{
+  "file_id": "25849097",
+  "source_file": "25849097.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 257,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.526781797409058,
+  "processed_at": "2026-05-02T15:53:12.981153",
+  "names_found": [
+    "filha de Joze",
+    "nor de doze",
+    "mes de Novembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

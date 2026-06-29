@@ -1,0 +1,16 @@
+{
+  "file_id": "45283226",
+  "raw_text": "```json\n{\n  \"transcription\": \"Nº81. Aos quinze dias do mez de Janeiro do anno de mil oitocentos oitenta e nove, ás tres horas da tarde, no lugar da Casa desta justa freguezia de Santa Maria da Villa de Celorico da Beira, concelho da mesma Villa, freguezia do Guarda,",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "Villa de Celorico",
+      "mez de Janeiro",
+      "freguezia de Santa"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

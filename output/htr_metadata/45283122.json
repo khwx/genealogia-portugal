@@ -1,0 +1,18 @@
+{
+  "file_id": "45283122",
+  "source_file": "45283122.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 234,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 8.28861927986145,
+  "processed_at": "2026-05-23T18:21:31.805708",
+  "names_found": [
+    "mez de Novembro",
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

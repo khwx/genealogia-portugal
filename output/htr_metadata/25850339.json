@@ -1,0 +1,19 @@
+{
+  "file_id": "25850339",
+  "source_file": "25850339.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 259,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.38814115524292,
+  "processed_at": "2026-05-02T17:10:56.392555",
+  "names_found": [
+    "Antonio de Gouveia",
+    "João de Amaral",
+    "termo de abertura"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

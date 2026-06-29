@@ -1,0 +1,18 @@
+{
+  "file_id": "25849158",
+  "source_file": "25849158.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 229,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 12.08474349975586,
+  "processed_at": "2026-05-02T16:10:15.333038",
+  "names_found": [
+    "mulher de Ma",
+    "mes de Julho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,38 @@
+{
+  "file_id": "25856141",
+  "source_file": "25856141.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1021,
+  "tokens": 356,
+  "duration_ms": 0,
+  "wall_time_s": 13.372496366500854,
+  "processed_at": "2026-05-02T18:37:03.865579",
+  "names_found": [
+    "Outubro de 1783",
+    "freguezia de S",
+    "tubro de 1783",
+    "Inez de Margarida",
+    "filho\nde Maria",
+    "Pinto de Fig",
+    "freguesia de São",
+    "Vizitacao de 6",
+    "Mateos de Figueiredo",
+    "datados de 1783 e 1786",
+    "zia de S",
+    "registos de óbitos",
+    "mes de Setembro",
+    "Igreja de S"
+  ],
+  "dates_found": [
+    "1786",
+    "6 de Outubro de 1783",
+    "1783"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São",
+    "Celorico"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "25856437",
+  "source_file": "25856437.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 272,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.875919103622437,
+  "processed_at": "2026-05-02T18:47:05.929796",
+  "names_found": [
+    "Pela de meu",
+    "Pelas de meus",
+    "Depois de se"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,16 @@
+{
+  "file_id": "45283222",
+  "raw_text": "```json\n{\n  \"transcription\": \"Nº 19. Aos quinze dias do mez de Setembro do anno de mil\\nnovecentos setenta e cinco, ás doze horas da manhã,\\nfalleceu na sua da fabrica desta freguezia de Santa Maria,\\ne Villa de Celorico da Beira, concelho da mesma Villa,\\",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "Villa de Celorico",
+      "mez de Setembro",
+      "freguezia de Santa"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "file_id": "45283177",
+  "raw_text": "```json\n{\n  \"transcription\": \"Ha de servir este livro para n'elle se lançarem, em con-\\nformidade das Ordens Regias, os assentos d'obitos, que tiverem\\nlugar na freguezia de Santa Maria da villa de Celorico\\nda Beira, Bispado da Guarda, numerado, e rubricado",
+  "structured": {
+    "names": [
+      "villa de Celorico",
+      "freguezia de Santa",
+      "Ha de servir"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

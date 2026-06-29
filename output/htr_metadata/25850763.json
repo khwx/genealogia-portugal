@@ -1,0 +1,20 @@
+{
+  "file_id": "25850763",
+  "source_file": "25850763.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 268,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.157237529754639,
+  "processed_at": "2026-05-02T17:59:34.834508",
+  "names_found": [
+    "anno de mil",
+    "mulher de Manoel",
+    "mes de Novembro",
+    "Casas de muro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

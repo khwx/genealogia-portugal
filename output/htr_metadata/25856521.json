@@ -1,0 +1,19 @@
+{
+  "file_id": "25856521",
+  "source_file": "25856521.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 20.174842596054077,
+  "processed_at": "2026-05-02T19:08:30.860565",
+  "names_found": [
+    "Villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

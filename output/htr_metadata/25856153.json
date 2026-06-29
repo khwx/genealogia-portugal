@@ -1,0 +1,19 @@
+{
+  "file_id": "25856153",
+  "source_file": "25856153.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 220,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.36187219619751,
+  "processed_at": "2026-05-02T18:40:18.823212",
+  "names_found": [
+    "Manoel de Sá",
+    "pela de seu",
+    "todos de esm"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

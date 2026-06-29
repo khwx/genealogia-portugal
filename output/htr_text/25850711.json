@@ -1,0 +1,23 @@
+{
+  "file_id": "25850711",
+  "raw_text": "Este é um documento do livro de óbitos da paróquia de São Pedro, em Celorico da Beira, datado de 1755-1756.\n\n---TRANSCRIPTION---\n\n[Página da Esquerda]\n\n[Margem superior esquerda: S. Pedro]\n\nquatro dias do mes de Dezembro do\nprezente anno de mil sette centos e\nsincoenta e sinco, foy sepultada nes-\nta Parochial Igreja de Sam Pedro da\nVilla de Celorico: de que tudo fiz este\ntermo, dia, mes,",
+  "structured": {
+    "names": [
+      "livro de óbitos",
+      "mes de Dezembro",
+      "Villa de Celorico",
+      "Igreja de Sam",
+      "anno de mil",
+      "paróquia de São",
+      "datado de 1755"
+    ],
+    "dates": [
+      "1756",
+      "1755"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "Celorico"
+    ]
+  }
+}

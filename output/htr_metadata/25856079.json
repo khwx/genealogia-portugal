@@ -1,0 +1,18 @@
+{
+  "file_id": "25856079",
+  "source_file": "25856079.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 283,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.76528263092041,
+  "processed_at": "2026-05-02T18:20:01.162676",
+  "names_found": [
+    "Villanova de Fascoa",
+    "mes de Setembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

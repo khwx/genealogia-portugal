@@ -1,0 +1,27 @@
+{
+  "file_id": "25850753",
+  "source_file": "25850753.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 227,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.377549409866333,
+  "processed_at": "2026-05-02T17:56:51.757206",
+  "names_found": [
+    "extração de dados",
+    "registo de óbitos",
+    "freguesia de São",
+    "datado de 1776 e 1777",
+    "missa de corpo"
+  ],
+  "dates_found": [
+    "1776",
+    "1777"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

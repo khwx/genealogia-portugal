@@ -1,0 +1,25 @@
+{
+  "file_id": "25849284",
+  "source_file": "25849284.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.393766403198242,
+  "processed_at": "2026-05-02T16:45:22.718931",
+  "names_found": [
+    "mes\nde Setembro",
+    "assentos de óbito",
+    "freguesia de Santa",
+    "datados de 1798"
+  ],
+  "dates_found": [
+    "1798"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

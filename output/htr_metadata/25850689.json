@@ -1,0 +1,22 @@
+{
+  "file_id": "25850689",
+  "source_file": "25850689.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 291,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.473600387573242,
+  "processed_at": "2026-05-02T17:39:02.127409",
+  "names_found": [
+    "vinte de Mayo",
+    "livro de óbitos",
+    "freguesia\nde São",
+    "transcrição de um"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia\nde São"
+  ]
+}

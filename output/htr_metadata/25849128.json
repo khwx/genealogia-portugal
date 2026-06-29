@@ -1,0 +1,38 @@
+{
+  "file_id": "25849128",
+  "source_file": "25849128.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1663,
+  "tokens": 497,
+  "duration_ms": 0,
+  "wall_time_s": 10.786458969116211,
+  "processed_at": "2026-05-02T16:01:53.547962",
+  "names_found": [
+    "Maria de Souza",
+    "Leitão de Britto",
+    "mes de Mayo",
+    "nilio de S",
+    "ma de Manoel",
+    "solteira\nde idade",
+    "Bispado de Vizeu e moradora",
+    "Villa de Ce",
+    "Mendes\nde idade",
+    "freguezia de S",
+    "freguezia de Santa",
+    "mulher de\nAlberto",
+    "freguezia\nde Santa",
+    "lugar de Moreira",
+    "Villa de Celorico",
+    "maior de sincoenta",
+    "ter de que\ne para",
+    "mes de\nMayo",
+    "filho de Manoel",
+    "Maria de Jesus"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25849315",
+  "source_file": "25849315.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 282,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 13.092494487762451,
+  "processed_at": "2026-05-02T16:54:05.265596",
+  "names_found": [
+    "Igreja de Santa"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

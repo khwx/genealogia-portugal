@@ -1,0 +1,21 @@
+{
+  "file_id": "25850405",
+  "source_file": "25850405.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 239,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.278105735778809,
+  "processed_at": "2026-05-02T17:29:04.245521",
+  "names_found": [
+    "freguesia de S",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de S",
+    "Celorico"
+  ]
+}

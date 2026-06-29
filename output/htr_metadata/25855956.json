@@ -1,0 +1,20 @@
+{
+  "file_id": "25855956",
+  "source_file": "25855956.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 268,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.423922538757324,
+  "processed_at": "2026-05-02T18:01:28.893664",
+  "names_found": [
+    "digo de Luiz",
+    "freguezia de S",
+    "filha\nde Antonio",
+    "Antonio de Brito\ne de"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

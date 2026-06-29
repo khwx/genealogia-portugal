@@ -1,0 +1,22 @@
+{
+  "file_id": "25850687",
+  "source_file": "25850687.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 307,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.47336483001709,
+  "processed_at": "2026-05-02T17:38:30.691855",
+  "names_found": [
+    "assento de óbito",
+    "final de um",
+    "freguesia de São"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

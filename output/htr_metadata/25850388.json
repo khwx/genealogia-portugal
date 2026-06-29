@@ -1,0 +1,18 @@
+{
+  "file_id": "25850388",
+  "source_file": "25850388.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 280,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.225457906723022,
+  "processed_at": "2026-05-02T17:24:29.953292",
+  "names_found": [
+    "Bispa de Guarda",
+    "zia de Santa"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

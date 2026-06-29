@@ -1,0 +1,17 @@
+{
+  "file_id": "25856139",
+  "source_file": "25856139.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 230,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.971798419952393,
+  "processed_at": "2026-05-02T18:36:28.953282",
+  "names_found": [
+    "mes de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

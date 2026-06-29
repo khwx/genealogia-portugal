@@ -1,0 +1,21 @@
+{
+  "file_id": "25848656",
+  "source_file": "25848656.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.476689100265503,
+  "processed_at": "2026-05-02T15:35:01.808995",
+  "names_found": [
+    "Dias de\nCarvalho",
+    "mez de Maio",
+    "Dias de Car"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

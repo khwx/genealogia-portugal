@@ -1,0 +1,20 @@
+{
+  "file_id": "45283612",
+  "raw_text": "```json\n{\n  \"transcription\": \"No anno de mil oito centos sessenta e seis, aos vinte e seis dias do mez de Fevereiro, nesta freguesia de Santa Maria, Villa de Celorico da Beira, concelho do mesmo, e diocese de Viseu, em casa de sua morada, faleceu de morte natural, de repente,",
+  "structured": {
+    "names": [
+      "diocese de Viseu",
+      "mez de Fevereiro",
+      "faleceu de morte",
+      "Villa de Celorico",
+      "anno de mil",
+      "freguesia de Santa",
+      "casa de sua"
+    ],
+    "dates": [],
+    "places": [
+      "freguesia de Santa",
+      "Celorico da Beira"
+    ]
+  }
+}

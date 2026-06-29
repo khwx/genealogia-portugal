@@ -5,7 +5,17 @@ Supports: OpenRouter (free vision models), Google AI Studio (Gemini Flash).
 Resume-safe: skips already processed files.
 """
 
+# Load .env file FIRST, before any other imports or variable assignments
 import os
+env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(env_file):
+    with open(env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ[k.strip()] = v.strip()
+
 import sys
 import json
 import base64
@@ -29,12 +39,20 @@ STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/out
 BACKEND = os.environ.get("HTR_BACKEND", "openrouter")
 OPENROUTER_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_KEYS = os.environ.get("GEMINI_KEYS", os.environ.get("GEMINI_API_KEY", "")).split(",")
+GEMINI_KEYS = [k.strip() for k in GEMINI_KEYS if k.strip()]
+GEMINI_MODELS = os.environ.get("GEMINI_MODELS", "gemini-3-flash-preview,gemini-2.5-flash,gemini-2.0-flash").split(",")
+GEMINI_MODELS = [m.strip() for m in GEMINI_MODELS if m.strip()]
+
+# Track rate-limited keys and models
+rate_limited_keys = {}
+rate_limited_models = {}
+current_key_index = 0
+current_model_index = 0
 
 MAX_IMAGE_WIDTH = int(os.environ.get("MAX_IMAGE_WIDTH", "1500"))
 JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "80"))
-DELAY_BETWEEN_REQUESTS = float(os.environ.get("DELAY_BETWEEN_REQUESTS", "1"))
+DELAY_BETWEEN_REQUESTS = float(os.environ.get("DELAY_BETWEEN_REQUESTS", "60"))
 MAX_RETRIES = int(os.environ.get("MAX_RETRIES", "5"))
 RETRY_DELAY = float(os.environ.get("RETRY_DELAY", "10"))
 REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "120"))
@@ -64,32 +82,28 @@ signal.signal(signal.SIGINT, signal_handler)
 
 PROMPT = """You are a transcription assistant for Portuguese historical documents.
 
-This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal, from the 1700s-1800s.
+This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal.
 
-Transcribe ALL the handwritten text you can read. Output the text as-is, preserving line breaks.
+Output ONLY a JSON object (no other text) with this structure:
+{
+  "transcription": "full transcribed text here",
+  "deceased": [
+    {
+      "name": "person name",
+      "death_date": "YYYY-MM-DD",
+      "age": "age if mentioned",
+      "father": "father's name",
+      "mother": "mother's name",
+      "spouse": "spouse's name"
+    }
+  ]
+}
 
-Then extract structured data:
-- Names of deceased persons
-- Death dates
-- Ages
-- Parents' names
-- Spouses' names
-- Parish (freguesia)
-
-Format your response as:
----TRANSCRIPTION---
-[transcribed text here]
----ENTITIES---
-NOME: [name]
-DATA ÓBITO: [date]
-IDADE: [age]
-PAI: [father]
-MÃE: [mother]
-CÔNJUGE: [spouse]
-FREGUESIA: [parish]
----END---
-
-If you cannot read something, write [ilegível]. Do NOT invent content."""
+IMPORTANT: 
+- For death_date, ALWAYS use ISO format (YYYY-MM-DD).
+- If you cannot read something, use [ilegível].
+- Do NOT invent content.
+- Output ONLY the JSON, no markdown, no explanation."""
 
 
 def load_state():
@@ -200,8 +214,53 @@ def call_openrouter(img_b64, prompt):
     return {"status": "error", "text": "", "error": "max_retries_exceeded"}
 
 
+def get_available_key():
+    """Get next available (key, model), skipping rate-limited ones."""
+    global current_key_index, current_model_index
+    now = time.time()
+    
+    # Clean up expired rate limits
+    expired_keys = [k for k, t in rate_limited_keys.items() if t <= now]
+    for k in expired_keys:
+        del rate_limited_keys[k]
+    expired_models = [m for m, t in rate_limited_models.items() if t <= now]
+    for m in expired_models:
+        del rate_limited_models[m]
+    
+    if not GEMINI_KEYS or not GEMINI_MODELS:
+        return None, None
+    
+    # Try all combinations: (key, model)
+    for ki in range(len(GEMINI_KEYS)):
+        key_idx = (current_key_index + ki) % len(GEMINI_KEYS)
+        key = GEMINI_KEYS[key_idx]
+        if key in rate_limited_keys:
+            continue
+            
+        for mi in range(len(GEMINI_MODELS)):
+            model_idx = (current_model_index + mi) % len(GEMINI_MODELS)
+            model = GEMINI_MODELS[model_idx]
+            if model in rate_limited_models:
+                continue
+            
+            current_key_index = key_idx
+            current_model_index = model_idx
+            return key, model
+    
+    # All combinations rate-limited, wait for earliest
+    all_times = list(rate_limited_keys.values()) + list(rate_limited_models.values())
+    if all_times:
+        wait_time = min(all_times) - now
+        if wait_time > 0:
+            log.warning(f"All {len(GEMINI_KEYS)} keys & {len(GEMINI_MODELS)} models rate-limited. Waiting {wait_time:.0f}s...")
+            time.sleep(wait_time + 1)
+            return get_available_key()
+    return None, None
+
+
 def call_gemini(img_b64, prompt):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_KEY}"
+    global current_key_index, current_model_index, rate_limited_keys, rate_limited_models
+    
     payload = {
         "contents": [
             {
@@ -216,9 +275,15 @@ def call_gemini(img_b64, prompt):
             "maxOutputTokens": 2000,
         },
     }
-    headers = {"Content-Type": "application/json"}
-
+    
     for attempt in range(MAX_RETRIES):
+        key, model = get_available_key()
+        if not key or not model:
+            return {"status": "error", "text": "", "error": "No available API keys/models"}
+        
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+        headers = {"Content-Type": "application/json"}
+        
         try:
             req = urllib.request.Request(
                 url, data=json.dumps(payload).encode(), headers=headers
@@ -237,14 +302,16 @@ def call_gemini(img_b64, prompt):
                     "text": text,
                     "tokens": usage.get("candidatesTokenCount", 0),
                     "duration_ms": 0,
-                    "model": GEMINI_MODEL,
+                    "model": model,
                 }
         except urllib.error.HTTPError as e:
-            body = e.read().decode()[:200]
+            body = e.read().decode()[:300]
             if e.code == 429:
-                wait = RETRY_DELAY * (attempt + 1) * 2
-                log.warning(f"Rate limited (429). Waiting {wait}s...")
-                time.sleep(wait)
+                # Mark key AND model as rate-limited for 60 seconds
+                rate_limited_keys[key] = time.time() + 60
+                rate_limited_models[model] = time.time() + 60
+                log.warning(f"Key ...{key[-6:]} & model {model} rate limited. Rotating...")
+                time.sleep(1)
             elif e.code >= 500:
                 log.warning(f"Server error {e.code} (attempt {attempt+1}/{MAX_RETRIES})")
                 time.sleep(RETRY_DELAY * (attempt + 1))
@@ -254,14 +321,14 @@ def call_gemini(img_b64, prompt):
         except Exception as e:
             log.warning(f"Error (attempt {attempt+1}/{MAX_RETRIES}): {e}")
             time.sleep(RETRY_DELAY)
-
+    
     return {"status": "error", "text": "", "error": "max_retries_exceeded"}
 
 
 def call_htr(img_b64, prompt):
     if BACKEND == "gemini":
-        if not GEMINI_KEY:
-            return {"status": "error", "text": "", "error": "GEMINI_API_KEY not set"}
+        if not GEMINI_KEYS:
+            return {"status": "error", "text": "", "error": "GEMINI_KEYS not set"}
         return call_gemini(img_b64, prompt)
     elif BACKEND == "openrouter":
         if not OPENROUTER_KEY:
@@ -391,14 +458,14 @@ def process_image(tiff_path, state):
 
 def main():
     if len(sys.argv) > 1:
-        global BACKEND, OPENROUTER_KEY, GEMINI_KEY
+        global BACKEND, OPENROUTER_KEY, GEMINI_KEYS
         for arg in sys.argv[1:]:
             if arg.startswith("--backend="):
                 BACKEND = arg.split("=", 1)[1]
             elif arg.startswith("--openrouter-key="):
                 OPENROUTER_KEY = arg.split("=", 1)[1]
             elif arg.startswith("--gemini-key="):
-                GEMINI_KEY = arg.split("=", 1)[1]
+                GEMINI_KEYS = arg.split("=", 1)[1].split(",")
             elif arg == "--dry-run":
                 global DRY_RUN
                 DRY_RUN = True
@@ -410,9 +477,9 @@ def main():
         if not os.environ.get("OPENROUTER_API_KEY"):
             log.error("OPENROUTER_API_KEY not set. Get one at https://openrouter.ai/keys")
             sys.exit(1)
-    elif BACKEND == "gemini" and not GEMINI_KEY:
-        if not os.environ.get("GEMINI_API_KEY"):
-            log.error("GEMINI_API_KEY not set. Get one at https://aistudio.google.com/apikey")
+    elif BACKEND == "gemini" and not GEMINI_KEYS:
+        if not os.environ.get("GEMINI_KEYS"):
+            log.error("GEMINI_KEYS not set. Get one at https://aistudio.google.com/apikey")
             sys.exit(1)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -429,7 +496,7 @@ def main():
 
     log.info(f"=== Cloud HTR Batch Started ===")
     log.info(f"Backend: {BACKEND}")
-    log.info(f"Model: {OPENROUTER_MODEL if BACKEND == 'openrouter' else GEMINI_MODEL}")
+    log.info(f"Model: {OPENROUTER_MODEL if BACKEND == 'openrouter' else GEMINI_MODELS[0]}")
     log.info(f"Total images: {len(tiff_files)}")
     log.info(f"Already processed: {len(already)}")
     log.info(f"To process: {len(to_process)} (batch size: {BATCH_SIZE})")

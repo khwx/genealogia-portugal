@@ -1,0 +1,28 @@
+{
+  "file_id": "45283320",
+  "source_file": "45283320.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 236,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 43.47486710548401,
+  "processed_at": "2026-05-02T21:35:11.893056",
+  "names_found": [
+    "mez de Junho",
+    "ano de 1871",
+    "anno de mil",
+    "registo de óbitos",
+    "freguesia de Santa",
+    "concelho de Celorico"
+  ],
+  "dates_found": [
+    "ano de 1871",
+    "1871"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

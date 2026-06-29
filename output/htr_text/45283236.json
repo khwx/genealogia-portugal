@@ -1,0 +1,17 @@
+{
+  "file_id": "45283236",
+  "raw_text": "```json\n{\n  \"transcription\": \"N.º 18 – Aos dez seis dias do mez de Dezembro do anno de mil oitocentos setenta e nove, ás nove horas da noite, na rua do castello da Ribeira, da Villa de Celorico da Beira, desta freguezia de Santa Maria, da Villa de Cel",
+  "structured": {
+    "names": [
+      "freguezia de Santa",
+      "Villa de Cel",
+      "mez de Dezembro",
+      "Villa de Celorico",
+      "anno de mil"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

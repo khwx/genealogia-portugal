@@ -1,0 +1,16 @@
+{
+  "file_id": "45283265",
+  "raw_text": "```json\n{\n  \"transcription\": \"Livro de Óbitos de 1857\\n\\nCelorico. Aos primeiro dia do mez de Janeiro de mil oitocentos cin-\\ncoenta e sete annos, faleceu da vida prezente, com pouco\\nLuis Bibia\\nsaude, e sem sacramentos, Luis Bib",
+  "structured": {
+    "names": [
+      "Livro de Óbitos",
+      "mez de Janeiro"
+    ],
+    "dates": [
+      "1857"
+    ],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

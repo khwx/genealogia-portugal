@@ -1,0 +1,21 @@
+{
+  "file_id": "25850396",
+  "raw_text": "Este documento contém registos de óbitos da freguesia de Santa Maria, em Celorico da Beira, datados de setembro de 1795. Os registos indicam uma elevada mortalidade numa única família (filhos de Domingos de Carvalho e Maria de Jesus) num curto espaço de tempo, possivelmente devido a uma epidemia.\n\n",
+  "structured": {
+    "names": [
+      "filhos de Domingos",
+      "datados de setembro",
+      "espaço de tempo",
+      "Maria de Jesus",
+      "registos de óbitos",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1795"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

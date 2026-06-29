@@ -1,0 +1,37 @@
+{
+  "file_id": "25856430",
+  "source_file": "25856430.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 2112,
+  "tokens": 683,
+  "duration_ms": 0,
+  "wall_time_s": 10.597859859466553,
+  "processed_at": "2026-05-02T18:45:17.505430",
+  "names_found": [
+    "mulher de vinte",
+    "freguezia de S",
+    "faleceu de doença",
+    "idade de settenta",
+    "Setembro de 1807",
+    "doente de cama",
+    "Villa de Celorico",
+    "diante de seu",
+    "sette\nde Settembro",
+    "Antonio de Gou",
+    "Antonio de Gouveia",
+    "trinta de tenção",
+    "tinho de Celorico",
+    "Igreja de S",
+    "habito de S",
+    "Sangue\nde seu"
+  ],
+  "dates_found": [
+    "27 de Setembro de 1807",
+    "1807"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

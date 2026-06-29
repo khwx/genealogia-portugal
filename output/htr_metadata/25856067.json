@@ -1,0 +1,20 @@
+{
+  "file_id": "25856067",
+  "source_file": "25856067.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 300,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.18038535118103,
+  "processed_at": "2026-05-02T18:16:49.597469",
+  "names_found": [
+    "freguezia de Santa",
+    "Antonio de Rio",
+    "Ermida de Santo",
+    "Ermida de que"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

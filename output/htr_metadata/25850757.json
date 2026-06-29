@@ -1,0 +1,25 @@
+{
+  "file_id": "25850757",
+  "source_file": "25850757.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 12.641998529434204,
+  "processed_at": "2026-05-02T17:57:57.312117",
+  "names_found": [
+    "datado de 1788",
+    "Villa\nde Celor",
+    "anno de mil e sette",
+    "paróquia de São",
+    "registo de óbitos"
+  ],
+  "dates_found": [
+    "1788"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

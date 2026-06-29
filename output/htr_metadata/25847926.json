@@ -1,0 +1,25 @@
+{
+  "file_id": "25847926",
+  "source_file": "25847926.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 256,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.529837131500244,
+  "processed_at": "2026-05-02T13:17:31.378125",
+  "names_found": [
+    "datados de 1756",
+    "mes de Janeiro",
+    "registos de óbitos",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1756"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

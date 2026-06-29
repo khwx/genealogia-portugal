@@ -1,0 +1,17 @@
+{
+  "file_id": "25856489",
+  "source_file": "25856489.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.697806596755981,
+  "processed_at": "2026-05-02T19:00:17.675035",
+  "names_found": [
+    "espero de cum"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

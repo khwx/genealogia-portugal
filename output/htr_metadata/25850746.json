@@ -1,0 +1,22 @@
+{
+  "file_id": "25850746",
+  "source_file": "25850746.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 264,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 9.346701383590698,
+  "processed_at": "2026-05-02T17:54:53.967469",
+  "names_found": [
+    "anno de mil",
+    "Viuva de Francisco",
+    "Villa de Celorico",
+    "mes de Mayo"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

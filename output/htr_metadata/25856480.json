@@ -1,0 +1,17 @@
+{
+  "file_id": "25856480",
+  "source_file": "25856480.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 9.541949033737183,
+  "processed_at": "2026-05-02T18:58:02.987631",
+  "names_found": [
+    "Auto de aprovação"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

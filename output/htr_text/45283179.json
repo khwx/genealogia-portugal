@@ -1,0 +1,24 @@
+{
+  "file_id": "45283179",
+  "raw_text": "{\"transcription\": \"Nº 2. Aos oito dias do mez de Janeiro do anno de mil oitocentos setenta e quatro, á meia noite, n'esta caza sita n'este lugar de Beijinheiros d'esta freguezia de Santa Maria da Villa de Cellorico da Beira, concelho d'ella, Bispado de Guarda, falleceu um individuo do sexo masculino, por nome Antonio Agostinho, que tinha cinco e oito annos de idade, natural e morador n'este lugar de Beijinheiros d'esta freguezia, filho natural d'outro Antonio Agostinho e d'Anna Roza, o qual foi sepultado no cemiterio publico do referido lugar de Beijinheiros. E para constar lavrei um duplicado este assento que assigno. Era ut supra.\\nJ. Pedro Joze Mendes d'Almeida.\\nNº 3. Aos oito dias do mez de Janeiro do anno de mil oitocentos setenta e quatro, ás uma horas da noite, n'uma caza sita na rua da Figueiredo d'esta freguezia de Santa Maria da Villa de Cellorico da Beira, concelho d'ella, Bispado de Guarda, falleceu um individuo do sexo masculino, por nome Joze de Carvalho, d'idade de dezaseis annos, natural e morador n'esta Villa e freguezia, filho legitimo de Francisco Antonio de Carvalho e d'Anna Viegas, o qual foi sepultado no cemiterio publico d'esta mesma Villa. E para constar lavrei um duplicado este assento que assigno. Era ut supra.\\nJ. Pedro Joze Mendes d'Almeida.\", \"deceased\": [{\"name\": \"Antonio Agostinho\", \"death_date\": \"1874-01-08\", \"age\": \"58 annos\", \"father\": \"Antonio Agostinho\", \"mother\": \"Anna Roza\", \"spouse\": null}, {\"name\": \"Joze de Carvalho\", \"death_date\": \"1874-01-08\", \"age\": \"16 annos\", \"father\": \"Francisco Antonio de Carvalho\", \"mother\": \"Anna Viegas\", \"spouse\": null}]}",
+  "structured": {
+    "names": [
+      "legitimo de Francisco",
+      "Antonio de Carvalho",
+      "lugar de Beijinheiros",
+      "idade de dezaseis",
+      "Joze de Carvalho",
+      "freguezia de Santa",
+      "annos de idade",
+      "Villa de Cellorico",
+      "Antonio de Carvalho e d",
+      "anno de mil",
+      "Bispado de Guarda",
+      "mez de Janeiro"
+    ],
+    "dates": [
+      "1874"
+    ],
+    "places": []
+  }
+}

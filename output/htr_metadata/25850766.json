@@ -1,0 +1,24 @@
+{
+  "file_id": "25850766",
+  "source_file": "25850766.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 291,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.99131155014038,
+  "processed_at": "2026-05-02T18:00:25.828785",
+  "names_found": [
+    "Maria de Almeida",
+    "mes de Agosto",
+    "villa de\nCelorico",
+    "mulher de Joaõ",
+    "Freguezia de Sam",
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

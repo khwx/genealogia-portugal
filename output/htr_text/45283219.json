@@ -1,0 +1,16 @@
+{
+  "file_id": "45283219",
+  "raw_text": "```json\n{\n  \"transcription\": \"Nº 81. Aos quatro dias do mez de Março do anno de mil oitocentos oitenta e cinco, ás dez horas da noite, n'uma das lajes d'esta freguezia de Santa Maria, e Villa de Celorico da Beira, concelho da mesma Villa,",
+  "structured": {
+    "names": [
+      "freguezia de Santa",
+      "Villa de Celorico",
+      "mez de Março",
+      "anno de mil"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "file_id": "45283050",
+  "source_file": "45283050.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 219,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.486895084381104,
+  "processed_at": "2026-05-02T19:39:14.539866",
+  "names_found": [
+    "mez de Janeiro",
+    "ano de 1885",
+    "registo de óbitos",
+    "freguesia de Santa",
+    "concelho de Celorico"
+  ],
+  "dates_found": [
+    "1885",
+    "ano de 1885"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

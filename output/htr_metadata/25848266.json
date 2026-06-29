@@ -1,0 +1,21 @@
+{
+  "file_id": "25848266",
+  "source_file": "25848266.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 282,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.695492506027222,
+  "processed_at": "2026-05-02T15:04:40.271286",
+  "names_found": [
+    "Chagas de me",
+    "dia de meu",
+    "la de testam",
+    "alma de meu",
+    "Missas de esmola"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

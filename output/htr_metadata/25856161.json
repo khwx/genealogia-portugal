@@ -1,0 +1,18 @@
+{
+  "file_id": "25856161",
+  "source_file": "25856161.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 312,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 12.86452841758728,
+  "processed_at": "2026-05-02T18:42:29.914805",
+  "names_found": [
+    "assento de óbito",
+    "filha de meu"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

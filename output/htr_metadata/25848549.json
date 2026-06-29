@@ -1,0 +1,18 @@
+{
+  "file_id": "25848549",
+  "source_file": "25848549.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 276,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.169044733047485,
+  "processed_at": "2026-05-02T15:05:28.065099",
+  "names_found": [
+    "freguezia de Santa",
+    "final de um"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,25 @@
+{
+  "file_id": "25856446",
+  "source_file": "25856446.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 231,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.004810571670532,
+  "processed_at": "2026-05-02T18:49:25.681125",
+  "names_found": [
+    "paróquia de São",
+    "el de Mello",
+    "registo de óbitos",
+    "datado de maio",
+    "Igreja de S"
+  ],
+  "dates_found": [
+    "1810"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

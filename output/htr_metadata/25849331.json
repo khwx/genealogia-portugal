@@ -1,0 +1,26 @@
+{
+  "file_id": "25849331",
+  "source_file": "25849331.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 231,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.395504713058472,
+  "processed_at": "2026-05-02T16:58:28.325221",
+  "names_found": [
+    "Rocha\nde S",
+    "mes de Fevereiro",
+    "registo de óbitos",
+    "freguesia de Santa",
+    "datado de 1809"
+  ],
+  "dates_found": [
+    "1809"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

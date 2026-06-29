@@ -1,0 +1,20 @@
+{
+  "file_id": "25848254",
+  "source_file": "25848254.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 232,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.891827821731567,
+  "processed_at": "2026-05-02T15:01:27.629576",
+  "names_found": [
+    "filho de Maria",
+    "mes de Julho",
+    "era\nde mil e sete",
+    "fregues de Sam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

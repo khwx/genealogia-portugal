@@ -1,0 +1,19 @@
+{
+  "file_id": "25856534",
+  "source_file": "25856534.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 8.94734811782837,
+  "processed_at": "2026-05-02T19:11:53.320922",
+  "names_found": [
+    "dia de q",
+    "freguezia de S",
+    "legitimo de Ma"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,22 @@
+{
+  "file_id": "45283146",
+  "source_file": "45283146.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 902,
+  "tokens": 308,
+  "duration_ms": 0,
+  "wall_time_s": 7.006052255630493,
+  "processed_at": "2026-05-25T02:28:37.902348",
+  "names_found": [
+    "acabada de o",
+    "dias de Junho",
+    "legitima de Francisco",
+    "bro de 1873"
+  ],
+  "dates_found": [
+    "1873"
+  ],
+  "places_found": []
+}

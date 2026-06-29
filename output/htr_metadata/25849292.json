@@ -1,0 +1,19 @@
+{
+  "file_id": "25849292",
+  "source_file": "25849292.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 310,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 13.976637363433838,
+  "processed_at": "2026-05-02T16:47:41.544556",
+  "names_found": [
+    "dita de Lorvão",
+    "logo de fora",
+    "erecta de Sta"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

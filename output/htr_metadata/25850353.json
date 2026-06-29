@@ -1,0 +1,25 @@
+{
+  "file_id": "25850353",
+  "source_file": "25850353.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 232,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.193227052688599,
+  "processed_at": "2026-05-02T17:14:47.775555",
+  "names_found": [
+    "paróquia de São",
+    "vila de Celorico",
+    "registo de óbitos",
+    "mes de Março",
+    "datado de 1783"
+  ],
+  "dates_found": [
+    "1783"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

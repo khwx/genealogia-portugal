@@ -1,5 +1,5 @@
 """
-Configurações do projeto de extração de registos de óbitos.
+Configurações do projeto de extração de registos (nascimentos, casamentos, óbitos).
 """
 import os
 
@@ -7,8 +7,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 IMAGES_DIR = os.path.join(OUTPUT_DIR, "images")
+FULL_IMAGES_DIR = os.path.join(OUTPUT_DIR, "full_images")
 TEXT_DIR = os.path.join(OUTPUT_DIR, "text")
-DB_PATH = os.path.join(OUTPUT_DIR, "obitos.db")
+OCR_TEXT_DIR = os.path.join(OUTPUT_DIR, "ocr_text")
+DB_PATH = os.path.join(OUTPUT_DIR, "genealogia.db")
 
 # URLs
 TOMBO_URL = "https://tombo.pt/m/clb"

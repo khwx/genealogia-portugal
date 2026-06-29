@@ -1,0 +1,27 @@
+{
+  "file_id": "25850723",
+  "source_file": "25850723.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 262,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.225959062576294,
+  "processed_at": "2026-05-02T17:48:37.138667",
+  "names_found": [
+    "datados de 1757 e 1758",
+    "final de assento",
+    "freguesia de São",
+    "Igreja de Sam",
+    "registos de óbitos"
+  ],
+  "dates_found": [
+    "1757",
+    "1758"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

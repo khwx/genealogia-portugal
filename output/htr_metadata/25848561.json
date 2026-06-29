@@ -1,0 +1,20 @@
+{
+  "file_id": "25848561",
+  "source_file": "25848561.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 285,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 14.446348905563354,
+  "processed_at": "2026-05-02T15:08:35.007817",
+  "names_found": [
+    "nos de sua",
+    "idade de quarenta e outo",
+    "mesma\nde que",
+    "Mercês de Deos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

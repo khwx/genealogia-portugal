@@ -1,0 +1,19 @@
+{
+  "file_id": "25848602",
+  "source_file": "25848602.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.66881799697876,
+  "processed_at": "2026-05-02T15:20:09.259698",
+  "names_found": [
+    "Capella de Nossa",
+    "freguezia de Sancta",
+    "mez de Fevereiro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

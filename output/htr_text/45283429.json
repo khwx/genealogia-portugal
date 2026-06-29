@@ -1,0 +1,13 @@
+{
+  "file_id": "45283429",
+  "raw_text": "```json\n{\n  \"transcription\": \"~ 1881 ~\\nLivro d'Obitos da freguezia de\\nSanta Maria de Cellorico da\\nBeira, Diocese da Guarda\",\n  \"deceased\": []\n}\n```",
+  "structured": {
+    "names": [
+      "Maria de Cellorico"
+    ],
+    "dates": [
+      "1881"
+    ],
+    "places": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "file_id": "25849234",
+  "source_file": "25849234.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 290,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 13.095527410507202,
+  "processed_at": "2026-05-02T16:31:30.454632",
+  "names_found": [
+    "disposições de última",
+    "livro de óbitos",
+    "freguesia de São",
+    "instituição de herdeiros"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

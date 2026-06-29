@@ -1,0 +1,33 @@
+{
+  "file_id": "45283015",
+  "source_file": "45283015.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 811,
+  "tokens": 257,
+  "duration_ms": 0,
+  "wall_time_s": 8.283811092376709,
+  "processed_at": "2026-05-02T23:05:23.034359",
+  "names_found": [
+    "Villa de Celorico",
+    "termo de abertura",
+    "livro de óbitos",
+    "Janeiro\nde 1872",
+    "freguezia de Santa",
+    "Circular\nde 28",
+    "Setembro de 1863",
+    "Há de servir",
+    "Prior de Santa"
+  ],
+  "dates_found": [
+    "28 de Setembro de 1863",
+    "1872",
+    "1863",
+    "1 de Janeiro\nde 1872"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico da\nBeira"
+  ]
+}

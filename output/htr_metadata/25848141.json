@@ -1,0 +1,27 @@
+{
+  "file_id": "25848141",
+  "source_file": "25848141.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 263,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.572761058807373,
+  "processed_at": "2026-05-02T14:29:18.335505",
+  "names_found": [
+    "assentos de óbito",
+    "mes de Fevereiro",
+    "extração de dados",
+    "datados de 1723",
+    "Maria de Celorico",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1723"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

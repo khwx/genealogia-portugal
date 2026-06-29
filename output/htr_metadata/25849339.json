@@ -1,0 +1,17 @@
+{
+  "file_id": "25849339",
+  "source_file": "25849339.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 245,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.39442491531372,
+  "processed_at": "2026-05-02T17:00:35.248218",
+  "names_found": [
+    "estado de terça"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

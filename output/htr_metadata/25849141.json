@@ -1,0 +1,19 @@
+{
+  "file_id": "25849141",
+  "source_file": "25849141.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 241,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.931738376617432,
+  "processed_at": "2026-05-02T16:05:31.000414",
+  "names_found": [
+    "menor\nde dez",
+    "tubro de mil e Sete",
+    "mes de Ou"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

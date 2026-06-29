@@ -1,0 +1,21 @@
+{
+  "file_id": "25848664",
+  "source_file": "25848664.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 241,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.275822639465332,
+  "processed_at": "2026-05-02T15:37:11.626287",
+  "names_found": [
+    "mez de Novembro",
+    "natural de Torres"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "natural de Torres",
+    "Celorico"
+  ]
+}

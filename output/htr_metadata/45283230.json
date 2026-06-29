@@ -1,0 +1,19 @@
+{
+  "file_id": "45283230",
+  "source_file": "45283230.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 239,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.4023118019104,
+  "processed_at": "2026-05-27T02:59:00.488054",
+  "names_found": [
+    "anno de mil",
+    "mez de Outubro",
+    "idade de onze"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

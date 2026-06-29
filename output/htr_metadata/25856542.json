@@ -1,0 +1,20 @@
+{
+  "file_id": "25856542",
+  "source_file": "25856542.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.971797943115234,
+  "processed_at": "2026-05-02T19:13:54.194851",
+  "names_found": [
+    "Capella de Nossa",
+    "Freguesia de S"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Freguesia de S"
+  ]
+}

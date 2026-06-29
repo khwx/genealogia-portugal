@@ -1,0 +1,26 @@
+{
+  "file_id": "45283187",
+  "source_file": "45283187.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 1095,
+  "tokens": 317,
+  "duration_ms": 0,
+  "wall_time_s": 9.492893695831299,
+  "processed_at": "2026-05-25T02:41:10.514616",
+  "names_found": [
+    "Ignez de Sousa",
+    "freguezia de Santa",
+    "Mendes de Almeida",
+    "mez de Dezembro",
+    "mezes de idade",
+    "Villa de Celorico",
+    "anno de mil",
+    "filho de Antonio"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

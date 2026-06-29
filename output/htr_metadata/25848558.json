@@ -1,0 +1,17 @@
+{
+  "file_id": "25848558",
+  "source_file": "25848558.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 220,
+  "tokens": 91,
+  "duration_ms": 0,
+  "wall_time_s": 7.836014747619629,
+  "processed_at": "2026-05-02T15:07:43.395182",
+  "names_found": [],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

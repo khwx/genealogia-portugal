@@ -1,0 +1,16 @@
+{
+  "file_id": "45283121",
+  "raw_text": "```json\n{\n  \"transcription\": \"No. 58 -- Aos dezaseis dias do mez de Outubro do anno de mil oitocentos trinta e nove, a hora que ignoro, no lugar do Roda do Tabolado d'esta freguezia de Santa Maria, e Villa de Celorico da Beira, concelho da",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "mez de Outubro",
+      "freguezia de Santa",
+      "Villa de Celorico"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

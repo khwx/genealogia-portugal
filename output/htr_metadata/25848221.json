@@ -1,0 +1,21 @@
+{
+  "file_id": "25848221",
+  "source_file": "25848221.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 321,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.48373532295227,
+  "processed_at": "2026-05-02T14:52:02.258424",
+  "names_found": [
+    "livro de registos",
+    "significativos de leitura",
+    "descrição de bens",
+    "verba de testamento",
+    "Sena de Samadura"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

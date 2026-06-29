@@ -1,0 +1,22 @@
+{
+  "file_id": "25850741",
+  "source_file": "25850741.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 238,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.056415557861328,
+  "processed_at": "2026-05-02T17:53:30.038814",
+  "names_found": [
+    "mes de Janeiro",
+    "anno de mil",
+    "Villa de Celorico",
+    "Igreja de Sam"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

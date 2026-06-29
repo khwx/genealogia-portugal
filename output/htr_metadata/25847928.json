@@ -1,0 +1,20 @@
+{
+  "file_id": "25847928",
+  "source_file": "25847928.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 274,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 14.0076584815979,
+  "processed_at": "2026-05-02T13:18:06.056361",
+  "names_found": [
+    "menor de dous",
+    "Joze\nde Aguiar",
+    "mes de Agosto",
+    "ma de Gomes"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

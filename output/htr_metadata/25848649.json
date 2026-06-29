@@ -1,0 +1,24 @@
+{
+  "file_id": "25848649",
+  "source_file": "25848649.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 257,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.556710481643677,
+  "processed_at": "2026-05-02T15:33:09.568443",
+  "names_found": [
+    "datados de 1846",
+    "fragmento de registo",
+    "vila de Celorico",
+    "registos de óbito"
+  ],
+  "dates_found": [
+    "1846"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

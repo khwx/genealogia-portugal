@@ -1,0 +1,27 @@
+{
+  "file_id": "25849270",
+  "source_file": "25849270.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 12.371984004974365,
+  "processed_at": "2026-05-02T16:41:24.110402",
+  "names_found": [
+    "cruz de Manoel",
+    "Maria de Celorico",
+    "datados de Janeiro",
+    "co de Andrade",
+    "freguesia de Santa",
+    "registos de óbitos"
+  ],
+  "dates_found": [
+    "1753"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "file_id": "45284181",
+  "source_file": "45284181.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 224,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.697726249694824,
+  "processed_at": "2026-05-26T08:19:54.724942",
+  "names_found": [
+    "mez de Fevereiro",
+    "Outubro de 1829"
+  ],
+  "dates_found": [
+    "1829"
+  ],
+  "places_found": []
+}

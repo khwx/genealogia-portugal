@@ -1,0 +1,19 @@
+{
+  "file_id": "25856425",
+  "source_file": "25856425.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 249,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.580465078353882,
+  "processed_at": "2026-05-02T18:44:01.758098",
+  "names_found": [
+    "menor de trez",
+    "filho de Bernardo",
+    "nove de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,29 @@
+{
+  "file_id": "25847921",
+  "source_file": "25847921.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 536,
+  "tokens": 149,
+  "duration_ms": 0,
+  "wall_time_s": 12.684071063995361,
+  "processed_at": "2026-05-02T13:16:07.903315",
+  "names_found": [
+    "assentos de óbito",
+    "Maria de Brito",
+    "resumo de um",
+    "esmola de mandarmos",
+    "freguesia de Santa",
+    "dentro de hum",
+    "datados de 1754",
+    "testamento de papel"
+  ],
+  "dates_found": [
+    "1754"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

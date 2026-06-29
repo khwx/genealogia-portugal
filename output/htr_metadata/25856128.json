@@ -1,0 +1,20 @@
+{
+  "file_id": "25856128",
+  "source_file": "25856128.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 270,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 8.796886682510376,
+  "processed_at": "2026-05-02T18:33:30.763269",
+  "names_found": [
+    "villa de Loriga e Prior",
+    "villa de Ce",
+    "mes de Agosto",
+    "Igreja de Sam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

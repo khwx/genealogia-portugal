@@ -1,0 +1,20 @@
+{
+  "file_id": "25850673",
+  "source_file": "25850673.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 279,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.876659631729126,
+  "processed_at": "2026-05-02T17:34:40.678172",
+  "names_found": [
+    "mes\nde Novembro",
+    "ficou de Mano",
+    "era de mil e sette",
+    "freguezia de\nSam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

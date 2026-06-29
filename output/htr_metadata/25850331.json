@@ -1,0 +1,29 @@
+{
+  "file_id": "25850331",
+  "source_file": "25850331.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1524,
+  "tokens": 431,
+  "duration_ms": 0,
+  "wall_time_s": 10.461313486099243,
+  "processed_at": "2026-05-02T17:08:41.049272",
+  "names_found": [
+    "mes de Agosto",
+    "Igreja\nde Sao",
+    "Igreja de Sao",
+    "capaz de\nmais",
+    "anno de mil",
+    "mes de Septembro",
+    "filha de\nBartholomeu",
+    "antes de receber",
+    "Pedro de villa",
+    "menor de dous",
+    "filho de\nFrancisco"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25856552",
+  "source_file": "25856552.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 213,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.64533519744873,
+  "processed_at": "2026-05-02T19:16:22.474545",
+  "names_found": [
+    "mez de Janeiro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

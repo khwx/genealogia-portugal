@@ -1,0 +1,24 @@
+{
+  "file_id": "25850671",
+  "source_file": "25850671.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 281,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.83191180229187,
+  "processed_at": "2026-05-02T17:34:07.670897",
+  "names_found": [
+    "Testamento de Maria",
+    "ficou\nde Bartholameu",
+    "nome de Deos",
+    "freguezia\nde Sam",
+    "fiquei de Bartholameu",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25848194",
+  "source_file": "25848194.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 289,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.94772481918335,
+  "processed_at": "2026-05-02T14:44:21.346591",
+  "names_found": [
+    "filha de Manoel",
+    "mes de novembro",
+    "era de mil e sete",
+    "Maria de Azevedo",
+    "lugar de Vide"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

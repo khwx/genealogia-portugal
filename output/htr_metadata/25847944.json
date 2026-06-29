@@ -1,0 +1,27 @@
+{
+  "file_id": "25847944",
+  "source_file": "25847944.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash-lite",
+  "status": "success",
+  "text_length": 6300,
+  "tokens": 2000,
+  "duration_ms": 0,
+  "wall_time_s": 8.506344556808472,
+  "processed_at": "2026-05-02T13:34:27.677526",
+  "names_found": [
+    "Tomes\nde Novembro",
+    "freguesia de\nS",
+    "Villa de Celorico",
+    "legitima de Joam",
+    "paterna de Joam",
+    "Manuel de Jesus e Maria",
+    "Maria de Jesus",
+    "Tomer de\nNovembro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico\nda Beira",
+    "freguesia de\nS"
+  ]
+}

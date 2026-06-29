@@ -1,0 +1,20 @@
+{
+  "file_id": "25850407",
+  "raw_text": "Com base na imagem fornecida, aqui está a transcrição e a extração de entidades dos registos de óbito da freguesia de São Pedro, em Celorico da Beira, datados de 1799.\n\n---TRANSCRIPTION---\n\n[Página da Esquerda]\n\nJoaquim exposto. Aos sete dias do mes de Agosto de mil",
+  "structured": {
+    "names": [
+      "extração de entidades",
+      "mes de Agosto",
+      "datados de 1799",
+      "freguesia de São",
+      "registos de óbito"
+    ],
+    "dates": [
+      "1799"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de São"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "45283429",
+  "source_file": "45283429.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 150,
+  "tokens": 57,
+  "duration_ms": 0,
+  "wall_time_s": 65.73144745826721,
+  "processed_at": "2026-05-25T17:28:40.566937",
+  "names_found": [
+    "Maria de Cellorico"
+  ],
+  "dates_found": [
+    "1881"
+  ],
+  "places_found": []
+}

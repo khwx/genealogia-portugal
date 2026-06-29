@@ -1,0 +1,18 @@
+{
+  "file_id": "25856119",
+  "source_file": "25856119.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 299,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.42095160484314,
+  "processed_at": "2026-05-02T18:31:07.543281",
+  "names_found": [
+    "filha de Antonio",
+    "Junho de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

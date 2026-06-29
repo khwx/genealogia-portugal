@@ -1,0 +1,16 @@
+{
+  "file_id": "45283356",
+  "raw_text": "```json\n{\n  \"transcription\": \"No. 4 - Joaquim d'Almeida Cabral - Aos cinco dias do mez de Maio do anno de mil oito-centos oitenta e tres, ás cinco horas da tarde, n'esta freguezia de Santa Maria, da villa de Celorico da Beira, concelho d'ella, bispado",
+  "structured": {
+    "names": [
+      "villa de Celorico",
+      "mez de Maio",
+      "freguezia de Santa",
+      "anno de mil"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25850729",
+  "source_file": "25850729.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.940717935562134,
+  "processed_at": "2026-05-02T17:50:14.951481",
+  "names_found": [
+    "Maria de Celorico",
+    "anno de mil",
+    "mes\nde Septembro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

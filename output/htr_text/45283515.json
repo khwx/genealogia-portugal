@@ -1,0 +1,13 @@
+{
+  "file_id": "45283515",
+  "raw_text": "```json\n{\n  \"transcription\": \"apontado em duplicado que assignei. Celorico da\\nBeira vinte de Maio de mil novecentos e\\n[ilegível]\\nO Prior. Lopo. Mendes d'Almeida\\nManoel, e Espozos, que tinha huma idade de\\nvinte e oito annos",
+  "structured": {
+    "names": [
+      "vinte de Maio"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

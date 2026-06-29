@@ -1,0 +1,20 @@
+{
+  "file_id": "25850323",
+  "source_file": "25850323.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.159205198287964,
+  "processed_at": "2026-05-02T17:06:30.294847",
+  "names_found": [
+    "Igreja de São",
+    "mes de Julho",
+    "Jacinta de Almeida e\nfoi",
+    "anno\nde mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

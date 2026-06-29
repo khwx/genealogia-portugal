@@ -1,0 +1,18 @@
+{
+  "file_id": "25856072",
+  "source_file": "25856072.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 261,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.189157009124756,
+  "processed_at": "2026-05-02T18:18:10.947124",
+  "names_found": [
+    "Gregorio de Siqueira",
+    "mes de Outubro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

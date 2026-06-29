@@ -1,0 +1,28 @@
+{
+  "file_id": "25850351",
+  "source_file": "25850351.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 268,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 11.393938541412354,
+  "processed_at": "2026-05-02T17:14:15.642546",
+  "names_found": [
+    "assentos de óbito",
+    "Igreja de São",
+    "antes de se",
+    "freguesia de São",
+    "datados de 1783",
+    "villa de Celorico"
+  ],
+  "dates_found": [
+    "1783"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São",
+    "Celorico"
+  ]
+}

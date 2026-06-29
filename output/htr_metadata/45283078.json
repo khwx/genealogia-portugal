@@ -1,0 +1,22 @@
+{
+  "file_id": "45283078",
+  "source_file": "45283078.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 229,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.986637115478516,
+  "processed_at": "2026-05-02T19:43:02.006584",
+  "names_found": [
+    "anno de mil",
+    "mez de Janeiro",
+    "freguezia de Santa",
+    "la de Celor"
+  ],
+  "dates_found": [
+    "1861"
+  ],
+  "places_found": []
+}

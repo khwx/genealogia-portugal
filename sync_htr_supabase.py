@@ -1,0 +1,534 @@
+#!/usr/bin/env python3
+"""
+Sync HTR results to Supabase pessoas table.
+Resume-safe: skips already-synced records.
+Only syncs records with valid death record content.
+
+Modes:
+  normal:  Sync new HTR files to Supabase (default)
+  --update-dates:  Backfill data_obito on existing records with NULL date
+
+Usage:
+  python3 sync_htr_supabase.py
+  python3 sync_htr_supabase.py --update-dates
+  DRY_RUN=1 python3 sync_htr_supabase.py
+"""
+import os
+import sys
+import json
+import re
+import time
+from pathlib import Path
+from datetime import datetime
+
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://qljopxbxgflozrcdblrl.supabase.co")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1")
+
+INPUT_DIR = Path(os.environ.get("INPUT_DIR", "/home/pxtkhw/projetos/obitos/output/htr_text"))
+METADATA_DIR = Path(os.environ.get("METADATA_DIR", "/home/pxtkhw/projetos/obitos/output/htr_metadata"))
+CELORICO_JSON = Path(os.environ.get("CELORICO_JSON", "/home/pxtkhw/projetos/obitos/output/data/celorico_completo.json"))
+STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/sync_htr_state.json"))
+
+DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
+
+UPDATE_DATES = "--update-dates" in sys.argv
+
+# Portuguese number-word parsing tables
+DAY_NUMBERS = {
+    'hum': 1, 'um': 1, 'uma': 1,
+    'dois': 2, 'duas': 2, 'tres': 3, 'três': 3,
+    'quatro': 4, 'cinco': 5, 'seis': 6, 'sete': 7, 'oito': 8, 'nove': 9,
+    'dez': 10, 'onze': 11, 'doze': 12, 'treze': 13,
+    'catorze': 14, 'quatorze': 14, 'quinze': 15,
+    'dezasseis': 16, 'dezaseis': 16, 'dezesseis': 16,
+    'dezassete': 17, 'dezasete': 17, 'dezessete': 17,
+    'dezoito': 18, 'dezanove': 19, 'dezenove': 19,
+    'vinte': 20, 'trinta': 30,
+}
+TENS = {'vinte': 20, 'trinta': 30}
+MONTH_MAP = {
+    'janeiro': '01', 'fevereiro': '02', 'março': '03', 'abril': '04',
+    'maio': '05', 'junho': '06', 'julho': '07', 'agosto': '08',
+    'setembro': '09', 'outubro': '10', 'novembro': '11', 'dezembro': '12',
+    'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04',
+    'mai': '05', 'jun': '06', 'jul': '07', 'ago': '08',
+    'set': '09', 'out': '10', 'nov': '11', 'dez': '12',
+    'mayo': '05', 'may': '05', 'septembro': '09',
+}
+YEAR_NUMBERS = {
+    'mil': 1000, 'cento': 100, 'centos': 100, 'centtos': 100,
+    'duzentos': 200, 'duzentas': 200, 'trezentos': 300, 'trezentas': 300,
+    'quatrocentos': 400, 'quatrocentas': 400, 'quinhentos': 500, 'quinhentas': 500,
+    'seiscentos': 600, 'seiscentas': 600,
+    'setecentos': 700, 'settecentos': 700,
+    'oitocentos': 800, 'outocentos': 800,
+    'novecentos': 900, 'cem': 100,
+    'noventa': 90, 'oitenta': 80, 'setenta': 70, 'sessenta': 60,
+    'cinquenta': 50, 'cincoenta': 50, 'sincoenta': 50,
+    'quarenta': 40, 'trinta': 30, 'vinte': 20,
+    'dezanove': 19, 'dezenove': 19, 'dezoito': 18,
+    'dezassete': 17, 'dezessete': 17, 'dezasseis': 16, 'dezesseis': 16,
+    'quinze': 15, 'catorze': 14, 'treze': 13, 'doze': 12, 'onze': 11,
+    'dez': 10, 'nove': 9, 'oito': 8, 'sete': 7, 'seis': 6,
+    'cinco': 5, 'quatro': 4, 'tres': 3, 'três': 3,
+    'dois': 2, 'duas': 2, 'hum': 1, 'um': 1, 'uma': 1,
+}
+HUNDREDS_PREFIX = {
+    'sete': 'setecentos', 'sette': 'settecentos',
+    'oito': 'oitocentos', 'outo': 'outocentos',
+    'nove': 'novecentos', 'seis': 'seiscentos',
+    'dous': 'duzentos', 'cinco': 'quinhentos',
+    'quatro': 'quatrocentos', 'tres': 'trezentos', 'três': 'trezentos',
+}
+
+# Death record keywords (Portuguese)
+DEATH_KEYWORDS = [
+    'obito', 'faleceu', 'morreu', 'morreu', 'falec', 'morte',
+    'sepult', 'enterro', 'assento', 'registo', 'livro',
+    'dez', 'jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+    'jul', 'ago', 'set', 'out', 'nov', 'dez',
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+]
+
+def load_state():
+    if STATE_FILE.exists():
+        with open(STATE_FILE) as f:
+            return json.load(f)
+    return {"synced_ids": [], "errors": 0, "last_run": None, "filtered_out": 0}
+
+def save_state(state):
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+def is_good_quality(raw_text):
+    if not raw_text:
+        return False
+    text_lower = raw_text.lower()
+    special_char_ratio = len(re.findall(r'[^a-zA-ZÀ-Úà-ú\s\.,;:\-]', raw_text)) / max(len(raw_text), 1)
+    if special_char_ratio > 0.15:
+        return False
+    death_keywords = re.compile(r'obito|faleceu|morreu|sepult|enterro')
+    if not death_keywords.search(text_lower):
+        return False
+    if len(raw_text.strip()) < 50:
+        return False
+    has_capitalized_name = re.search(r'\b[A-ZÀ-Ú][a-zà-ú]+(?:\s+de\s+[A-ZÀ-Ú][a-zà-ú]+)+', raw_text)
+    if not has_capitalized_name:
+        return False
+    return True
+
+def build_file_to_freguesia():
+    """Build mapping from file_id to freguesia."""
+    if not CELORICO_JSON.exists():
+        return {}
+    with open(CELORICO_JSON) as f:
+        data = json.load(f)
+    mapping = {}
+    for doc in data.get("documentos", []):
+        freg = doc.get("freguesia", "")
+        for img in doc.get("imagens", []):
+            fid = str(img.get("file_id", ""))
+            mapping[fid] = freg
+    return mapping
+
+def is_valid_death_record(raw_text):
+    """Check if HTR text looks like a valid death record."""
+    if not raw_text or len(raw_text) < 50:
+        return False, "too_short"
+    
+    text_lower = raw_text.lower()
+    
+    # Must have death-related keywords
+    keyword_count = sum(1 for kw in DEATH_KEYWORDS if kw in text_lower)
+    if keyword_count < 2:
+        return False, "no_death_keywords"
+    
+    # Must have at least one capitalized name (Portuguese naming)
+    has_name = re.search(r'\b[A-ZÀ-Ú][a-zà-ú]+(?:\s+de\s+[A-ZÀ-Ú][a-zà-ú]+)+', raw_text)
+    if not has_name:
+        return False, "no_valid_name"
+    
+    # Check for garbled text (too many special chars or repeated patterns)
+    special_char_ratio = len(re.findall(r'[^a-zA-ZÀ-Úà-ú\s\.,;:\-]', raw_text)) / len(raw_text)
+    if special_char_ratio > 0.15:
+        return False, "garbled_text"
+    
+    return True, "valid"
+
+def extract_persons(raw_text):
+    """Extract person names from HTR text of death records."""
+    persons = []
+    text = ' '.join(raw_text.split())
+    
+    # Pattern 1: D. Name (title + name)
+    names_d = re.findall(r'D\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Ú][a-zà-ú]+){0,3})', text)
+    for name in names_d:
+        parts = name.split()
+        if len(parts) >= 2:
+            nome = ' '.join(parts[:-1])
+            sobrenome = parts[-1]
+            persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    
+    # Pattern 2: Name de Name (surname patterns)
+    if not persons:
+        names_surname = re.findall(r'([A-ZÀ-Ú][a-zà-ú]+(?:\s+de\s+[A-ZÀ-Ú][a-zà-ú]+)+)', text)
+        for name in names_surname[:2]:
+            parts = name.split(" de ")
+            if len(parts) >= 2:
+                nome = " de ".join(parts[:-1])
+                sobrenome = parts[-1]
+                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    
+    # Pattern 3: faleceu o/a Name
+    if not persons:
+        m = re.search(r'faleceu\s+(?:o|a)\s+([A-ZÀ-Ú][a-zà-ú\s]+?)(?:\s+(?:de|mulher|marido|foi|na))', text)
+        if m:
+            name = m.group(1).strip()
+            parts = name.split()
+            if len(parts) >= 2:
+                nome = ' '.join(parts[:-1])
+                sobrenome = parts[-1]
+                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    
+    return persons[:3]
+
+def parse_day_word(text):
+    text = text.strip().lower()
+    if text in DAY_NUMBERS:
+        return DAY_NUMBERS[text]
+    m = re.match(r'(vinte|trinta)\s+e\s+(hum|um|dois|tres|três|quatro|cinco|seis|sete|oito|nove)', text)
+    if m:
+        return TENS[m.group(1)] + DAY_NUMBERS.get(m.group(2), 0)
+    return None
+
+def parse_year_words(text):
+    text = text.strip().lower()
+    text = re.sub(r'\s+ann?os?\s*$', '', text)
+    def combine_hundreds(m):
+        return HUNDREDS_PREFIX.get(m.group(1).lower(), m.group(1) + 'centos')
+    text = re.sub(
+        r'\b(duzentos|duzentas|trezentos|trezentas|quatrocentos|quatrocentas|'
+        r'quinhentos|quinhentas|seiscentos|seiscentas|setecentos|settecentos|'
+        r'oitocentos|outocentos|novecentos|sete|sette|oito|outo|nove|seis|'
+        r'dous|cinco|quatro|tres|três)\s+cent[eo]s?\b',
+        combine_hundreds, text
+    )
+    words = re.findall(r'[a-zà-ú]+', text)
+    year = 0
+    for w in words:
+        if w == 'e':
+            continue
+        if w in YEAR_NUMBERS:
+            year += YEAR_NUMBERS[w]
+    if 1500 <= year <= 2100:
+        return year
+    return None
+
+def extract_date(raw_text):
+    """Extract death date from HTR text using multiple patterns."""
+    text = raw_text.strip()
+    # Focus on transcription portion (skip Gemini's document summary)
+    m_trans = re.search(r'---TRANSCRIPTION---(.+)', text, re.DOTALL | re.IGNORECASE)
+    if m_trans:
+        text = m_trans.group(1)
+
+    # Pattern A1: "Aos/Em/Em os XX dias do mes/mez de MONTH [de] YEAR"
+    pat_a1 = re.compile(
+        r'(?:aos|em\s+os|em)\s+'
+        r'([\w\s]+?)\s+dias?\s+do\s+mes\s+de\s+'
+        r'(\w+)[\s,]*(?:de\s+)?'
+        r'([\w\s]+?)(?:\s+ann?os?|\s+falece[ou]|\s+foi|\s+sepult|$)',
+        re.IGNORECASE
+    )
+    m = pat_a1.search(text)
+    if m:
+        day = parse_day_word(m.group(1))
+        month = MONTH_MAP.get(m.group(2).lower().strip())
+        year = parse_year_words(m.group(3))
+        if day and month and year:
+            return f"{year}-{month}-{day:02d}"
+
+    # Pattern A2: "Aos/Em XX de MONTH de YEAR"
+    pat_a2 = re.compile(
+        r'(?:aos|em\s+os|em)\s+'
+        r'([\w\s]+?)\s+de\s+'
+        r'(\w+)\s+de\s+'
+        r'([\w\s]+?)(?:\s+ann?os?|\s+falece[ou]|\s+foi|\s+sepult|$)',
+        re.IGNORECASE
+    )
+    m = pat_a2.search(text)
+    if m:
+        day = parse_day_word(m.group(1))
+        month = MONTH_MAP.get(m.group(2).lower().strip())
+        year = parse_year_words(m.group(3))
+        if day and month and year:
+            return f"{year}-{month}-{day:02d}"
+
+    # Pattern B: "no dia XX de MONTH de YEAR"
+    pat_b = re.compile(
+        r'(?:no\s+)?dia\s+'
+        r'([\w\s]+?)\s+de\s+'
+        r'(\w+)\s+de\s+'
+        r'([\w\s]+?)(?:\s+ann?os?|\s+falece[ou]|\s+foi|\s+sepult|$)',
+        re.IGNORECASE
+    )
+    m = pat_b.search(text)
+    if m:
+        day = parse_day_word(m.group(1))
+        month = MONTH_MAP.get(m.group(2).lower().strip())
+        year = parse_year_words(m.group(3))
+        if day and month and year:
+            return f"{year}-{month}-{day:02d}"
+
+    # Pattern D: "XX de Month de YYYY" (numeric)
+    pat_d = re.compile(
+        r'(\d{1,2})\s+de\s+'
+        r'(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro'
+        r'|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez|mayo|may|septembro)'
+        r'\s+de\s+(\d{4})',
+        re.IGNORECASE
+    )
+    m = pat_d.search(text)
+    if m:
+        day = m.group(1).zfill(2)
+        month = MONTH_MAP.get(m.group(2).lower().strip())
+        year = m.group(3)
+        if month:
+            return f"{year}-{month}-{day}"
+
+    return None
+
+def supabase_request(method, path, data=None):
+    """Make a request to Supabase REST API."""
+    import urllib.request
+    import urllib.error
+    
+    url = f"{SUPABASE_URL}/rest/v1/{path}"
+    headers = {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Prefer": "return=minimal",
+    }
+    
+    body = json.dumps(data).encode() if data else None
+    req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            if resp.status in (200, 201, 204):
+                return {"status": "success"}
+            return {"status": "error", "code": resp.status}
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()[:300]
+        return {"status": "error", "code": e.code, "body": body}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def get_synced_file_ids():
+    """Get file_ids already in Supabase."""
+    import urllib.request
+    import urllib.error
+    
+    url = f"{SUPABASE_URL}/rest/v1/pessoas?select=file_id&file_id=not.is.null"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+    }
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+            return set(str(r["file_id"]) for r in data if r.get("file_id"))
+    except:
+        return set()
+
+def update_dates():
+    """Backfill data_obito on existing records where it's NULL."""
+    import urllib.request
+    import urllib.error
+
+    print("=== Backfill data_obito on existing records ===\n")
+
+    # Get all records with file_id and NULL data_obito
+    url = f"{SUPABASE_URL}/rest/v1/pessoas?select=id,file_id,nome,sobrenome&file_id=not.is.null&data_obito=is.null"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+    }
+    req = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        records = json.loads(resp.read())
+
+    print(f"Records with NULL data_obito: {len(records)}")
+    if not records:
+        print("Nothing to update.")
+        return
+
+    updated = 0
+    errors = 0
+    skipped_no_file = 0
+    skipped_no_date = 0
+
+    for i, rec in enumerate(records):
+        file_id = rec.get("file_id")
+        if not file_id:
+            skipped_no_file += 1
+            continue
+
+        json_path = INPUT_DIR / f"{file_id}.json"
+        if not json_path.exists():
+            skipped_no_file += 1
+            continue
+
+        with open(json_path) as f:
+            data = json.load(f)
+        raw_text = data.get("raw_text", "")
+
+        # Check if it's a valid death record (same filter as normal sync)
+        is_valid, reason = is_valid_death_record(raw_text)
+        if not is_valid:
+            continue
+
+        death_date = extract_date(raw_text)
+        if not death_date:
+            skipped_no_date += 1
+            if (i + 1) % 50 == 0:
+                print(f"  Progress: {i+1}/{len(records)} (updated: {updated}, no_date: {skipped_no_date}, errors: {errors})")
+            continue
+
+        if DRY_RUN:
+            print(f"  Would update record {rec['id']} ({rec['nome']}): data_obito = {death_date}")
+            updated += 1
+        else:
+            patch_url = f"{SUPABASE_URL}/rest/v1/pessoas?id=eq.{rec['id']}"
+            patch_data = {"data_obito": death_date}
+            result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", patch_data)
+            if result["status"] == "success":
+                updated += 1
+                print(f"  ✓ Updated record {rec['id']} ({rec['nome']}): {death_date}")
+            else:
+                print(f"  ✗ Error updating record {rec['id']}: {result}")
+                errors += 1
+
+        if (i + 1) % 10 == 0:
+            print(f"  Progress: {i+1}/{len(records)} (updated: {updated}, no_date: {skipped_no_date}, errors: {errors})")
+
+    print(f"\n=== Update Complete ===")
+    print(f"Updated: {updated}")
+    print(f"No date found: {skipped_no_date}")
+    print(f"Errors: {errors}")
+
+def main():
+    if UPDATE_DATES:
+        update_dates()
+        return
+
+    state = load_state()
+    synced = set(state.get("synced_ids", []))
+    errors = state.get("errors", 0)
+    filtered_out = state.get("filtered_out", 0)
+    
+    print("Checking Supabase for already-synced records...")
+    db_synced = get_synced_file_ids()
+    synced.update(db_synced)
+    print(f"Already synced in DB: {len(db_synced)}")
+    
+    file_to_freguesia = build_file_to_freguesia()
+    print(f"Loaded freguesia mapping for {len(file_to_freguesia)} files")
+    
+    json_files = sorted(INPUT_DIR.glob("*.json"))
+    to_sync = [f for f in json_files if f.stem not in synced]
+    
+    print(f"\n=== HTR → Supabase Sync ===")
+    print(f"Total HTR files: {len(json_files)}")
+    print(f"Already synced: {len(synced)}")
+    print(f"To sync: {len(to_sync)}")
+    print(f"Dry run: {DRY_RUN}")
+    
+    if not to_sync:
+        print("Nothing to sync.")
+        return
+    
+    synced_count = 0
+    filtered_count = 0
+    
+    for i, json_file in enumerate(to_sync):
+        file_id = json_file.stem
+        
+        try:
+            with open(json_file) as f:
+                data = json.load(f)
+            
+            raw_text = data.get("raw_text", "")
+            
+            # Filter: check if valid death record
+            is_valid, reason = is_valid_death_record(raw_text)
+            if not is_valid:
+                filtered_count += 1
+                synced.add(file_id)
+                if (i + 1) % 50 == 0:
+                    print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
+                continue
+            
+            persons = extract_persons(raw_text)
+            if not persons:
+                filtered_count += 1
+                synced.add(file_id)
+                continue
+            
+            death_date = extract_date(raw_text)
+            freguesia = file_to_freguesia.get(file_id, "Celorico da Beira")
+            
+            for person in persons:
+                record = {
+                    "nome": person["nome"],
+                    "sobrenome": person.get("sobrenome", ""),
+                    "data_obito": death_date,
+                    "freguesia": freguesia,
+                    "concelho": "Celorico da Beira",
+                    "distrito": "Guarda",
+                    "fonte": "HTR Gemini 3 Flash Preview",
+                    "file_id": file_id,
+                    "criado_em": datetime.now().isoformat(),
+                }
+                
+                if not DRY_RUN:
+                    result = supabase_request("POST", "pessoas", record)
+                    if result["status"] == "error":
+                        if result.get("code") == 409:
+                            pass
+                        else:
+                            print(f"  Error inserting {person['nome']}: {result}")
+                            errors += 1
+                    else:
+                        synced_count += 1
+            
+            synced.add(file_id)
+            
+            if (i + 1) % 10 == 0:
+                print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
+                state["synced_ids"] = list(synced)
+                state["errors"] = errors
+                state["filtered_out"] = filtered_count
+                save_state(state)
+        
+        except Exception as e:
+            print(f"Error processing {file_id}: {e}")
+            errors += 1
+    
+    state["synced_ids"] = list(synced)
+    state["errors"] = errors
+    state["filtered_out"] = filtered_count
+    state["last_run"] = datetime.now().isoformat()
+    save_state(state)
+    
+    print(f"\n=== Sync Complete ===")
+    print(f"Synced: {synced_count} persons")
+    print(f"Filtered out (invalid): {filtered_count}")
+    print(f"Errors: {errors}")
+    print(f"Total in DB: {len(synced)}")
+
+if __name__ == "__main__":
+    main()

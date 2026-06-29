@@ -1,0 +1,21 @@
+{
+  "file_id": "25849303",
+  "source_file": "25849303.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 262,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.684353828430176,
+  "processed_at": "2026-05-02T16:50:46.681414",
+  "names_found": [
+    "mes de Agosto",
+    "filha de Manoel",
+    "freguezia de Santa",
+    "menor de treze",
+    "lugar de Pinheiro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,27 @@
+{
+  "file_id": "25847960",
+  "source_file": "25847960.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash-lite",
+  "status": "success",
+  "text_length": 5925,
+  "tokens": 2000,
+  "duration_ms": 0,
+  "wall_time_s": 6.723518371582031,
+  "processed_at": "2026-05-02T13:37:17.301734",
+  "names_found": [
+    "Joze de Jesus",
+    "idade de trinta e tres",
+    "sepultura de seus",
+    "anno de mil e setecentos",
+    "Antonio de Jesus",
+    "dez de Novembro",
+    "Maria de Jesus",
+    "freguezia\nde S",
+    "Manuel de Jesus",
+    "Joze\nde Jesus",
+    "filha de Antonio"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

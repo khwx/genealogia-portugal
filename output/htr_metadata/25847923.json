@@ -1,0 +1,19 @@
+{
+  "file_id": "25847923",
+  "source_file": "25847923.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 263,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.969044208526611,
+  "processed_at": "2026-05-02T13:16:41.755036",
+  "names_found": [
+    "mais de que",
+    "amor de Deos",
+    "Final de Combro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

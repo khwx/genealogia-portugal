@@ -1,0 +1,19 @@
+{
+  "file_id": "25850758",
+  "source_file": "25850758.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 283,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.29452657699585,
+  "processed_at": "2026-05-02T17:58:13.608616",
+  "names_found": [
+    "Missas de Corpo",
+    "serão de esmola",
+    "almas de nossos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

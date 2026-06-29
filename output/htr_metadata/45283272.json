@@ -1,0 +1,18 @@
+{
+  "file_id": "45283272",
+  "source_file": "45283272.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 260,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.043379545211792,
+  "processed_at": "2026-05-25T08:17:17.101181",
+  "names_found": [
+    "filha de João",
+    "mez de Novembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

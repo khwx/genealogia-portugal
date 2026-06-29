@@ -1,0 +1,19 @@
+{
+  "file_id": "25848189",
+  "source_file": "25848189.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 301,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 16.30557608604431,
+  "processed_at": "2026-05-02T14:42:52.317530",
+  "names_found": [
+    "registo de óbito",
+    "detalhada de legados",
+    "distribuição de roupas"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

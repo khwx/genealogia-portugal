@@ -1,0 +1,20 @@
+{
+  "file_id": "25850722",
+  "source_file": "25850722.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 249,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.838427305221558,
+  "processed_at": "2026-05-02T17:48:21.909928",
+  "names_found": [
+    "altar de\nda",
+    "será de e",
+    "molla de cem",
+    "coras de esmola"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

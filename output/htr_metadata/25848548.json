@@ -1,0 +1,17 @@
+{
+  "file_id": "25848548",
+  "source_file": "25848548.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 268,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.248194456100464,
+  "processed_at": "2026-05-02T15:05:12.893880",
+  "names_found": [
+    "doze de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

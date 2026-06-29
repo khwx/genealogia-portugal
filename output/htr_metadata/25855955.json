@@ -1,0 +1,28 @@
+{
+  "file_id": "25855955",
+  "source_file": "25855955.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 239,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.255509614944458,
+  "processed_at": "2026-05-02T18:01:13.467557",
+  "names_found": [
+    "Martinho de Cellorico",
+    "paróquia de São",
+    "início de 1800",
+    "Martinho de Celorico",
+    "registos de óbitos",
+    "Igreja de S",
+    "final de 1799 e o"
+  ],
+  "dates_found": [
+    "1799",
+    "1800"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

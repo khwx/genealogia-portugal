@@ -1,0 +1,20 @@
+{
+  "file_id": "25850675",
+  "source_file": "25850675.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 228,
+  "tokens": 91,
+  "duration_ms": 0,
+  "wall_time_s": 6.628127813339233,
+  "processed_at": "2026-05-02T17:35:06.058106",
+  "names_found": [
+    "Pedro de\nCelorico",
+    "Pedro de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

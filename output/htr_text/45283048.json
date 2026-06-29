@@ -1,0 +1,27 @@
+{
+  "file_id": "45283048",
+  "raw_text": "---TRANSCRIPTION---\nMAÇO 7\nLIVRO 62\n\nHa de servir este livro para n'elle se lançarem, em confor-\nmidade das Ordens Regias, os assentos de óbitos, que tive-\nrem lugar na freguezia de Santa Maria, da Villa de Celo-\nrico da Beira, Bispado da Guarda, numerando e rubricando\ndo outro igual este para a mesma freguezia, cuja numeração\ne rubrica faço em virtude da authorisação que foi concedi-\nda em Circular de 29 de Setembro de 1859. Celorico\nda Beira 1 de Janeiro de 1885.\n\nO Prior de Santa Maria\nJose Mendes d'Almeida\n\n---ENTITIES---\nNOME: [Não consta - Termo de abertura]\nDATA ÓBITO: [Não consta]\nIDADE: [Não consta]\nPAI: [Não consta]\nMÃE: [Não consta]\nCÔNJUGE: [Não consta]\nFREGUESIA: Santa Maria (Celorico da Beira)\n---END---",
+  "structured": {
+    "names": [
+      "Prior de Santa",
+      "freguezia de Santa",
+      "assentos de óbitos",
+      "Villa de Celo",
+      "Termo de abertura",
+      "Ha de servir",
+      "Setembro de 1859",
+      "Janeiro de 1885",
+      "Circular de 29"
+    ],
+    "dates": [
+      "1 de Janeiro de 1885",
+      "1859",
+      "1885",
+      "29 de Setembro de 1859"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "Celorico\nda Beira"
+    ]
+  }
+}

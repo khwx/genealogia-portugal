@@ -1,0 +1,22 @@
+{
+  "file_id": "25848625",
+  "source_file": "25848625.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 226,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.936179876327515,
+  "processed_at": "2026-05-02T15:26:23.024097",
+  "names_found": [
+    "Villa de Celorico",
+    "mes de Outubro",
+    "Collegiada de Sancta"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Igreja Matriz",
+    "Celorico"
+  ]
+}

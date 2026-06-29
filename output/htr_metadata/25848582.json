@@ -1,0 +1,17 @@
+{
+  "file_id": "25848582",
+  "source_file": "25848582.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 255,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.996182203292847,
+  "processed_at": "2026-05-02T15:14:34.331794",
+  "names_found": [
+    "Correa de Lacerda"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

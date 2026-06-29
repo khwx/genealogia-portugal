@@ -1,0 +1,23 @@
+{
+  "file_id": "25849338",
+  "source_file": "25849338.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 297,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 13.931398153305054,
+  "processed_at": "2026-05-02T17:00:19.851455",
+  "names_found": [
+    "mes de Janeiro",
+    "Jose de Oliveira",
+    "Maria de Celorico",
+    "filho de Manoel",
+    "Igreja de\nSanta"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

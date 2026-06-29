@@ -1,0 +1,20 @@
+{
+  "file_id": "25847893",
+  "source_file": "25847893.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 222,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.383922576904297,
+  "processed_at": "2026-05-02T12:59:12.306257",
+  "names_found": [
+    "Setembro de 1782"
+  ],
+  "dates_found": [
+    "1782",
+    "20 de Setembro de 1782"
+  ],
+  "places_found": []
+}

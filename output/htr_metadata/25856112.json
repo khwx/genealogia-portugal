@@ -1,0 +1,18 @@
+{
+  "file_id": "25856112",
+  "source_file": "25856112.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 259,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 24.96389150619507,
+  "processed_at": "2026-05-02T18:29:15.709580",
+  "names_found": [
+    "defluxo de sangue",
+    "eleição\nde hum"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

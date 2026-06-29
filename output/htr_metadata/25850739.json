@@ -1,0 +1,20 @@
+{
+  "file_id": "25850739",
+  "source_file": "25850739.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 272,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.273633003234863,
+  "processed_at": "2026-05-02T17:52:59.044890",
+  "names_found": [
+    "Villa\nde Cellorico",
+    "anno de\nmil",
+    "mes de Março",
+    "Igreja de Sam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

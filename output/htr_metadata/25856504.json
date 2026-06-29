@@ -1,0 +1,25 @@
+{
+  "file_id": "25856504",
+  "source_file": "25856504.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 244,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.238703489303589,
+  "processed_at": "2026-05-02T19:04:07.436463",
+  "names_found": [
+    "datado de 1818",
+    "registo de óbitos",
+    "página de um",
+    "freguesia de São"
+  ],
+  "dates_found": [
+    "1818"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

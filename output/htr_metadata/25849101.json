@@ -1,0 +1,19 @@
+{
+  "file_id": "25849101",
+  "source_file": "25849101.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 229,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 13.075708389282227,
+  "processed_at": "2026-05-02T15:54:20.684144",
+  "names_found": [
+    "mes\nde Janeiro",
+    "filho de João",
+    "nor de onze"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

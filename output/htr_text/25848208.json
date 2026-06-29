@@ -1,0 +1,21 @@
+{
+  "file_id": "25848208",
+  "raw_text": "Este documento é um registo de óbito e testamento da freguesia de Santa Maria de Celorico da Beira, datado de 1731. A caligrafia é típica do século XVIII, com muitas abreviaturas e sobreposição de tinta (bleed-through), o que dificulta a leitura de certas passagens.\n\n",
+  "structured": {
+    "names": [
+      "registo de óbito e testamento",
+      "Maria de Celorico",
+      "leitura de certas",
+      "datado de 1731",
+      "freguesia de Santa",
+      "sobreposição de tinta"
+    ],
+    "dates": [
+      "1731"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

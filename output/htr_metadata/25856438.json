@@ -1,0 +1,19 @@
+{
+  "file_id": "25856438",
+  "source_file": "25856438.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 271,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.095103025436401,
+  "processed_at": "2026-05-02T18:47:21.026802",
+  "names_found": [
+    "Regimento de Milicias",
+    "Bispado de Vizeu",
+    "marido de\nAnna"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

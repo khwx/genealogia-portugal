@@ -1,0 +1,22 @@
+{
+  "file_id": "45283613",
+  "source_file": "45283613.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 197,
+  "tokens": 67,
+  "duration_ms": 0,
+  "wall_time_s": 3.1824193000793457,
+  "processed_at": "2026-05-26T08:15:20.073034",
+  "names_found": [
+    "Janeiro de 1866"
+  ],
+  "dates_found": [
+    "2 de Janeiro de 1866",
+    "1866"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

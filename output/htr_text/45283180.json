@@ -1,0 +1,16 @@
+{
+  "file_id": "45283180",
+  "raw_text": "```json\n{\n  \"transcription\": \"Nº4. Aos dez dias do mez de Janeiro do anno de mil oitocentos\\nAmelia tor oitenta e quatro, ás cinco horas da tarde, n'esta\\nPachua Santa freguezia de Santa Maria, concelho d'ella, fre-\\nguezia da Villa de Celorico",
+  "structured": {
+    "names": [
+      "freguezia de Santa",
+      "Villa de Celorico",
+      "anno de mil",
+      "mez de Janeiro"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico"
+    ]
+  }
+}

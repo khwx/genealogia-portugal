@@ -1,0 +1,18 @@
+{
+  "file_id": "25849132",
+  "source_file": "25849132.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 215,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 13.733541250228882,
+  "processed_at": "2026-05-02T16:02:59.656560",
+  "names_found": [
+    "villa de m",
+    "as de Duarte"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25855957",
+  "source_file": "25855957.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 308,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 12.255075693130493,
+  "processed_at": "2026-05-02T18:01:46.151367",
+  "names_found": [
+    "proveniente de Celorico",
+    "registo de óbito e testamento",
+    "testamentárias de uma"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

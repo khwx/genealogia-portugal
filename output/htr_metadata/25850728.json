@@ -1,0 +1,23 @@
+{
+  "file_id": "25850728",
+  "source_file": "25850728.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 281,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.965659379959106,
+  "processed_at": "2026-05-02T17:49:59.008562",
+  "names_found": [
+    "missa de prezente",
+    "mulher de Manoel",
+    "Vila de Celorico",
+    "anno\nde mil",
+    "quatro de Março"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "file_id": "45283051",
+  "source_file": "45283051.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 278,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.759629487991333,
+  "processed_at": "2026-05-02T19:39:29.300561",
+  "names_found": [
+    "assentos de óbito",
+    "final de um",
+    "ano de 1885",
+    "freguesia de Santa",
+    "concelho de Celorico"
+  ],
+  "dates_found": [
+    "1885",
+    "ano de 1885"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

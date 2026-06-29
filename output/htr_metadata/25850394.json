@@ -1,0 +1,22 @@
+{
+  "file_id": "25850394",
+  "source_file": "25850394.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 274,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.878108978271484,
+  "processed_at": "2026-05-02T17:26:02.822795",
+  "names_found": [
+    "mes de Janeiro",
+    "ficou de Antonia",
+    "freguezia de Santa",
+    "la de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

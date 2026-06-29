@@ -1,0 +1,23 @@
+{
+  "file_id": "25848587",
+  "source_file": "25848587.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.34346318244934,
+  "processed_at": "2026-05-02T15:16:00.346554",
+  "names_found": [
+    "idade de tres",
+    "mes de Julho",
+    "Villa\nde Celorico",
+    "Collegiada de Sancta"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira",
+    "Igreja\nMatriz"
+  ]
+}

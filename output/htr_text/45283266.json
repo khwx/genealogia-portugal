@@ -1,0 +1,14 @@
+{
+  "file_id": "45283266",
+  "raw_text": "```json\n{\n  \"transcription\": \"termo que assigno. Celorico da Beira dia, mege e\\nno ao [ilegível]\\nO Vigr. Joze Mendes d'Almeida\\nCelorico Aos vinte e hum de Janeiro de mil oitocentos sessenta\\nda Beira e sete annos, faleceo",
+  "structured": {
+    "names": [
+      "hum de Janeiro"
+    ],
+    "dates": [],
+    "places": [
+      "Celorico",
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "25856466",
+  "source_file": "25856466.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 9.11165452003479,
+  "processed_at": "2026-05-02T18:54:31.032078",
+  "names_found": [
+    "ja de funto\ne de",
+    "Bispado de Pinhel",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

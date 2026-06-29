@@ -1,0 +1,19 @@
+{
+  "file_id": "25850350",
+  "source_file": "25850350.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 234,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.46713638305664,
+  "processed_at": "2026-05-02T17:13:59.247293",
+  "names_found": [
+    "anno de mil",
+    "freguezia de Sam",
+    "mes de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

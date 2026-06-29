@@ -1,0 +1,26 @@
+{
+  "file_id": "25856514",
+  "source_file": "25856514.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1025,
+  "tokens": 333,
+  "duration_ms": 0,
+  "wall_time_s": 10.611106395721436,
+  "processed_at": "2026-05-02T19:06:38.473286",
+  "names_found": [
+    "mez de Março",
+    "freguezia de S",
+    "pado de Braga",
+    "idade de trinta e cinco",
+    "falla de modo",
+    "Legitimos de Bernar",
+    "mez de Janeiro",
+    "Villa de Caminha",
+    "ja de S",
+    "Lugar de Val"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

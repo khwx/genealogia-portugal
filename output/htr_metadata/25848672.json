@@ -1,0 +1,21 @@
+{
+  "file_id": "25848672",
+  "source_file": "25848672.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 9.699633598327637,
+  "processed_at": "2026-05-02T15:39:20.497183",
+  "names_found": [
+    "mez de Novem",
+    "bro de mil",
+    "Mendes de Almeida"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

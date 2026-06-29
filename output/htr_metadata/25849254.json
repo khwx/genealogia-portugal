@@ -1,0 +1,20 @@
+{
+  "file_id": "25849254",
+  "source_file": "25849254.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.622663259506226,
+  "processed_at": "2026-05-02T16:36:55.921494",
+  "names_found": [
+    "mes de Dezembro",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

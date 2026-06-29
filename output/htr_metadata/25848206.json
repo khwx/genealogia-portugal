@@ -1,0 +1,24 @@
+{
+  "file_id": "25848206",
+  "source_file": "25848206.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 572,
+  "tokens": 164,
+  "duration_ms": 0,
+  "wall_time_s": 14.623482942581177,
+  "processed_at": "2026-05-02T14:47:43.523972",
+  "names_found": [
+    "instituição de um",
+    "filha de\nmeu",
+    "registo de óbito",
+    "terra de pão",
+    "vínculo de bens",
+    "reis de catuma",
+    "regras de sucessão",
+    "transcrição de um"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25850735",
+  "source_file": "25850735.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 295,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.140247344970703,
+  "processed_at": "2026-05-02T17:51:53.859198",
+  "names_found": [
+    "primeyro de Septembro",
+    "Villa de Alverca",
+    "anno de mil e sette",
+    "aonde de prezente",
+    "Igreja de Sam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

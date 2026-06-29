@@ -1,0 +1,23 @@
+{
+  "file_id": "25856096",
+  "source_file": "25856096.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 235,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 10.611412286758423,
+  "processed_at": "2026-05-02T18:24:39.003994",
+  "names_found": [
+    "no de mil",
+    "caza\nde sua",
+    "Villa de Celorico",
+    "viuva de\nMartinho",
+    "mes de fevereiro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

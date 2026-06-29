@@ -1,0 +1,25 @@
+{
+  "file_id": "25847897",
+  "source_file": "25847897.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 217,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 8.808772087097168,
+  "processed_at": "2026-05-02T12:59:59.686522",
+  "names_found": [
+    "Jozé de Almeida",
+    "freguesia de S",
+    "bro de 1784",
+    "Villa de Celorico"
+  ],
+  "dates_found": [
+    "1784"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de S"
+  ]
+}

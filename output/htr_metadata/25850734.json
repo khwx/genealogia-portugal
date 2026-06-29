@@ -1,0 +1,19 @@
+{
+  "file_id": "25850734",
+  "source_file": "25850734.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 273,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.908714056015015,
+  "processed_at": "2026-05-02T17:51:37.716621",
+  "names_found": [
+    "mes de Janeiro",
+    "no de mil",
+    "Igreja de Sam"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

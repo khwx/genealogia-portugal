@@ -1,0 +1,18 @@
+{
+  "file_id": "25850360",
+  "source_file": "25850360.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 235,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.372568845748901,
+  "processed_at": "2026-05-02T17:16:47.637309",
+  "names_found": [
+    "anno de mil e sete",
+    "mes de outubro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

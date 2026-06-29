@@ -1,0 +1,18 @@
+{
+  "file_id": "25848611",
+  "source_file": "25848611.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 260,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.907613515853882,
+  "processed_at": "2026-05-02T15:22:35.283707",
+  "names_found": [
+    "Capella de Nossa",
+    "tivesse de\nque"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

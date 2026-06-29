@@ -1,0 +1,17 @@
+{
+  "file_id": "25856473",
+  "source_file": "25856473.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 245,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.224191427230835,
+  "processed_at": "2026-05-02T18:56:18.569406",
+  "names_found": [
+    "mez de Setembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

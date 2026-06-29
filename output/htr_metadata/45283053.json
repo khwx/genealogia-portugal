@@ -1,0 +1,23 @@
+{
+  "file_id": "45283053",
+  "source_file": "45283053.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.567249774932861,
+  "processed_at": "2026-05-02T19:39:59.054043",
+  "names_found": [
+    "na\nde Jesus",
+    "Villa de\nSapina",
+    "freguezia de Santa",
+    "anno de mil",
+    "mez de Maio"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

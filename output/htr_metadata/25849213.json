@@ -1,0 +1,22 @@
+{
+  "file_id": "25849213",
+  "source_file": "25849213.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 12.341832160949707,
+  "processed_at": "2026-05-02T16:25:40.797788",
+  "names_found": [
+    "bro de mil",
+    "mes de Dezem",
+    "ta de Jesus",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25855973",
+  "source_file": "25855973.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 216,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.942142724990845,
+  "processed_at": "2026-05-02T18:06:04.222904",
+  "names_found": [
+    "Altar de N"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,22 @@
+{
+  "file_id": "25856109",
+  "source_file": "25856109.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 224,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.8143789768219,
+  "processed_at": "2026-05-02T18:28:15.530911",
+  "names_found": [
+    "Abril de 1763"
+  ],
+  "dates_found": [
+    "27 de Abril de 1763",
+    "1763"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

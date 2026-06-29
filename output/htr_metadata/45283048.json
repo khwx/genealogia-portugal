@@ -1,0 +1,33 @@
+{
+  "file_id": "45283048",
+  "source_file": "45283048.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 726,
+  "tokens": 252,
+  "duration_ms": 0,
+  "wall_time_s": 7.0970683097839355,
+  "processed_at": "2026-05-02T19:38:44.154389",
+  "names_found": [
+    "Prior de Santa",
+    "freguezia de Santa",
+    "assentos de óbitos",
+    "Villa de Celo",
+    "Termo de abertura",
+    "Ha de servir",
+    "Setembro de 1859",
+    "Janeiro de 1885",
+    "Circular de 29"
+  ],
+  "dates_found": [
+    "1 de Janeiro de 1885",
+    "1859",
+    "1885",
+    "29 de Setembro de 1859"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico\nda Beira"
+  ]
+}

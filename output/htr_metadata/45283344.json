@@ -1,0 +1,20 @@
+{
+  "file_id": "45283344",
+  "source_file": "45283344.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.11518907546997,
+  "processed_at": "2026-05-24T08:04:07.767504",
+  "names_found": [
+    "Branca de Jesus",
+    "Rita de Souza",
+    "paterna de Jorge",
+    "materna de Jorge"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,27 @@
+{
+  "file_id": "25849310",
+  "source_file": "25849310.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 233,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.061136484146118,
+  "processed_at": "2026-05-02T16:52:42.792886",
+  "names_found": [
+    "livro de óbitos",
+    "final de um",
+    "fólio de um",
+    "datado de 1804 e 1805",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1805",
+    "1804"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

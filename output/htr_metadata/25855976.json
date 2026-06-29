@@ -1,0 +1,23 @@
+{
+  "file_id": "25855976",
+  "source_file": "25855976.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 235,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.07933235168457,
+  "processed_at": "2026-05-02T18:06:52.939788",
+  "names_found": [
+    "freguezia de S",
+    "treze de Março",
+    "filha de Antonio",
+    "Maria de Lana",
+    "Martinho de\nCelorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

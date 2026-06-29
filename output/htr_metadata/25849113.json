@@ -1,0 +1,27 @@
+{
+  "file_id": "25849113",
+  "source_file": "25849113.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 266,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.904531717300415,
+  "processed_at": "2026-05-02T15:57:42.245730",
+  "names_found": [
+    "extração de dados",
+    "Maria de Celorico",
+    "registos de óbito",
+    "filho de Anto",
+    "datados de 1779",
+    "freguesia de Santa"
+  ],
+  "dates_found": [
+    "1779"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

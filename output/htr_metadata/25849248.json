@@ -1,0 +1,25 @@
+{
+  "file_id": "25849248",
+  "source_file": "25849248.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 15.5837881565094,
+  "processed_at": "2026-05-02T16:35:21.134357",
+  "names_found": [
+    "registo de óbito e testamento",
+    "Testamento de Antonio",
+    "datado de 1797",
+    "vila de Celorico",
+    "Botelho de que"
+  ],
+  "dates_found": [
+    "1797"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "file_id": "25856531",
+  "source_file": "25856531.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.451068878173828,
+  "processed_at": "2026-05-02T19:11:06.919723",
+  "names_found": [
+    "Igreja de\nS",
+    "mez de Maio"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

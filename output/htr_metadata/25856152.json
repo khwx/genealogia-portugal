@@ -1,0 +1,23 @@
+{
+  "file_id": "25856152",
+  "source_file": "25856152.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 257,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.92043399810791,
+  "processed_at": "2026-05-02T18:40:03.459444",
+  "names_found": [
+    "sete de Janeiro",
+    "villa de Celorico",
+    "Igreja de Sam"
+  ],
+  "dates_found": [
+    "1790"
+  ],
+  "places_found": [
+    "Celorico\nda Beira"
+  ]
+}

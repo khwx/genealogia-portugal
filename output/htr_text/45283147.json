@@ -1,0 +1,18 @@
+{
+  "file_id": "45283147",
+  "raw_text": "{\"transcription\": \"Fez este livro dezoito folhas, que numerei, e rubriquei com o meu apelido, e rubrica, de que uso. Celorico da Beira 1 de Janeiro de 1876. J. Pires de Santa Maria Lage Mendes de Almeida\", \"deceased\": []}",
+  "structured": {
+    "names": [
+      "Janeiro de 1876",
+      "Mendes de Almeida",
+      "Pires de Santa"
+    ],
+    "dates": [
+      "1876",
+      "1 de Janeiro de 1876"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

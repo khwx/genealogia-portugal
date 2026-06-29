@@ -1,0 +1,20 @@
+{
+  "file_id": "25850743",
+  "source_file": "25850743.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 278,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.487599849700928,
+  "processed_at": "2026-05-02T17:54:03.568897",
+  "names_found": [
+    "Irmandade de Santo",
+    "metade de cima",
+    "freguezia de Sta",
+    "Antonio de Lages"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

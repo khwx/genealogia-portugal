@@ -1,0 +1,19 @@
+{
+  "file_id": "25855987",
+  "source_file": "25855987.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.328060150146484,
+  "processed_at": "2026-05-02T18:09:56.351486",
+  "names_found": [
+    "Mes de Janeiro",
+    "filha de Joam",
+    "idade de oitenta e quatro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

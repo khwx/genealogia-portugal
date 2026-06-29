@@ -1,0 +1,21 @@
+{
+  "file_id": "25849310",
+  "raw_text": "Este documento é um fólio de um livro de óbitos da freguesia de Santa Maria, em Celorico da Beira, datado de 1804 e 1805.\n\n---TRANSCRIPTION---\n\n[Página da Esquerda]\n\n[Início do texto é o final de um assento anterior]\n...e recebido em",
+  "structured": {
+    "names": [
+      "livro de óbitos",
+      "final de um",
+      "fólio de um",
+      "datado de 1804 e 1805",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1805",
+      "1804"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

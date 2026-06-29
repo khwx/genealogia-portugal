@@ -1,0 +1,18 @@
+{
+  "file_id": "45283063",
+  "source_file": "45283063.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 381,
+  "tokens": 122,
+  "duration_ms": 0,
+  "wall_time_s": 10.158172845840454,
+  "processed_at": "2026-05-02T19:42:31.746506",
+  "names_found": [
+    "folha de rosto",
+    "seção de óbitos"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

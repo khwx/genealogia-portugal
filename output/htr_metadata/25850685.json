@@ -1,0 +1,17 @@
+{
+  "file_id": "25850685",
+  "source_file": "25850685.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 249,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.465753078460693,
+  "processed_at": "2026-05-02T17:37:56.961088",
+  "names_found": [
+    "Mel de Almd"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

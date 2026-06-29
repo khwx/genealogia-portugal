@@ -1,0 +1,21 @@
+{
+  "file_id": "25849211",
+  "source_file": "25849211.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 294,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.834104776382446,
+  "processed_at": "2026-05-02T16:25:06.256794",
+  "names_found": [
+    "mes de Agosto",
+    "freguezia de Santa",
+    "filho de Joseph",
+    "Antonio de idade",
+    "Maria de Jesus"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

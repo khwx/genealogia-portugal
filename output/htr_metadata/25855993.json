@@ -1,0 +1,40 @@
+{
+  "file_id": "25855993",
+  "source_file": "25855993.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 2130,
+  "tokens": 623,
+  "duration_ms": 0,
+  "wall_time_s": 10.705958366394043,
+  "processed_at": "2026-05-02T18:11:30.890858",
+  "names_found": [
+    "dezaseis de Dezembro",
+    "freguesia de S",
+    "ficou de Joze",
+    "Collegiada de Santa",
+    "villa de Celorico",
+    "idade de sessenta",
+    "dezembro de 1804",
+    "seis de Fevereiro",
+    "tinha de que",
+    "hum de Janeiro",
+    "Xavier de Moraes",
+    "ficou de Theodora",
+    "Martinho de Celorico",
+    "Sarmento de Vasconcellos",
+    "idade de trinta",
+    "idade de quarenta",
+    "Igreja de S"
+  ],
+  "dates_found": [
+    "16 de dezembro de 1804",
+    "1804"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico",
+    "freguesia de S"
+  ]
+}

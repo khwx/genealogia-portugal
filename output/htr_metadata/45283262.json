@@ -1,0 +1,23 @@
+{
+  "file_id": "45283262",
+  "source_file": "45283262.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.607084512710571,
+  "processed_at": "2026-05-25T08:05:13.744081",
+  "names_found": [
+    "nove de Setembro",
+    "mez de Setembro"
+  ],
+  "dates_found": [
+    "1886"
+  ],
+  "places_found": [
+    "Celorico",
+    "Celorico da Beira"
+  ]
+}

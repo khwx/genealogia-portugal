@@ -1,0 +1,25 @@
+{
+  "file_id": "25849312",
+  "source_file": "25849312.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1186,
+  "tokens": 374,
+  "duration_ms": 0,
+  "wall_time_s": 10.954765319824219,
+  "processed_at": "2026-05-02T16:53:16.690340",
+  "names_found": [
+    "Igreja de Santa",
+    "outro de Souza",
+    "dias de Fevereiro",
+    "Nunes de Brito"
+  ],
+  "dates_found": [
+    "1809",
+    "1805"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "file_id": "25850346",
+  "source_file": "25850346.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 809,
+  "tokens": 225,
+  "duration_ms": 0,
+  "wall_time_s": 12.270561933517456,
+  "processed_at": "2026-05-02T17:12:53.724144",
+  "names_found": [
+    "Igreja de São",
+    "Villa de Celorico",
+    "mes de Dezembro",
+    "mes de Novembro",
+    "anno\nde mil",
+    "Antonio de Andrade"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

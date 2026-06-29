@@ -1,0 +1,29 @@
+{
+  "file_id": "45283022",
+  "source_file": "45283022.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1824,
+  "tokens": 533,
+  "duration_ms": 0,
+  "wall_time_s": 15.131469964981079,
+  "processed_at": "2026-05-02T23:11:17.497750",
+  "names_found": [
+    "Mendes de Almeida",
+    "Villa\nde Celorico",
+    "legitima de Manoel",
+    "Villa de Celorico",
+    "Mendes de Ribeiro",
+    "mez de Outubro",
+    "legitimo de Francisco",
+    "freguezia de Santa",
+    "Villa de\nCelorico",
+    "mez de Agosto",
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

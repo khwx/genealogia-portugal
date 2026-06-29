@@ -1,0 +1,27 @@
+{
+  "file_id": "25850355",
+  "source_file": "25850355.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 218,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 13.139516115188599,
+  "processed_at": "2026-05-02T17:15:22.546603",
+  "names_found": [
+    "cao de S",
+    "Nota de visitação",
+    "registo de óbitos",
+    "freguesia de São",
+    "datado de 1783 e 1784"
+  ],
+  "dates_found": [
+    "1783",
+    "1784"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

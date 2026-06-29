@@ -1,0 +1,13 @@
+{
+  "file_id": "25849291",
+  "raw_text": "\n- Wait, I'm repeating myself. Let me look closer at the text.\n- \"Ordeno mais se me digão cem missas pela minha alma que se dirão por esmola de dous vintens cada huma, e se dirão mais duzentas pela alma de meu Pay, e May, e mais cem pela alma de minha May, e cem",
+  "structured": {
+    "names": [
+      "alma de minha",
+      "esmola de dous",
+      "alma de meu"
+    ],
+    "dates": [],
+    "places": []
+  }
+}

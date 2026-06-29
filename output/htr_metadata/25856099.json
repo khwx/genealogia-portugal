@@ -1,0 +1,26 @@
+{
+  "file_id": "25856099",
+  "source_file": "25856099.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 292,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.838534355163574,
+  "processed_at": "2026-05-02T18:25:28.069189",
+  "names_found": [
+    "nome de Deos",
+    "testamento de Maria",
+    "Josepha de Jesus",
+    "nota de aprovação",
+    "posterior de 1767",
+    "leitura de certas",
+    "datado de 1762"
+  ],
+  "dates_found": [
+    "1767",
+    "1762"
+  ],
+  "places_found": []
+}

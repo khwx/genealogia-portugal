@@ -1,0 +1,28 @@
+{
+  "file_id": "45283206",
+  "source_file": "45283206.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 542,
+  "tokens": 176,
+  "duration_ms": 0,
+  "wall_time_s": 9.183640956878662,
+  "processed_at": "2026-05-27T02:29:23.541572",
+  "names_found": [
+    "Prior de Santa",
+    "Mendes de Almeida",
+    "assentos de óbitos",
+    "nfreguezia de Santa",
+    "Villa de Celorico",
+    "Beira de Janeiro",
+    "Circular de 28"
+  ],
+  "dates_found": [
+    "1863",
+    "1880"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

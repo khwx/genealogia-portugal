@@ -1,0 +1,25 @@
+{
+  "file_id": "25850403",
+  "source_file": "25850403.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 271,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.331042051315308,
+  "processed_at": "2026-05-02T17:28:32.031234",
+  "names_found": [
+    "paróquia de São",
+    "datados de 1798",
+    "extração de dados",
+    "registos de óbito"
+  ],
+  "dates_found": [
+    "1798"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico"
+  ]
+}

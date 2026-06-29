@@ -1,0 +1,21 @@
+{
+  "file_id": "25849329",
+  "source_file": "25849329.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 282,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.967835664749146,
+  "processed_at": "2026-05-02T16:57:56.475651",
+  "names_found": [
+    "ja de Santa",
+    "Maria de Almeida",
+    "tres de outubro",
+    "Manoel de quem",
+    "filho de\nPedro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,25 @@
+{
+  "file_id": "25856081",
+  "source_file": "25856081.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 273,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.649682521820068,
+  "processed_at": "2026-05-02T18:20:34.376225",
+  "names_found": [
+    "datados de 1757",
+    "registos de óbitos",
+    "freguesia de Santa",
+    "continuação de um"
+  ],
+  "dates_found": [
+    "1757"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

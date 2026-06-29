@@ -1,0 +1,17 @@
+{
+  "file_id": "25849155",
+  "source_file": "25849155.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 269,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 12.652918577194214,
+  "processed_at": "2026-05-02T16:09:24.893065",
+  "names_found": [
+    "Sangue de Seu"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

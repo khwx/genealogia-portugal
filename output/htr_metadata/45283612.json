@@ -1,0 +1,26 @@
+{
+  "file_id": "45283612",
+  "source_file": "45283612.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 276,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 90.74052619934082,
+  "processed_at": "2026-05-26T08:14:16.889404",
+  "names_found": [
+    "diocese de Viseu",
+    "mez de Fevereiro",
+    "faleceu de morte",
+    "Villa de Celorico",
+    "anno de mil",
+    "freguesia de Santa",
+    "casa de sua"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de Santa",
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "file_id": "25849287",
+  "source_file": "25849287.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 222,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.086233615875244,
+  "processed_at": "2026-05-02T16:46:11.994293",
+  "names_found": [
+    "lho de Tereza",
+    "mes de Setembro",
+    "lugar de Espi",
+    "menor de hum"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

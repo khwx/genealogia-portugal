@@ -1,0 +1,15 @@
+{
+  "file_id": "25847903",
+  "source_file": "25847903.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 218,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.058162689208984,
+  "processed_at": "2026-05-02T13:01:09.163648",
+  "names_found": [],
+  "dates_found": [],
+  "places_found": []
+}

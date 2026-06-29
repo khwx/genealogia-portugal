@@ -1,0 +1,20 @@
+{
+  "file_id": "25847874",
+  "source_file": "25847874.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 286,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.530544996261597,
+  "processed_at": "2026-05-02T12:55:30.512234",
+  "names_found": [
+    "assento de que",
+    "mes de Março",
+    "testamento de que",
+    "era de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,20 @@
+{
+  "file_id": "25850372",
+  "source_file": "25850372.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.589093208312988,
+  "processed_at": "2026-05-02T17:20:04.724583",
+  "names_found": [
+    "Rodrigues de idade",
+    "Soares de S",
+    "mes de Novembro",
+    "Cavaleiro\nde S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

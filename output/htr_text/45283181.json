@@ -1,0 +1,23 @@
+{
+  "file_id": "45283181",
+  "raw_text": "{\"transcription\": \"Nº 60. Aos vinte dias do mez de Janeiro do anno de mil oito centos setenta e quatro, à huma hora da tarde, no lugar do Espinheiro desta freguesia de Santa Maria da Villa de Celorico da Beira, concelho d'ella, bresga da Guarda, falleceu um individuo do sexo feminino por nome Anna Ribeiro, que tinha tres annos d'idade, natural e moradora no mesmo lugar do Espinheiro, filha legitima de Joze Ribeiro, e Maria Ribeiro, a qual foi sepultada no referido lugar do Espinheiro. Separam quatro lavras em duplicado este assento que assigno. Era ut supra.\\nJ. Prior. Joze Mendes d'Almeida.\\n\\nNº 70. Aos vinte dias do mez de Janeiro do anno de mil oito centos setenta e quatro, ás quatro horas da manhãa, n'esta freguesia de Santa Maria, da villa de Celorico da Beira, concelho d'ella, bresga da Guarda, falleceu um individuo do sexo masculino por nome Joze d'Almeida Sobral, que tinha seis mezes e meio d'idade, natural e morador no referido lugar do Espinheiro, filho legitimo de Antonio d'Almeida Sobral, e Margarida Maria de Jesus, o qual foi sepultado no cemiterio publico do mesmo lugar do Espinheiro. Separa quatro lavras em duplicado este assento que assigno. Era ut supra.\\nJ. Prior. Joze Mendes d'Almeida.\", \"deceased\": [{\"name\": \"Anna Ribeiro\", \"death_date\": \"1874-01-20\", \"age\": \"3 years\", \"father\": \"Joze Ribeiro\", \"mother\": \"Maria Ribeiro\", \"spouse\": null}, {\"name\": \"Joze d'Almeida Sobral\", \"death_date\": \"1874-01-20\", \"age\": \"6 months and a half\", \"father\": \"Antonio d'Almeida Sobral\", \"mother\": \"Margarida Maria de Jesus\", \"spouse\": null}]}",
+  "structured": {
+    "names": [
+      "Maria de Jesus",
+      "legitima de Joze",
+      "legitimo de Antonio",
+      "Villa de Celorico",
+      "villa de Celorico",
+      "anno de mil",
+      "freguesia de Santa",
+      "mez de Janeiro"
+    ],
+    "dates": [
+      "1874"
+    ],
+    "places": [
+      "freguesia de Santa",
+      "Celorico da Beira"
+    ]
+  }
+}

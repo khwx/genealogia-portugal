@@ -1,0 +1,26 @@
+{
+  "file_id": "25849175",
+  "source_file": "25849175.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 13.862736463546753,
+  "processed_at": "2026-05-02T16:15:08.229719",
+  "names_found": [
+    "Final de um",
+    "registos de óbitos",
+    "freguesia de Santa",
+    "datados de 1787 e 1788"
+  ],
+  "dates_found": [
+    "1787",
+    "1788"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

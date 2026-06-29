@@ -1,0 +1,18 @@
+{
+  "file_id": "45283062",
+  "raw_text": "---TRANSCRIPTION---\nTem este livro sincoenta meias folhas, que vaõ nume-\nradas, e rubricadas, com o meu apelido, Almeida, de que\nfaço. Celorico da Beira 1 de Janeiro de 1888 ~\nO Prior de Santa Maria\nJoze Mendes de Almeida\n\n---ENTITIES---\nNOME",
+  "structured": {
+    "names": [
+      "Janeiro de 1888",
+      "Prior de Santa",
+      "Mendes de Almeida"
+    ],
+    "dates": [
+      "1 de Janeiro de 1888",
+      "1888"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "25848673",
+  "source_file": "25848673.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 245,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.054506301879883,
+  "processed_at": "2026-05-02T15:39:35.553982",
+  "names_found": [
+    "mez de Dezembro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25856475",
+  "source_file": "25856475.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 237,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 8.699068307876587,
+  "processed_at": "2026-05-02T18:56:47.977172",
+  "names_found": [
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,26 @@
+{
+  "file_id": "25850338",
+  "source_file": "25850338.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 256,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 13.325028657913208,
+  "processed_at": "2026-05-02T17:10:41.002965",
+  "names_found": [
+    "mes de Julho",
+    "datados de 1789",
+    "registos de óbito e um",
+    "anno de mil",
+    "freguesia de São"
+  ],
+  "dates_found": [
+    "1789"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de São"
+  ]
+}

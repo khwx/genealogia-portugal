@@ -1,0 +1,19 @@
+{
+  "file_id": "25849343",
+  "source_file": "25849343.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 416,
+  "tokens": 121,
+  "duration_ms": 0,
+  "wall_time_s": 10.638475179672241,
+  "processed_at": "2026-05-02T17:01:36.043665",
+  "names_found": [
+    "chagas de Christo",
+    "pelos de todos",
+    "Joze de Souza e sua"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

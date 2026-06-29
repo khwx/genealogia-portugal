@@ -1,0 +1,29 @@
+{
+  "file_id": "45283123",
+  "source_file": "45283123.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 1190,
+  "tokens": 337,
+  "duration_ms": 0,
+  "wall_time_s": 8.251630783081055,
+  "processed_at": "2026-05-23T18:22:40.059735",
+  "names_found": [
+    "natural de Maria",
+    "Villa de Celorico",
+    "lugar de Espinheiro",
+    "mezes de idade",
+    "freguezia de Santa",
+    "anno de mil",
+    "Anna de Jesus",
+    "natural de Manteigas",
+    "mez de Dezembro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "natural de Maria",
+    "natural de Manteigas",
+    "Celorico da Beira"
+  ]
+}

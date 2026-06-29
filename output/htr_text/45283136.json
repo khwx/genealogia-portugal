@@ -1,0 +1,25 @@
+{
+  "file_id": "45283136",
+  "raw_text": "{\n  \"transcription\": \"Ha de servir este livro para n'elle se lançarem, na conformidade das Ordens Regias, os assentos de obitos, que tiverem lugar na freguezia de Santa Maria da Villa de Celorico da Beira, Bispado da Guarda; numerado, e rubricado outro igual a este para a mesma freguezia, cuja numeração e rubrica faço em virtude da authorização que foi concedida em Circular de 28 de Setembro de 1864. Celorico da Beira 4 de Janeiro de 1876.\\n\\nO Prior de Santa Maria\\nJosé Mendes d'Almeida\\n\\nPACO 7\\nLivro 53\",\n  \"deceased\": []\n}",
+  "structured": {
+    "names": [
+      "Setembro de 1864",
+      "Circular de 28",
+      "Ha de servir",
+      "Prior de Santa",
+      "freguezia de Santa",
+      "assentos de obitos",
+      "Janeiro de 1876",
+      "Villa de Celorico"
+    ],
+    "dates": [
+      "28 de Setembro de 1864",
+      "4 de Janeiro de 1876",
+      "1876",
+      "1864"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

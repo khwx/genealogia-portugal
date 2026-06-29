@@ -1,0 +1,20 @@
+{
+  "file_id": "25850737",
+  "source_file": "25850737.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 273,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 11.30019998550415,
+  "processed_at": "2026-05-02T17:52:27.484858",
+  "names_found": [
+    "anno de mil",
+    "mulher de Duarte",
+    "Villa de Cellorico",
+    "mes de De"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

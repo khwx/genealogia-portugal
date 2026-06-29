@@ -1,0 +1,21 @@
+{
+  "file_id": "45283362",
+  "source_file": "45283362.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 248,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 131.59328293800354,
+  "processed_at": "2026-05-24T08:26:25.325195",
+  "names_found": [
+    "rua de Baixo",
+    "anno de mil",
+    "mez de Setembro",
+    "freguezia de Santa",
+    "villa de Cel"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

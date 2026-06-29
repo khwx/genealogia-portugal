@@ -1,0 +1,18 @@
+{
+  "file_id": "45283604",
+  "source_file": "45283604.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 261,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 9.93421721458435,
+  "processed_at": "2026-05-26T08:03:25.232422",
+  "names_found": [
+    "Bairge de Guarda",
+    "concelho de mesma"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

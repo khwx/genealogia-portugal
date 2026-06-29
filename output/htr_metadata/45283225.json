@@ -1,0 +1,32 @@
+{
+  "file_id": "45283225",
+  "source_file": "45283225.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 535,
+  "tokens": 163,
+  "duration_ms": 0,
+  "wall_time_s": 10.365822553634644,
+  "processed_at": "2026-05-27T02:53:09.000921",
+  "names_found": [
+    "bisculher de 28",
+    "Janeiro de 1879",
+    "assentos de obitos",
+    "Dezembro de 1867",
+    "Parocho de Santa",
+    "serviço de obitos",
+    "freguesia de Santa",
+    "Villa de Celorico"
+  ],
+  "dates_found": [
+    "1 de Janeiro de 1879",
+    "28 de Dezembro de 1867",
+    "1879",
+    "1867"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

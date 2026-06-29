@@ -1,0 +1,26 @@
+{
+  "file_id": "25848556",
+  "source_file": "25848556.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 454,
+  "tokens": 165,
+  "duration_ms": 0,
+  "wall_time_s": 9.171132802963257,
+  "processed_at": "2026-05-02T15:07:18.409550",
+  "names_found": [
+    "página de rosto",
+    "Maria\nDe\nCelorico",
+    "Freguezia\nDe\nSanta",
+    "Maria de Celorico"
+  ],
+  "dates_found": [
+    "1810",
+    "1845",
+    "1854"
+  ],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

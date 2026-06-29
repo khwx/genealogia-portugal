@@ -1,0 +1,27 @@
+{
+  "file_id": "45283077",
+  "source_file": "45283077.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 619,
+  "tokens": 210,
+  "duration_ms": 0,
+  "wall_time_s": 9.26995849609375,
+  "processed_at": "2026-05-02T19:42:46.018246",
+  "names_found": [
+    "Dezembro de 1860",
+    "Maria de Celorico",
+    "anno de 1861",
+    "Ha de servir",
+    "Termo de Abertura"
+  ],
+  "dates_found": [
+    "1861",
+    "1860",
+    "29 de Dezembro de 1860"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

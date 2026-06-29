@@ -1,0 +1,34 @@
+{
+  "file_id": "25850320",
+  "source_file": "25850320.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 732,
+  "tokens": 217,
+  "duration_ms": 0,
+  "wall_time_s": 11.845336198806763,
+  "processed_at": "2026-05-02T17:05:41.798456",
+  "names_found": [
+    "Mendes de Carvalho",
+    "mes de Agosto",
+    "datado de 1777",
+    "anno de\nmil",
+    "Igreja de São",
+    "Villa de Celorico",
+    "paróquia de São",
+    "vila de Celorico",
+    "mestre de\npedreiro",
+    "registo de óbitos",
+    "tempo de lhe",
+    "cauza de se",
+    "sofocar de repente"
+  ],
+  "dates_found": [
+    "1777"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "Celorico"
+  ]
+}

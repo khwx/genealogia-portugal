@@ -1,0 +1,18 @@
+{
+  "file_id": "25855979",
+  "source_file": "25855979.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 209,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.093812227249146,
+  "processed_at": "2026-05-02T18:07:41.193218",
+  "names_found": [
+    "fa de Gouvea",
+    "trinta de Setembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,24 @@
+{
+  "file_id": "45283357",
+  "raw_text": "{\n  \"transcription\": \"No. 69. Auxilia da Conceição. Inocente. Aos seis dias do mez de Julho, digo mez de Junho do anno de mil oitocentos oitenta e tres, ás duas horas da madrugada, n'uma caza sita na rua da Misericordia d'esta freguezia de Santa Maria, da Villa de Celorico da Beira, concelho d'ella, Bispado da Guarda, falleceu um individuo do sexo feminino, por nome Auxilia da Conceição, de dezasete mezes d'idade, natural e moradora n'esta freguezia, filha legitima de João Domingos, e Maria Rocha, Jornaleiros, a qual foi sepultada no cemiterio publico d'esta dita Villa. E para constar lavrei em duplicado este assento que assigno. Era ut supra. O Prior Jozé Mendes d'Almeida\\n\\nNo. 70. Maria Joze Felizes. Aos quinze dias do mez de Julho do anno de mil oitocentos oitenta e tres, ás cinco horas da tarde, n'uma caza sita na rua do Poço d'esta freguezia de Santa Maria, da Villa de Celorico da Beira, concelho d'ella, Bispado da Guarda, falleceu, socorrida com os Sacramentos da Igreja, um individuo do sexo feminino, por nome Maria Joze Felizes, natural do lugar dos Chãos, do Bispado de Vizeu, e moradora n'esta freguezia, d'idade de quarenta e dois annos, Proprietaria, cazada com Jorge de Campos Felizes, filha legitima de Manoel Cabral, e d'outra Maria Joze, a qual deixou filhos, não fez testamento, e foi sepultada no cemiterio publico d'esta referida Villa. E para constar lavrei em duplicado este assento que assigno. Era ut supra. O Prior Jozé Mendes d'Almeida\",\n  \"deceased\": [\n    {\n      \"name\": \"Auxilia da Conceição\",\n      \"death_date\": \"1883-06-06\",\n      \"age\": \"17 meses\",\n      \"father\": \"João Domingos\",\n      \"mother\": \"Maria Rocha\",\n      \"spouse\": null\n    },",
+  "structured": {
+    "names": [
+      "anno de mil",
+      "mez de Julho",
+      "legitima de Manoel",
+      "Bispado de Vizeu",
+      "legitima de João",
+      "idade de quarenta e dois",
+      "freguezia de Santa",
+      "mez de Junho",
+      "Jorge de Campos",
+      "Villa de Celorico"
+    ],
+    "dates": [
+      "1883"
+    ],
+    "places": [
+      "Celorico da Beira"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "file_id": "45283343",
+  "source_file": "45283343.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 259,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 21.18892812728882,
+  "processed_at": "2026-05-02T21:45:38.100402",
+  "names_found": [
+    "freguezia de Santa",
+    "anno de mil",
+    "Villa de Cellorico"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,17 @@
+{
+  "file_id": "25847872",
+  "source_file": "25847872.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 251,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.883445262908936,
+  "processed_at": "2026-05-02T12:55:07.381028",
+  "names_found": [
+    "mulher de Antonio"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25850696",
+  "source_file": "25850696.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 311,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 11.528481721878052,
+  "processed_at": "2026-05-02T17:41:03.003444",
+  "names_found": [
+    "Villa de Selo",
+    "Rodrigues de Oliveira",
+    "era de mil",
+    "Igreja de Sam",
+    "mes\nde Septembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

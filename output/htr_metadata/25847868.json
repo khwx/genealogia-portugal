@@ -1,0 +1,18 @@
+{
+  "file_id": "25847868",
+  "source_file": "25847868.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 310,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.604790925979614,
+  "processed_at": "2026-05-02T12:54:17.405119",
+  "names_found": [
+    "assento de Dio",
+    "tempo de minha"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

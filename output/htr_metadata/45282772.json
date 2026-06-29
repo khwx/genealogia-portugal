@@ -1,0 +1,18 @@
+{
+  "file_id": "45282772",
+  "source_file": "45282772.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 223,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 8.740270614624023,
+  "processed_at": "2026-05-02T19:32:31.700112",
+  "names_found": [
+    "anno de mil",
+    "mez de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

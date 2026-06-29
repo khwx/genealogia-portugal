@@ -1,0 +1,24 @@
+{
+  "file_id": "45283342",
+  "source_file": "45283342.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 237,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 9.967136859893799,
+  "processed_at": "2026-05-24T08:02:58.649467",
+  "names_found": [
+    "mez de Setembro",
+    "Villa de Celorico",
+    "freguezia de Santa",
+    "anno de mil"
+  ],
+  "dates_found": [
+    "1860"
+  ],
+  "places_found": [
+    "Celorico"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "file_id": "25856140",
+  "source_file": "25856140.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 277,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 11.53461480140686,
+  "processed_at": "2026-05-02T18:36:45.490083",
+  "names_found": [
+    "Villa\nde Sel",
+    "Villa de Selorico",
+    "zia de Sam",
+    "casas de minha",
+    "tres de Abril"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

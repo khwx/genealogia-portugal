@@ -1,0 +1,22 @@
+{
+  "file_id": "25850736",
+  "source_file": "25850736.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 249,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 12.321244478225708,
+  "processed_at": "2026-05-02T17:52:11.182442",
+  "names_found": [
+    "Freguezia de Sam",
+    "Villa de Celorico",
+    "anno de mil",
+    "mes de Junho"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

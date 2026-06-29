@@ -1,0 +1,23 @@
+{
+  "file_id": "25849183",
+  "source_file": "25849183.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 266,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 9.834582805633545,
+  "processed_at": "2026-05-02T16:17:26.985255",
+  "names_found": [
+    "deixaram de sua",
+    "rezadas de esmola",
+    "Igreja de Santa",
+    "Villa de Celorico",
+    "houver de ordem"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

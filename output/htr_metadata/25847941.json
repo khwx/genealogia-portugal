@@ -1,0 +1,18 @@
+{
+  "file_id": "25847941",
+  "source_file": "25847941.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash-lite",
+  "status": "success",
+  "text_length": 6132,
+  "tokens": 1999,
+  "duration_ms": 0,
+  "wall_time_s": 8.281049251556396,
+  "processed_at": "2026-05-02T13:33:53.355282",
+  "names_found": [
+    "mais de dez",
+    "mez de\nnovembro"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

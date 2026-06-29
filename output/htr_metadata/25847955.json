@@ -1,0 +1,21 @@
+{
+  "file_id": "25847955",
+  "source_file": "25847955.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash-lite",
+  "status": "success",
+  "text_length": 4424,
+  "tokens": 2000,
+  "duration_ms": 0,
+  "wall_time_s": 7.510616779327393,
+  "processed_at": "2026-05-02T13:36:26.322873",
+  "names_found": [
+    "falecio de Vila",
+    "filho de Jorge",
+    "Lano de mª",
+    "filla de Jorge",
+    "mordomo de Lany"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

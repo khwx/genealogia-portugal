@@ -1,0 +1,20 @@
+{
+  "file_id": "25850336",
+  "source_file": "25850336.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 288,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 10.719499826431274,
+  "processed_at": "2026-05-02T17:10:03.356429",
+  "names_found": [
+    "mes de Dezembro",
+    "ficou de Manoel",
+    "anno\nde mil",
+    "sette de dezoito"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

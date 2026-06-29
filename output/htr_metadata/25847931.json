@@ -1,0 +1,22 @@
+{
+  "file_id": "25847931",
+  "source_file": "25847931.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 247,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 12.941718816757202,
+  "processed_at": "2026-05-02T13:18:57.317679",
+  "names_found": [
+    "mulher de Manoel",
+    "villa de\nCelorico e fregue",
+    "mes de Janeiro",
+    "Celorico de Santa"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

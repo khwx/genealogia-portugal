@@ -1,0 +1,20 @@
+{
+  "file_id": "25855971",
+  "source_file": "25855971.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 302,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 12.700307130813599,
+  "processed_at": "2026-05-02T18:05:30.282711",
+  "names_found": [
+    "registo de óbito",
+    "nomeação de herdeiros",
+    "registo de um",
+    "data de óbito"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

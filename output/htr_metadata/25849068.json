@@ -1,0 +1,25 @@
+{
+  "file_id": "25849068",
+  "source_file": "25849068.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 269,
+  "tokens": 79,
+  "duration_ms": 0,
+  "wall_time_s": 10.261860132217407,
+  "processed_at": "2026-05-02T15:45:05.312229",
+  "names_found": [
+    "morreo de sua",
+    "Villa de Celor",
+    "idade de setenta",
+    "Villa\nde Celorico",
+    "freguesia de Santa",
+    "testamento de Antonio"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de Santa",
+    "Celorico"
+  ]
+}

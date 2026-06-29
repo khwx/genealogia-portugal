@@ -1,0 +1,18 @@
+{
+  "file_id": "25856543",
+  "source_file": "25856543.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 242,
+  "tokens": 80,
+  "duration_ms": 0,
+  "wall_time_s": 9.489443302154541,
+  "processed_at": "2026-05-02T19:14:08.686030",
+  "names_found": [
+    "Outubro de mil",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

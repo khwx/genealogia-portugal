@@ -1,0 +1,20 @@
+{
+  "file_id": "45283483",
+  "raw_text": "```json\n{\n  \"transcription\": \"1844. Aos vinte e hum de Dezembro de mil oitocentos quarenta e quatro, na casa de sua morada, na freguesia de Santa Maria, e Villa de Celorico da Beira, parochiana desta freguesia, e na mesma idade de vinte e",
+  "structured": {
+    "names": [
+      "hum de Dezembro",
+      "Villa de Celorico",
+      "idade de vinte",
+      "freguesia de Santa",
+      "casa de sua"
+    ],
+    "dates": [
+      "1844"
+    ],
+    "places": [
+      "freguesia de Santa",
+      "Celorico da Beira"
+    ]
+  }
+}

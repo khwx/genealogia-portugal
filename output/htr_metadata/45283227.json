@@ -1,0 +1,22 @@
+{
+  "file_id": "45283227",
+  "source_file": "45283227.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 250,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.625680446624756,
+  "processed_at": "2026-05-27T02:55:31.091036",
+  "names_found": [
+    "anno de mil",
+    "Villa de Celorico",
+    "mez de Março",
+    "freguezia de Santa"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

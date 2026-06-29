@@ -1,0 +1,18 @@
+{
+  "file_id": "25856565",
+  "source_file": "25856565.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 238,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.418247938156128,
+  "processed_at": "2026-05-02T19:19:41.171364",
+  "names_found": [
+    "mez de Julho",
+    "Igreja\nde S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

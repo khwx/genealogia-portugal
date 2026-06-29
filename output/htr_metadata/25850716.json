@@ -1,0 +1,21 @@
+{
+  "file_id": "25850716",
+  "source_file": "25850716.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 11.556480884552002,
+  "processed_at": "2026-05-02T17:46:40.896878",
+  "names_found": [
+    "Igreja de São",
+    "freguesia de São",
+    "mes de Mayo"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "freguesia de São"
+  ]
+}

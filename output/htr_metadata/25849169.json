@@ -1,0 +1,21 @@
+{
+  "file_id": "25849169",
+  "source_file": "25849169.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 254,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 10.761203527450562,
+  "processed_at": "2026-05-02T16:13:26.655131",
+  "names_found": [
+    "freguezia de Santa",
+    "mes de Outubro",
+    "Maria de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

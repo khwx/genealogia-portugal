@@ -1,0 +1,23 @@
+{
+  "file_id": "25849060",
+  "source_file": "25849060.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 250,
+  "tokens": 76,
+  "duration_ms": 0,
+  "wall_time_s": 9.460307598114014,
+  "processed_at": "2026-05-02T15:42:54.117184",
+  "names_found": [
+    "fregues de que",
+    "Igreja de Santa",
+    "da de onde",
+    "casa de Manoel",
+    "villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

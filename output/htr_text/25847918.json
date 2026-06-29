@@ -1,0 +1,19 @@
+{
+  "file_id": "25847918",
+  "raw_text": "Este documento contém um testamento e dois assentos de óbito da freguesia de Santa Maria, na vila de Celorico da Beira, datados de 1755. A imagem apresenta o aviso \"TINTA TRANSPASSADA\", indicando que a tinta do verso da folha manchou a frente, dificultando a leitura em certas partes.",
+  "structured": {
+    "names": [
+      "datados de 1755",
+      "vila de Celorico",
+      "assentos de óbito",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1755"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

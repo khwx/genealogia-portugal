@@ -1,0 +1,19 @@
+{
+  "file_id": "45283191",
+  "source_file": "45283191.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 257,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 10.353088140487671,
+  "processed_at": "2026-05-25T02:45:50.750412",
+  "names_found": [
+    "freguezia de Santa",
+    "anno de mil",
+    "mez de Junho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

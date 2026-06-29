@@ -1,0 +1,20 @@
+{
+  "file_id": "25856142",
+  "raw_text": "Este documento contém vários registos de óbito da freguesia de Santa Maria, em Celorico da Beira, datados de 1781. Curiosamente, os quatro registos principais nestas páginas referem-se a mulheres com o mesmo nome e estado civil (Maria de Jesus, viúva de Manoel Fernandes), o que sugere uma coincidência comum",
+  "structured": {
+    "names": [
+      "viúva de Manoel",
+      "datados de 1781",
+      "registos de óbito",
+      "Maria de Jesus",
+      "freguesia de Santa"
+    ],
+    "dates": [
+      "1781"
+    ],
+    "places": [
+      "Celorico da Beira",
+      "freguesia de Santa"
+    ]
+  }
+}

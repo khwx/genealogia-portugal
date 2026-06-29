@@ -1,0 +1,20 @@
+{
+  "file_id": "45283198",
+  "source_file": "45283198.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 233,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 14.297496795654297,
+  "processed_at": "2026-05-27T02:19:17.811011",
+  "names_found": [
+    "Villa de Celor",
+    "anno de mil",
+    "mez de Setembro",
+    "freguezia de Santa"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

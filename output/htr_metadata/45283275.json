@@ -1,0 +1,19 @@
+{
+  "file_id": "45283275",
+  "source_file": "45283275.tiff",
+  "backend": "gemini",
+  "model": "gemini-2.5-flash",
+  "status": "success",
+  "text_length": 253,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 14.90420651435852,
+  "processed_at": "2026-05-25T08:20:53.391107",
+  "names_found": [
+    "mez de Janeiro"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico da Beira"
+  ]
+}

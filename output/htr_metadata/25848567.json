@@ -1,0 +1,22 @@
+{
+  "file_id": "25848567",
+  "source_file": "25848567.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 246,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 12.458700895309448,
+  "processed_at": "2026-05-02T15:10:18.862715",
+  "names_found": [
+    "dezoito de Abril",
+    "Escrivão de meu",
+    "viverão de mil",
+    "Villa de Celorico"
+  ],
+  "dates_found": [],
+  "places_found": [
+    "Celorico"
+  ]
+}

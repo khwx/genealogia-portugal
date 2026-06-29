@@ -1,0 +1,17 @@
+{
+  "file_id": "45282779",
+  "source_file": "45282779.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 252,
+  "tokens": 77,
+  "duration_ms": 0,
+  "wall_time_s": 10.076972246170044,
+  "processed_at": "2026-05-02T19:34:18.156120",
+  "names_found": [
+    "legitimo de Jorge"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

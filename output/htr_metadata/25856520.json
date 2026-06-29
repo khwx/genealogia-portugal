@@ -1,0 +1,35 @@
+{
+  "file_id": "25856520",
+  "source_file": "25856520.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 2106,
+  "tokens": 729,
+  "duration_ms": 0,
+  "wall_time_s": 9.182307720184326,
+  "processed_at": "2026-05-02T19:08:05.683632",
+  "names_found": [
+    "idade de dezaseis",
+    "Abril de\nmil",
+    "Santo de minha",
+    "como de raiz",
+    "termo de Celo",
+    "alma de minha",
+    "Abril de 1822",
+    "idade de setenta",
+    "mez de Maio",
+    "alma de meu",
+    "Maio de 1822",
+    "Freguezia de S",
+    "zia de S",
+    "Igreja de S",
+    "filho de Diogo"
+  ],
+  "dates_found": [
+    "28 de Abril de 1822",
+    "8 de Maio de 1822",
+    "1822"
+  ],
+  "places_found": []
+}

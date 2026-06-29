@@ -1,0 +1,27 @@
+{
+  "file_id": "25849247",
+  "source_file": "25849247.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 944,
+  "tokens": 289,
+  "duration_ms": 0,
+  "wall_time_s": 11.569692134857178,
+  "processed_at": "2026-05-02T16:35:00.548773",
+  "names_found": [
+    "mes de Julho",
+    "Pires de idade",
+    "freguezia de Santa",
+    "Ines de\nGouveia",
+    "Ines de Gou",
+    "veia de dezoito",
+    "Leitão de Brito",
+    "idade de dezoito",
+    "sepultura de seus",
+    "filha de\nBernardo",
+    "mes de\nJulho"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

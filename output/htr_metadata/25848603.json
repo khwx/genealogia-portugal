@@ -1,0 +1,29 @@
+{
+  "file_id": "25848603",
+  "source_file": "25848603.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 548,
+  "tokens": 164,
+  "duration_ms": 0,
+  "wall_time_s": 10.721729040145874,
+  "processed_at": "2026-05-02T15:20:24.983745",
+  "names_found": [
+    "Maria de Almeida",
+    "livro de óbitos",
+    "dez de Agosto",
+    "mo de Francisco",
+    "perigo de vida",
+    "datadas de 1829",
+    "freguesia de Santa",
+    "Ermida de Nossa"
+  ],
+  "dates_found": [
+    "1829"
+  ],
+  "places_found": [
+    "Celorico da Beira",
+    "freguesia de Santa"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "file_id": "25856570",
+  "source_file": "25856570.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 258,
+  "tokens": 78,
+  "duration_ms": 0,
+  "wall_time_s": 8.773275375366211,
+  "processed_at": "2026-05-02T19:20:56.970096",
+  "names_found": [
+    "mez de Fevereiro",
+    "Igreja de S"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

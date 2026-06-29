@@ -1,0 +1,17 @@
+{
+  "file_id": "45283141",
+  "source_file": "45283141.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 214,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 8.385590076446533,
+  "processed_at": "2026-05-23T18:31:39.853791",
+  "names_found": [
+    "anno de mil"
+  ],
+  "dates_found": [],
+  "places_found": []
+}

@@ -1,0 +1,14 @@
+{
+  "file_id": "25849275",
+  "raw_text": "Record 4 (Right page, bottom):**\n  - NOME: Maria\n  - DATA ÓBITO: 18 de Agosto de 1797\n  - IDADE: 22 anos\n  - PAI: Manoel Francisco\n  - MÃE: Caetania Maria\n  - CÔNJUGE: Solteira\n",
+  "structured": {
+    "names": [
+      "Agosto de 1797"
+    ],
+    "dates": [
+      "18 de Agosto de 1797",
+      "1797"
+    ],
+    "places": []
+  }
+}

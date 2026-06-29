@@ -1,0 +1,19 @@
+{
+  "file_id": "25849179",
+  "source_file": "25849179.tiff",
+  "backend": "gemini",
+  "model": "gemini-3-flash-preview",
+  "status": "success",
+  "text_length": 227,
+  "tokens": 75,
+  "duration_ms": 0,
+  "wall_time_s": 11.547912120819092,
+  "processed_at": "2026-05-02T16:16:21.249806",
+  "names_found": [
+    "menor de idade",
+    "mes de Março",
+    "legitima de\nManoel"
+  ],
+  "dates_found": [],
+  "places_found": []
+}
