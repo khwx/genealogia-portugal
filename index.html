@@ -7,242 +7,151 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a;
-            --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8;
-            --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e;
-            --radius: 12px;
-        }
+        :root { --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a; --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8; --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e; --radius: 12px; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-
-        .topbar {
-            background: var(--bg2); border-bottom: 1px solid var(--border);
-            padding: 0 24px; height: 60px; display: flex; align-items: center;
-            justify-content: space-between; position: sticky; top: 0; z-index: 100;
-        }
+        .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
         .logo span { color: var(--accent2); }
-        .nav-links { display: flex; gap: 4px; }
-        .nav-link {
-            color: var(--text2); font-size: .85rem; padding: 6px 12px;
-            border-radius: 8px; text-decoration: none; transition: .2s;
-        }
-        .nav-link:hover, .nav-link.active { background: var(--bg3); color: var(--text); }
-
         .hero { text-align: center; padding: 60px 20px 40px; }
         .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; }
         .hero p { color: var(--text2); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.5; }
-
         .search-container { max-width: 700px; margin: 0 auto 40px; padding: 0 20px; }
-        .search-box {
-            display: flex; background: var(--bg2); border: 2px solid var(--border);
-            border-radius: 100px; padding: 6px; transition: .3s;
-        }
+        .search-box { display: flex; background: var(--bg2); border: 2px solid var(--border); border-radius: 100px; padding: 6px; transition: .3s; }
         .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,99,255,0.1); }
-        .search-input {
-            flex: 1; background: transparent; border: none; color: var(--text);
-            font-size: 1.1rem; padding: 12px 20px; outline: none; font-family: inherit;
-        }
-        .search-btn {
-            background: var(--accent); color: white; border: none; border-radius: 100px;
-            padding: 0 32px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; font-family: inherit;
-        }
-        .search-btn:hover { background: var(--accent2); transform: scale(1.02); }
-
-        .results-container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
-        
-        .filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-        .filter-select {
-            background: var(--bg2); color: var(--text); border: 1px solid var(--border);
-            border-radius: 8px; padding: 8px 16px; outline: none; font-family: inherit; font-size: .9rem;
-        }
-
-        .record-card {
-            background: var(--bg2); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center; transition: .2s;
-        }
-        .record-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .record-main { flex: 1; }
-        .record-name { font-size: 1.25rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-        .record-meta { font-size: .85rem; color: var(--text2); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-        .record-meta span { display: flex; align-items: center; gap: 6px; }
-        .meta-icon { opacity: 0.7; }
-        
-        .view-btn {
-            background: var(--bg3); color: var(--text); border: 1px solid var(--border);
-            padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: .85rem;
-            transition: .2s; margin-left: 16px; display: inline-flex; align-items: center; gap: 6px;
-        }
-        .view-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
-        .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.5; }
-        
-        .loading-spinner {
-            display: none; width: 40px; height: 40px; border: 3px solid var(--border);
-            border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
-        .stats { display: flex; justify-content: center; gap: 32px; margin-top: 32px; opacity: 0.8; }
-        .stat-item { text-align: center; }
-        .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--text); }
-        .stat-lbl { font-size: .8rem; color: var(--text2); margin-top: 4px; }
+        .search-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; padding: 12px 20px; outline: none; font-family: inherit; }
+        .search-btn { background: var(--accent); color: white; border: none; border-radius: 100px; padding: 0 32px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; font-family: inherit; }
+        .search-btn:hover { background: var(--accent2); }
+        .results-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        .result-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; transition: .2s; }
+        .result-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .result-name { font-size: 1.2rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .result-meta { display: flex; gap: 16px; color: var(--text2); font-size: 0.9rem; flex-wrap: wrap; }
+        .result-meta span { display: flex; align-items: center; gap: 6px; }
+        .result-meta .icon { color: var(--accent2); }
+        .loading { text-align: center; padding: 40px; color: var(--text2); }
+        .stats-bar { display: flex; gap: 12px; padding: 16px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .stat-chip { padding: 6px 14px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
+        .stat-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
     </style>
 </head>
 <body>
+    <div class="topbar">
+        <a href="#" class="logo">Genealogia <span>Portugal</span></a>
+        <nav class="nav-links">
+            <a href="#" class="nav-link active">Pesquisa</a>
+            <a href="review.html" class="nav-link">Revisão</a>
+        </nav>
+    </div>
 
-    <nav class="topbar">
-        <div style="display:flex;align-items:center;gap:16px;">
-            <a href="/" class="logo">🌳 Genealogia <span>Portugal</span></a>
-            <div class="nav-links">
-                <a href="/" class="nav-link active">🔍 Pesquisar</a>
-                <a href="index_pages.html" class="nav-link">📚 Livros</a>
-                <a href="review.html" class="nav-link">✅ Revisão</a>
-                <a href="gedcom.html" class="nav-link">📤 Exportar</a>
-            </div>
-        </div>
-    </nav>
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-chip">Total: <span id="totalCount">...</span></div>
+        <div class="stat-chip">Com Data: <span id="dateCount">...</span></div>
+        <div class="stat-chip">Freguesias: <span id="freguesiaCount">...</span></div>
+    </div>
 
     <div class="hero">
-        <h1>Descobre os teus antepassados</h1>
-        <p>Pesquisa em milhares de registos paroquiais transcritos automaticamente do Arquivo Distrital e verificados pela nossa comunidade.</p>
-        
-        <div class="stats" id="global-stats">
-            <!-- Preenchido via JS -->
-        </div>
+        <h1>Descobre a tua história</h1>
+        <p>Pesquisa em registos de óbitos de Celorico da Beira. Mais de 850 pessoas transcritas e digitalizadas.</p>
     </div>
 
     <div class="search-container">
-        <form class="search-box" onsubmit="event.preventDefault(); doSearch();">
-            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome ou apelido (ex: João Figueiredo)...">
-            <button type="submit" class="search-btn">Pesquisar</button>
-        </form>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome, freguesia ou data...">
+            <button id="searchBtn" class="search-btn">Pesquisar</button>
+        </div>
     </div>
 
-    <div class="results-container">
-        <div class="filters" style="display: none;" id="filters-bar">
-            <!-- Aqui podíamos adicionar filtros dinâmicos de ano/freguesia caso houvesse backend para group by -->
-        </div>
-
-        <div class="loading-spinner" id="spinner"></div>
-        <div id="results">
-            <!-- Resultados aparecem aqui -->
-        </div>
+    <div class="results-container" id="resultsContainer">
+        <div class="loading">A carregar dados...</div>
     </div>
 
     <script>
-    async function loadStats() {
-        try {
-            // Conta os registos totais se a tabela permitir
-            // Como é Supabase, usamos limit=1 e param "count=exact"
-            const res = await fetch('/api/pessoas?limit=1');
-            // Como é um proxy, pode não trazer headers. Vamos só contar os livros como fallback
-            const resLivros = await fetch('/api/livros');
-            const livros = await resLivros.json();
-            
-            document.getElementById('global-stats').innerHTML = `
-                <div class="stat-item">
-                    <div class="stat-val">${livros.length}</div>
-                    <div class="stat-lbl">Livros Inventariados</div>
-                </div>
-            `;
-        } catch(e) {}
-    }
-
-    async function doSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        const resultsDiv = document.getElementById('results');
-        const spinner = document.getElementById('spinner');
+        // Configuração Supabase (Vai buscar às variáveis de ambiente do Vercel)
+        const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL || 'https://qljopxbxgflozrcdblrl.supabase.co';
+        const SUPABASE_KEY = import.meta.env?.VITE_SUPABASE_KEY || 'sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
         
-        resultsDiv.innerHTML = '';
-        spinner.style.display = 'block';
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
 
-        let url = '/api/pessoas';
-        if (query) {
-            url += `?q=${encodeURIComponent(query)}`;
+        let allData = [];
+        let filteredData = [];
+
+        // Carregar dados iniciais
+        async function loadData() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&limit=2000`, { headers });
+                if (!response.ok) throw new Error('Erro ao carregar dados');
+                allData = await response.json();
+                
+                // Atualizar estatísticas
+                const total = allData.length;
+                const withDate = allData.filter(p => p.data_obito).length;
+                const freguesias = new Set(allData.map(p => p.freguesia).filter(Boolean)).size;
+                
+                document.getElementById('totalCount').textContent = total;
+                document.getElementById('dateCount').textContent = withDate;
+                document.getElementById('freguesiaCount').textContent = freguesias;
+                
+                filteredData = allData;
+                renderResults(filteredData);
+            } catch (error) {
+                document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:var(--red)">Erro: ${error.message}</div>`;
+            }
         }
 
-        try {
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            spinner.style.display = 'none';
-
-            if (data.error) {
-                showError("Erro a conectar à base de dados: " + data.error);
+        // Renderizar resultados
+        function renderResults(data) {
+            const container = document.getElementById('resultsContainer');
+            if (data.length === 0) {
+                container.innerHTML = '<div class="loading">Nenhum resultado encontrado.</div>';
                 return;
             }
 
-            if (!data || data.length === 0) {
-                showEmptyDesc("Nenhum registo encontrado para a tua pesquisa. Tenta com menos nomes ou apelidos diferentes.");
-                return;
-            }
-
-            renderResults(data);
-
-        } catch (err) {
-            spinner.style.display = 'none';
-            showError("Aconteceu um erro inesperado ao pesquisar.");
-        }
-    }
-
-    function renderResults(records) {
-        const resultsDiv = document.getElementById('results');
-        
-        resultsDiv.innerHTML = `
-            <div style="font-size:.85rem; color:var(--text2); margin-bottom:16px;">
-                Mostrando os ${records.length} registos ${document.getElementById('searchInput').value ? 'encontrados' : 'recentes'}.
-            </div>
-        ` + records.map(reg => `
-            <div class="record-card">
-                <div class="record-main">
-                    <div class="record-name">${esc(reg.nome)}</div>
-                    <div class="record-meta">
-                        ${reg.data_obito ? `<span><span class="meta-icon">💀</span> ${esc(reg.data_obito)}</span>` : ''}
-                        ${reg.freguesia ? `<span><span class="meta-icon">📍</span> ${esc(reg.freguesia)}${reg.concelho ? ', ' + esc(reg.concelho) : ''}</span>` : ''}
-                        ${reg.ano ? `<span><span class="meta-icon">📅</span> ${esc(reg.ano)}</span>` : ''}
+            container.innerHTML = data.map(person => {
+                const nome = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Desconhecido';
+                const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Sem data';
+                const freguesia = person.freguesia || 'Celorico da Beira';
+                
+                return `
+                    <div class="result-card">
+                        <div class="result-name">${nome}</div>
+                        <div class="result-meta">
+                            <span><span class="icon">📅</span> ${dataObito}</span>
+                            <span><span class="icon">📍</span> ${freguesia}</span>
+                            ${person.concelho ? `<span><span class="icon">🏛️</span> ${person.concelho}</span>` : ''}
+                        </div>
                     </div>
-                </div>
-                ${reg.imagem_url ? `<a href="${esc(reg.imagem_url)}" target="_blank" class="view-btn">📄 Ver Original</a>` : `
-                ${reg.fonte ? `<span style="font-size:0.75rem;color:var(--text2); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px;">Transcrito</span>` : ''}`}
-            </div>
-        `).join('');
-    }
+                `;
+            }).join('');
+        }
 
-    function showEmptyDesc(msg) {
-        document.getElementById('results').innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">🔍</div>
-                <h3 style="font-size:1.2rem; color:var(--text); margin-bottom:8px;">Nenhum resultado</h3>
-                <p>${msg}</p>
-            </div>
-        `;
-    }
-
-    function showError(msg) {
-        document.getElementById('results').innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">⚠️</div>
-                <h3 style="font-size:1.2rem; color:var(--text); margin-bottom:8px;">Erro na Pesquisa</h3>
-                <p>Muitas vezes isto significa que a base de dados ainda não tem registos adicionados ao sistema. Processa e aprova registos no Editor.</p>
-                <code style="display:block; margin-top:12px; font-size:0.8rem; opacity:0.5;">${msg}</code>
-            </div>
-        `;
-    }
-
-    function esc(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>"']/g, function(m) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        // Pesquisa
+        document.getElementById('searchBtn').addEventListener('click', performSearch);
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
         });
-    }
 
-    // Carregar inicialmente os 50 registos mais recentes ou stats
-    doSearch();
-    loadStats();
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (!query) {
+                filteredData = allData;
+            } else {
+                filteredData = allData.filter(person => {
+                    const nome = `${person.nome || ''} ${person.sobrenome || ''}`.toLowerCase();
+                    const freguesia = (person.freguesia || '').toLowerCase();
+                    const data = (person.data_obito || '').toLowerCase();
+                    return nome.includes(query) || freguesia.includes(query) || data.includes(query);
+                });
+            }
+            renderResults(filteredData);
+        }
+
+        // Iniciar
+        loadData();
     </script>
 </body>
 </html>

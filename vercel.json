@@ -2,14 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "src": "*.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/index.html",
+      "dest": "/index_vercel.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/api/index.py"
+      "dest": "/$1"
     }
-  ]
+  ],
+  "env": {
+    "VITE_SUPABASE_URL": "https://qljopxbxgflozrcdblrl.supabase.co",
+    "VITE_SUPABASE_KEY": "sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1"
+  }
 }
