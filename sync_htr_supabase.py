@@ -161,10 +161,28 @@ def extract_persons(raw_text):
     persons = []
     text = ' '.join(raw_text.split())
     
-    # Pattern 1: D. Name (title + name)
-    names_d = re.findall(r'D\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Ú][a-zà-ú]+){0,3})', text)
+    # Filter out common noise words in names
+    noise_words = {
+        'meu', 'minha', 'meus', 'minhas', 'pais', 'mãe', 'mae', 'pai', 'filho', 'filha',
+        'sua', 'suas', 'seus', 'seu', 'celorico', 'beira', 'distrito', 'guarda',
+        'arquivo', 'livro', 'folhas', 'folha', 'rubricadas', 'numeradas', 'vão',
+        'foi', 'sepultado', 'sepultada', 'assento', 'lavrei', 'testamento',
+        'faleceu', 'morreu', 'idade', 'anos', 'meses', 'dias'
+    }
+    
+    def clean_name(parts):
+        """Filter and clean name parts."""
+        cleaned = []
+        for part in parts:
+            part_lower = part.lower().strip('.,;:')
+            if part_lower not in noise_words and len(part) > 2:
+                cleaned.append(part)
+        return cleaned
+    
+    # Pattern 1: D. Name (title + name) - more flexible
+    names_d = re.findall(r'D\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){0,4})', text)
     for name in names_d:
-        parts = name.split()
+        parts = clean_name(name.split())
         if len(parts) >= 2:
             nome = ' '.join(parts[:-1])
             sobrenome = parts[-1]
@@ -172,20 +190,31 @@ def extract_persons(raw_text):
     
     # Pattern 2: Name de Name (surname patterns)
     if not persons:
-        names_surname = re.findall(r'([A-ZÀ-Ú][a-zà-ú]+(?:\s+de\s+[A-ZÀ-Ú][a-zà-ú]+)+)', text)
+        names_surname = re.findall(r'(?:^|[\s,;])([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,3})', text)
         for name in names_surname[:2]:
-            parts = name.split(" de ")
+            parts = clean_name(name.split())
             if len(parts) >= 2:
-                nome = " de ".join(parts[:-1])
+                nome = ' '.join(parts[:-1])
                 sobrenome = parts[-1]
                 persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
     
     # Pattern 3: faleceu o/a Name
     if not persons:
-        m = re.search(r'faleceu\s+(?:o|a)\s+([A-ZÀ-Ú][a-zà-ú\s]+?)(?:\s+(?:de|mulher|marido|foi|na))', text)
+        m = re.search(r'faleceu\s+(?:o|a)\s+([A-ZÀ-Ú][a-zà-ú\s]+?)(?:\s+(?:de|mulher|marido|foi|na|idade))', text)
         if m:
             name = m.group(1).strip()
-            parts = name.split()
+            parts = clean_name(name.split())
+            if len(parts) >= 2:
+                nome = ' '.join(parts[:-1])
+                sobrenome = parts[-1]
+                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    
+    # Pattern 4: Aos X dias... faleceu Nome
+    if not persons:
+        m = re.search(r'faleceu\s+(?:o|a)?\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){0,3})', text)
+        if m:
+            name = m.group(1).strip()
+            parts = clean_name(name.split())
             if len(parts) >= 2:
                 nome = ' '.join(parts[:-1])
                 sobrenome = parts[-1]
