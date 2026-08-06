@@ -1,0 +1,26 @@
+FROM selenium/standalone-chrome:120.0
+
+USER root
+
+# Instalar drivers de vídeo e bibliotecas para WebGL
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglx-mesa0 \
+    libegl-mesa0 \
+    libgbm1 \
+    libdrm2 \
+    libxcb-dri3-0 \
+    libxcb-present0 \
+    libxshmfence1 \
+    mesa-vulkan-drivers \
+    vulkan-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configurar variáveis para WebGL
+ENV MESA_GL_VERSION_OVERRIDE=3.3
+ENV MESA_GLSL_VERSION_OVERRIDE=330
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV GALLIUM_DRIVER=swrast
+
+USER seluser
