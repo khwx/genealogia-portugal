@@ -161,66 +161,125 @@ def extract_persons(raw_text):
     persons = []
     text = ' '.join(raw_text.split())
     
-    # Filter out common noise words in names
-    noise_words = {
-        'meu', 'minha', 'meus', 'minhas', 'pais', 'mãe', 'mae', 'pai', 'filho', 'filha',
-        'sua', 'suas', 'seus', 'seu', 'celorico', 'beira', 'distrito', 'guarda',
-        'arquivo', 'livro', 'folhas', 'folha', 'rubricadas', 'numeradas', 'vão',
-        'foi', 'sepultado', 'sepultada', 'assento', 'lavrei', 'testamento',
-        'faleceu', 'morreu', 'idade', 'anos', 'meses', 'dias'
-    }
+NOISE_WORDS = {
+    'villa', 'vila', 'igreja', 'igrejas', 'capella', 'capelas', 'collegiada',
+    'bispado', 'arquivo', 'distrito', 'freguesia', 'freguesias',
+    'cemiterio', 'cemitério', 'sepultura', 'sepultamento', 'sepultado',
+    'assento', 'assentos', 'livro', 'livros', 'folhas', 'folha',
+    'defuntos', 'morte', 'morto',
+    'sacramento', 'sacramentos', 'batismo', 'casamento', 'obito', 'óbito',
+    'testamento', 'testamentos',
+    'eram', 'desta', 'deste', 'desse', 'dessa', 'nesta', 'neste',
+    'era', 'anno', 'annos', 'anos', 'idade', 'meses', 'dias',
+    'janeiro', 'fevereiro', 'março', 'marco', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+    'santa', 'santo', 'santos', 'sancta', 'senhora', 'senhor',
+    'padre', 'reverendo', 'vigario', 'vigário', 'cura', 'prior',
+    'arcipreste', 'beneficiado', 'mordomo', 'juiz', 'escrivão',
+    'encomendado', 'provisor', 'vigairo',
+    'matriz', 'collegio', 'colégio', 'convento', 'mosteiro',
+    'ermida', 'cathedral', 'catedral', 'parochia', 'paróquia',
+    'oratorio', 'oratório', 'capellao', 'capelão', 'sacristia',
+    'celorico', 'celoricense', 'beirense', 'guarda',
+    'portugal', 'reinado', 'el-rei', 'el rei',
+    'magestade', 'majestade',
+    'mes', 'mez', 'mezes',
+    'irmaos', 'irmaãs', 'irmao', 'irmaã',
+    'neto', 'neta', 'netos', 'netas',
+    'sobrinho', 'sobrinha', 'sobrinhos', 'sobrinhas',
+    'tio', 'tia', 'tios', 'tias',
+    'avo', 'avos', 'avó', 'avô',
+    'cunhado', 'cunhada', 'cunhados', 'cunhadas',
+    'genro', 'nora',
+    'padrasto', 'madrasta',
+    'afilhado', 'afilhada', 'afilhados', 'afilhadas',
+    'compadre', 'comadre',
+    'vizinho', 'vizinha', 'vizinhos', 'vizinhas',
+    'proximo', 'proxima', 'proximos', 'proximas',
+    'familia', 'família', 'familias', 'famílias',
+    'alma', 'almas',
+    'domicilio', 'domicílio',
+    'função', 'funcao',
+    'serviço', 'servicos',
+}
+
+def clean_name(parts):
+    cleaned = []
+    for part in parts:
+        part_lower = part.lower().strip('.,;:')
+        if part_lower not in NOISE_WORDS and len(part) > 2:
+            cleaned.append(part)
+    return cleaned
+
+def extract_persons(raw_text):
+    """Extract person names from HTR text - STRICT mode."""
+    if not raw_text or len(raw_text.strip()) < 50:
+        return []
     
-    def clean_name(parts):
-        """Filter and clean name parts."""
-        cleaned = []
-        for part in parts:
-            part_lower = part.lower().strip('.,;:')
-            if part_lower not in noise_words and len(part) > 2:
-                cleaned.append(part)
-        return cleaned
+    persons = []
+    text = ' '.join(raw_text.split())
     
-    # Pattern 1: D. Name (title + name) - more flexible
-    names_d = re.findall(r'D\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){0,4})', text)
+    def try_add_name(parts):
+        cleaned = clean_name(parts)
+        if len(cleaned) >= 2:
+            nome = ' '.join(cleaned[:-1])[:100]
+            apelido = cleaned[-1][:50]
+            if nome and apelido and nome[0].isupper() and apelido[0].isupper():
+                persons.append({"nome": nome, "sobrenome": apelido})
+                return True
+        return False
+    
+    # 1. Very strict pattern: D. Nome (must have full name after D.)
+    names_d = re.findall(r'D\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,4})', text)
     for name in names_d:
-        parts = clean_name(name.split())
-        if len(parts) >= 2:
-            nome = ' '.join(parts[:-1])
-            sobrenome = parts[-1]
-            persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+        if try_add_name(name.split()):
+            return persons[:1]
     
-    # Pattern 2: Name de Name (surname patterns)
-    if not persons:
-        names_surname = re.findall(r'(?:^|[\s,;])([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,3})', text)
-        for name in names_surname[:2]:
-            parts = clean_name(name.split())
-            if len(parts) >= 2:
-                nome = ' '.join(parts[:-1])
-                sobrenome = parts[-1]
-                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    # 2. Obito/Oficio/Assento de + Name
+    names_obito = re.findall(r'(?:Obito|Oficio|Assento|Livro)\s+(?:de|da|do)\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,3})', text)
+    for name in names_obito:
+        if try_add_name(name.split()):
+            return persons[:1]
     
-    # Pattern 3: faleceu o/a Name
-    if not persons:
-        m = re.search(r'faleceu\s+(?:o|a)\s+([A-ZÀ-Ú][a-zà-ú\s]+?)(?:\s+(?:de|mulher|marido|foi|na|idade))', text)
-        if m:
-            name = m.group(1).strip()
-            parts = clean_name(name.split())
-            if len(parts) >= 2:
-                nome = ' '.join(parts[:-1])
-                sobrenome = parts[-1]
-                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    # 3. Priest titles + Name
+    titles = r'(?:Padre|Reverendo(?:\s+Padre)?)\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,3})'
+    names_priest = re.findall(titles, text)
+    for name in names_priest:
+        if try_add_name(name.split()):
+            return persons[:1]
     
-    # Pattern 4: Aos X dias... faleceu Nome
-    if not persons:
-        m = re.search(r'faleceu\s+(?:o|a)?\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){0,3})', text)
-        if m:
-            name = m.group(1).strip()
-            parts = clean_name(name.split())
-            if len(parts) >= 2:
-                nome = ' '.join(parts[:-1])
-                sobrenome = parts[-1]
-                persons.append({"nome": nome[:100], "sobrenome": sobrenome[:50]})
+    # 4. Title + Name (Encomendado, Vigario, Prior, etc.)
+    titles2 = r'(?:Encomendado|Vigario|Vigário|Cura|Prior|Arcipreste|Beneficiado|Mordomo|Juiz|Escrivão|Provisor)\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,3})'
+    names_title = re.findall(titles2, text)
+    for name in names_title:
+        if try_add_name(name.split()):
+            return persons[:1]
     
-    return persons[:3]
+    # 5. mulher/filho/filha de + Name
+    names_family = re.findall(r'(?:mulher|filho|filha|viuva?|sobrinha?|afilhada?|sobrinho|afilhado)\s+de\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,2})', text)
+    for name in names_family[:1]:
+        if try_add_name(name.split()):
+            return persons[:1]
+    
+    # 6. meu/minha + relationship + Name
+    names_family2 = re.findall(r'(?:meu|minha)\s+(?:sobrinho|sobrinha|afilhado|afilhada|filho|filha|irmao|irmaã|pai|mae)\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,2})', text)
+    for name in names_family2[:1]:
+        if try_add_name(name.split()):
+            return persons[:1]
+    
+    # 7. Name de Name (surname pattern) - require at least 2 "de" connections
+    names_surname = re.findall(r'(?:^|[\s,;])([A-ZÀ-Ú][a-zà-ú]+(?:\s+de\s+[A-ZÀ-Ú][a-zà-ú]+){1,2})', text)
+    for name in names_surname[:1]:
+        if try_add_name(name.split()):
+            return persons[:1]
+    
+    # 8. death event patterns with old spelling
+    names_death = re.findall(r'(?:faleceo|falleceu|falece|faleçeo|morreo|morreu)\s+(?:o|a)?\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de\s+|da\s+|do\s+)?[A-ZÀ-Ú][a-zà-ú]+){1,2})', text)
+    for name in names_death[:1]:
+        if try_add_name(name.split()):
+            return persons[:1]
+    
+    return persons[:1]
 
 def parse_day_word(text):
     text = text.strip().lower()
@@ -527,14 +586,16 @@ def main():
                     result = supabase_request("POST", "pessoas", record)
                     if result["status"] == "error":
                         if result.get("code") == 409:
-                            pass
+                            synced.add(file_id)
                         else:
                             print(f"  Error inserting {person['nome']}: {result}")
                             errors += 1
                     else:
+                        synced.add(file_id)
                         synced_count += 1
-            
-            synced.add(file_id)
+                else:
+                    synced.add(file_id)
+                    synced_count += 1
             
             if (i + 1) % 10 == 0:
                 print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
