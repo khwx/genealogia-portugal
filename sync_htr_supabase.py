@@ -27,6 +27,7 @@ SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_-oWYfk9uhb5DIByIe7
 INPUT_DIR = Path(os.environ.get("INPUT_DIR", "/home/pxtkhw/projetos/obitos/output/htr_text"))
 METADATA_DIR = Path(os.environ.get("METADATA_DIR", "/home/pxtkhw/projetos/obitos/output/htr_metadata"))
 CELORICO_JSON = Path(os.environ.get("CELORICO_JSON", "/home/pxtkhw/projetos/obitos/output/data/celorico_completo.json"))
+FREGUESIA_MAPPING_JSON = Path(os.environ.get("FREGUESIA_MAPPING_JSON", "/home/pxtkhw/projetos/obitos/output/data/freguesia_file_mapping.json"))
 STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/sync_htr_state.json"))
 
 DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
@@ -119,17 +120,24 @@ def is_good_quality(raw_text):
     return True
 
 def build_file_to_freguesia():
-    """Build mapping from file_id to freguesia."""
-    if not CELORICO_JSON.exists():
-        return {}
-    with open(CELORICO_JSON) as f:
-        data = json.load(f)
+    """Build mapping from file_id to freguesia. Uses combined mapping if available,
+    falls back to celorico_completo.json for backward compatibility."""
     mapping = {}
-    for doc in data.get("documentos", []):
-        freg = doc.get("freguesia", "")
-        for img in doc.get("imagens", []):
-            fid = str(img.get("file_id", ""))
-            mapping[fid] = freg
+    # 1. Try combined mapping file (includes all freguesias)
+    if FREGUESIA_MAPPING_JSON.exists():
+        with open(FREGUESIA_MAPPING_JSON) as f:
+            data = json.load(f)
+        mapping.update(data.get("mapping", {}))
+    # 2. Fallback: load from celorico_completo.json
+    if not mapping and CELORICO_JSON.exists():
+        with open(CELORICO_JSON) as f:
+            data = json.load(f)
+        for doc in data.get("documentos", []):
+            freg = doc.get("freguesia", "")
+            for img in doc.get("imagens", []):
+                fid = str(img.get("file_id", ""))
+                if fid:
+                    mapping[fid] = freg
     return mapping
 
 def is_valid_death_record(raw_text):
