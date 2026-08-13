@@ -323,18 +323,18 @@ class HTRProcessor:
 
             self.process_single(tiff_path)
 
-            # ULTRA SLOW MODE: 10 min delay between requests to avoid rate limits
-            # This processes ~100 images/day per 7 keys, well within quotas
+            # Rate-limit-aware delay between requests
+            # With 8 keys: 300s = 288 imgs/day total = 36/key/day (well within 150 free tier)
             if self.global_errors > 0 and self.global_success > 0:
                 error_rate = self.global_errors / (self.global_success + self.global_errors)
                 if error_rate > 0.5:
                     sleep_time = 900  # 15 min if many errors
                 elif error_rate > 0.2:
-                    sleep_time = 600   # 10 min if some errors (default)
+                    sleep_time = 600   # 10 min if some errors
                 else:
-                    sleep_time = 600    # 10 min base delay
+                    sleep_time = 300    # 5 min base delay (8 keys)
             else:
-                sleep_time = 600       # 10 min base delay between requests
+                sleep_time = 300       # 5 min base delay between requests (8 keys)
 
             if i > 0:  # Don't delay on first run
                 time.sleep(sleep_time)
