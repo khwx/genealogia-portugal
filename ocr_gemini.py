@@ -35,14 +35,11 @@ MONTHS_PT = {
     "dezembro": "12",
 }
 
-GEMINI_KEYS = [
-    """",
-    """",
-    """",
-    """",
-    """",
-    "***REMOVED***",
-]
+GEMINI_KEYS = [k.strip() for k in os.environ.get("GEMINI_KEYS", "").split(",") if k.strip()]
+if not GEMINI_KEYS:
+    single = os.environ.get("GEMINI_API_KEY", "").strip()
+    if single:
+        GEMINI_KEYS = [single]
 
 DOC_MAP = {
     "1d7ea53080f5401aa4c0a6d035244e71": {"titulo": "PCLB19/001/B2", "periodo": "1718-1728"},
