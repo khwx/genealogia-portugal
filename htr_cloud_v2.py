@@ -12,6 +12,7 @@ Comportamento:
 
 import os
 import sys
+import re
 import json
 import base64
 import time
@@ -112,6 +113,33 @@ logging.basicConfig(
     ],
 )
 log = logging.getLogger("htr_cloud_v2")
+
+def parse_gemini_json(text):
+    """Best-effort parse of the model JSON response.
+
+    The prompt asks for `{"transcription": ..., "deceased": [...]}`, but the
+    model sometimes wraps it in ```json fences or adds chatter. Returns the
+    parsed dict, or None if no valid JSON object is found.
+    """
+    if not text:
+        return None
+    t = text.strip()
+    if t.startswith("```"):
+        t = re.sub(r"^```[a-zA-Z]*\n?", "", t)
+        t = re.sub(r"```\s*$", "", t).strip()
+    start = t.find("{")
+    end = t.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        return None
+    frag = t[start:end + 1]
+    try:
+        obj = json.loads(frag)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    return obj
+
 
 PROMPT = """You are a transcription assistant for Portuguese historical documents.
 This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal.
@@ -439,13 +467,21 @@ class HTRProcessor:
                 "model": result.get("model", ""),
                 "key": result.get("key", ""),
                 "text_length": len(result.get("text", "")),
+                "parsed_ok": parsed is not None,
                 "wall_time_s": elapsed,
                 "processed_at": datetime.now().isoformat(),
             }
 
+            parsed = parse_gemini_json(result.get("text", ""))
+            transcription = parsed.get("transcription") if parsed else None
+            deceased = parsed.get("deceased") if parsed else None
+
             output_data = {
                 "file_id": file_id,
                 "raw_text": result.get("text", ""),
+                "transcription": transcription,
+                "deceased": deceased,
+                "parsed_ok": parsed is not None,
             }
 
             with open(OUTPUT_DIR / f"{file_id}.json", "w", encoding="utf-8") as f:
