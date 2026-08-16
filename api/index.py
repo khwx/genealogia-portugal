@@ -3,6 +3,19 @@ import requests
 import os
 import json
 
+# Load .env (same pattern as other scripts, so it works on a fresh clone)
+_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env_file = os.path.join(_root, '.env')
+if not os.path.exists(env_file):
+    env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+if os.path.exists(env_file):
+    with open(env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                os.environ[k.strip()] = v.strip()
+
 app = Flask(__name__, template_folder='.')
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://qljopxbxgflozrcdblrl.supabase.co')
@@ -110,7 +123,7 @@ def get_pessoas():
             # Pesquisa simplificada no nome
             url += f'&nome=ilike.*{query}*&limit=100'
         else:
-            url += '&order=data_extracao.desc&limit=50'
+            url += '&order=criado_em.desc&limit=50'
             
         resp = requests.get(url, headers=HEADERS)
         return jsonify(resp.json())
