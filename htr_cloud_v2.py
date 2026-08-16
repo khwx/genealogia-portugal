@@ -66,6 +66,14 @@ MODEL_INTERVAL = {
     "gemini-3.6-flash": 4320,         # RPD 20
     "gemini-3.7-flash": 4320,         # RPD 20
 }
+# RPD free tier por MODELO (usado para preferir o modelo com mais quota livre).
+MODEL_RPD = {
+    "gemini-3-flash-preview": 20,
+    "gemini-2.5-flash": 20,
+    "gemini-3.5-flash-lite": 500,
+    "gemini-3.6-flash": 20,
+    "gemini-3.7-flash": 20,
+}
 # Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL.
 MODEL_RPM_INTERVAL = {
     "gemini-3.5-flash-lite": 4,       # RPM 15
@@ -260,7 +268,10 @@ class HTRProcessor:
             combo = (kh.key, kh.model)
             hint_first = 0 if (key_hint is not None and kh.key == key_hint) else 1
             used = self.daily_count.get(combo, 0)
-            return (hint_first, used, -kh.health_score, -kh.last_success)
+            # Prefere o modelo com MAIS quota diária livre (evita martelar
+            # modelos esgotados que só devolvem 429, roubando workers ao lite).
+            remaining = MODEL_RPD.get(kh.model, 20) - used
+            return (hint_first, -remaining, used, -kh.health_score, -kh.last_success)
 
         candidates.sort(key=sortkey)
         return candidates[0]
@@ -319,6 +330,7 @@ class HTRProcessor:
                     log.warning(f"Rate limit 429 for ...{key[-6:]} model {model}")
                     kh.mark_error(is_rate_limit=True)
                     self.consecutive_429[combo] = self.consecutive_429.get(combo, 0) + 1
+                    self.daily_count[combo] = self.daily_count.get(combo, 0) + 1
                     # 2+ 429 seguidos => quota diária esgotada: salta até meia-noite.
                     if self.consecutive_429[combo] >= 2:
                         self.daily_exhausted[combo] = self._next_midnight()
