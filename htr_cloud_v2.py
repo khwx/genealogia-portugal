@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-HTR Cloud V2 - Melhorado para rate limits e eficiência
-Features:
-- Rate limit por key/modelo com backoff exponencial
-- Cache de quotes dezativação/images por key
-- Delay dinámico baseado em sucesso/erro
-- Retry com circuit breaker
-- Health checks de keys
+HTR Cloud V2 - OCR/HTR via Gemini com pacing por chave + concorrência.
+
+Comportamento:
+- Cada chave Gemini tem o seu próprio rate-limit (KEY_INTERVAL) para respeitar
+  o free tier (~150 pedidos/dia por chave).
+- Várias chaves/modelos processam em paralelo (CONCURRENT_REQUESTS).
+- Health checks + backoff em 429/5xx (bloqueio temporário da chave).
+- Idempotente: não reprocessa ficheiros já transcritos.
 """
 
 import os
@@ -14,14 +15,14 @@ import sys
 import json
 import base64
 import time
-import re
 import signal
 import logging
+import threading
 import urllib.request
 import urllib.error
 from pathlib import Path
-from datetime import datetime
-from collections import defaultdict
+from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor
 from PIL import Image
 from io import BytesIO
 
@@ -43,12 +44,32 @@ STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/out
 
 GEMINI_KEYS = os.environ.get("GEMINI_KEYS", "")
 GEMINI_KEYS = [k.strip() for k in GEMINI_KEYS.split(",") if k.strip()]
+
 GEMINI_MODELS = os.environ.get("GEMINI_MODELS", "gemini-3-flash-preview,gemini-2.5-flash").split(",")
 GEMINI_MODELS = [m.strip() for m in GEMINI_MODELS if m.strip()]
 
 MAX_IMAGE_WIDTH = int(os.environ.get("MAX_IMAGE_WIDTH", "1500"))
 JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "80"))
-CONCURRENT_REQUESTS = int(os.environ.get("CONCURRENT_REQUESTS", "1"))
+CONCURRENT_REQUESTS = max(1, int(os.environ.get("CONCURRENT_REQUESTS", "1")))
+
+# Pacing conforme limites free tier da API Gemini (site):
+#   RPD = 20 pedidos/dia por MODELO por chave  -> 86400/20 = 4320s por (chave,modelo)
+#   RPM = 5 pedidos/min por MODELO por chave    -> 60/5 = 12s entre pedidos no mesmo modelo
+KEY_INTERVAL = float(os.environ.get("KEY_INTERVAL", "4320"))
+RPM_INTERVAL = float(os.environ.get("RPM_INTERVAL", "12"))
+
+# Intervalo (s) por MODELO = 86400 / RPD free tier. Fallback KEY_INTERVAL.
+MODEL_INTERVAL = {
+    "gemini-3-flash-preview": 4320,   # RPD 20
+    "gemini-2.5-flash": 4320,         # RPD 20
+    "gemini-3.5-flash-lite": 175,     # RPD 500 -> 172.8s
+    "gemini-3.6-flash": 4320,         # RPD 20
+    "gemini-3.7-flash": 4320,         # RPD 20
+}
+# Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL.
+MODEL_RPM_INTERVAL = {
+    "gemini-3.5-flash-lite": 4,       # RPM 15
+}
 
 logging.basicConfig(
     level=logging.INFO,
@@ -71,7 +92,7 @@ If you cannot read something, use [ilegível]. Do NOT invent content. Output ONL
 
 
 class KeyHealth:
-    """Tracks health of each API key"""
+    """Tracks health of each API key/model combo"""
     def __init__(self, key, model):
         self.key = key
         self.model = model
@@ -81,6 +102,7 @@ class KeyHealth:
         self.last_error = 0
         self.blocked_until = 0
         self.consecutive_errors = 0
+        self.lock = threading.Lock()
 
     @property
     def health_score(self):
@@ -89,17 +111,20 @@ class KeyHealth:
         return self.success_count / (self.success_count + self.error_count + 1)
 
     def mark_success(self):
-        self.success_count += 1
-        self.last_success = time.time()
-        self.consecutive_errors = 0
+        with self.lock:
+            self.success_count += 1
+            self.last_success = time.time()
+            self.consecutive_errors = 0
 
     def mark_error(self, is_rate_limit=False):
-        self.error_count += 1
-        self.last_error = time.time()
-        self.consecutive_errors += 1
+        with self.lock:
+            self.error_count += 1
+            self.last_error = time.time()
+            self.consecutive_errors += 1
 
     def block(self, seconds):
-        self.blocked_until = time.time() + seconds
+        with self.lock:
+            self.blocked_until = time.time() + seconds
 
     @property
     def is_available(self):
@@ -109,10 +134,22 @@ class KeyHealth:
 class HTRProcessor:
     def __init__(self):
         self.shutdown_requested = False
-        self. key_health = {}
+        self.key_health = {}
         self.global_success = 0
         self.global_errors = 0
         self.state = self.load_state()
+        # Per-(key,model) pacing (RPD) and per-model pacing (RPM).
+        self.combo_last = {(k, m): 0.0 for k in GEMINI_KEYS for m in GEMINI_MODELS}
+        self.combo_locks = {(k, m): threading.Lock() for k in GEMINI_KEYS for m in GEMINI_MODELS}
+        self.model_last = {m: 0.0 for m in GEMINI_MODELS}
+        self.model_locks = {m: threading.Lock() for m in GEMINI_MODELS}
+        self.state_lock = threading.Lock()
+        # Health/quota tracking
+        self.dead_combos = set()          # (key,model) com 400/404 -> inútil para sempre
+        self.daily_exhausted = {}         # (key,model) -> timestamp de revival (quota diária)
+        self.daily_count = {}             # (key,model) -> nº de sucessos hoje
+        self.consecutive_429 = {}         # (key,model) -> 429 seguidos
+        self.today = datetime.now().strftime("%Y-%m-%d")
 
     def signal_handler(self, signum, frame):
         sig_name = signal.Signals(signum).name if hasattr(signal, 'Signals') else str(signum)
@@ -136,42 +173,110 @@ class HTRProcessor:
         with open(STATE_FILE, "w") as f:
             json.dump(self.state, f, indent=2)
 
-    def get_healthy_key(self):
-        """Get the healthiest available key"""
+    def acquire_combo(self, key, model):
+        """Pace a request: respect per-model RPM and per-(key,model) RPD."""
+        rpd_interval = MODEL_INTERVAL.get(model, KEY_INTERVAL)
+        rpm_interval = MODEL_RPM_INTERVAL.get(model, RPM_INTERVAL)
+        # Per-model global RPM pacing (short spacing).
+        mlock = self.model_locks.get(model)
+        if mlock is not None:
+            with mlock:
+                wait = rpm_interval - (time.time() - self.model_last[model])
+                if wait > 0:
+                    time.sleep(wait)
+                self.model_last[model] = time.time()
+        # Per-(key,model) RPD pacing (long spacing).
+        clock = self.combo_locks.get((key, model))
+        if clock is not None:
+            with clock:
+                wait = rpd_interval - (time.time() - self.combo_last[(key, model)])
+                if wait > 0:
+                    time.sleep(wait)
+                self.combo_last[(key, model)] = time.time()
+
+    def _maybe_reset_daily(self):
+        today = datetime.now().strftime("%Y-%m-%d")
+        if today != self.today:
+            self.today = today
+            self.daily_count = {}
+            self.daily_exhausted = {}
+            self.consecutive_429 = {}
+            log.info("Reset diário de contadores de quota.")
+
+    def _next_midnight(self):
+        now = datetime.now()
+        nm = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        return nm.timestamp()
+
+    def _is_exhausted(self, combo):
+        rev = self.daily_exhausted.get(combo)
+        if rev is None:
+            return False
+        if time.time() >= rev:
+            self.daily_exhausted.pop(combo, None)
+            self.daily_count.pop(combo, None)
+            self.consecutive_429.pop(combo, None)
+            return False
+        return True
+
+    def get_healthy_key(self, key_hint=None):
+        """Get the healthiest available key/model combo.
+
+        - Exclui combos mortos (400/404) e esgotados (quota diária).
+        - Prefere a chave hint (espalha ficheiros por chaves).
+        - Dentro da chave, prefere o modelo MENOS usado hoje (usa os 2 modelos).
+        """
+        self._maybe_reset_daily()
         candidates = []
         for key in GEMINI_KEYS:
             for model in GEMINI_MODELS:
-                health_key = (key, model)
-                if health_key not in self.key_health:
-                    self.key_health[health_key] = KeyHealth(key, model)
-
-                kh = self.key_health[health_key]
+                combo = (key, model)
+                if combo in self.dead_combos:
+                    continue
+                if self._is_exhausted(combo):
+                    continue
+                if combo not in self.key_health:
+                    self.key_health[combo] = KeyHealth(key, model)
+                kh = self.key_health[combo]
                 if kh.is_available:
                     candidates.append(kh)
 
         if not candidates:
-            # All blocked, wait for earliest
             earliest = float('inf')
+            for rev in self.daily_exhausted.values():
+                if rev > time.time() and rev < earliest:
+                    earliest = rev
             for kh in self.key_health.values():
-                if kh.blocked_until > 0 and kh.blocked_until < earliest:
+                if kh.blocked_until > time.time() and kh.blocked_until < earliest:
                     earliest = kh.blocked_until
+            if earliest == float('inf'):
+                earliest = time.time() + 60
             wait = max(earliest - time.time(), 0) + 2
-            log.warning(f"All keys blocked. Waiting {wait:.0f}s...")
+            log.warning(f"All combos unavailable. Waiting {wait:.0f}s...")
             time.sleep(wait)
             return self.get_healthy_key()
 
-        # Sort by health score (most successful first)
-        candidates.sort(key=lambda x: (x.health_score, -x.last_success), reverse=True)
+        def sortkey(kh):
+            combo = (kh.key, kh.model)
+            hint_first = 0 if (key_hint is not None and kh.key == key_hint) else 1
+            used = self.daily_count.get(combo, 0)
+            return (hint_first, used, -kh.health_score, -kh.last_success)
+
+        candidates.sort(key=sortkey)
         return candidates[0]
 
-    def call_gemini(self, img_b64):
+    def call_gemini(self, img_b64, preferred_key=None):
         """Call Gemini API with circuit breaker pattern"""
         attempt = 0
         max_attempts = 5
 
         while attempt < max_attempts:
-            kh = self.get_healthy_key()
+            kh = self.get_healthy_key(preferred_key)
             key, model = kh.key, kh.model
+            combo = (key, model)
+
+            # Respect the per-(key,model) free-tier spacing before sending.
+            self.acquire_combo(key, model)
 
             payload = {
                 "contents": [{
@@ -203,6 +308,8 @@ class HTRProcessor:
 
                     kh.mark_success()
                     self.global_success += 1
+                    self.daily_count[combo] = self.daily_count.get(combo, 0) + 1
+                    self.consecutive_429[combo] = 0
                     return {"status": "success", "text": text, "model": model}
 
             except urllib.error.HTTPError as e:
@@ -211,7 +318,20 @@ class HTRProcessor:
                 if e.code == 429:
                     log.warning(f"Rate limit 429 for ...{key[-6:]} model {model}")
                     kh.mark_error(is_rate_limit=True)
-                    kh.block(180)  # Block for 3 minutes
+                    self.consecutive_429[combo] = self.consecutive_429.get(combo, 0) + 1
+                    # 2+ 429 seguidos => quota diária esgotada: salta até meia-noite.
+                    if self.consecutive_429[combo] >= 2:
+                        self.daily_exhausted[combo] = self._next_midnight()
+                        log.warning(f"Quota diária esgotada ...{key[-6:]} {model}; salta até à meia-noite.")
+                    kh.block(180)
+                elif e.code in (400, 404):
+                    # Chave inválida (400) ou modelo indisponível (404): morto para sempre.
+                    log.error(f"HTTP {e.code} (combo morto) ...{key[-6:]} {model}: {body[:80]}")
+                    self.dead_combos.add(combo)
+                    kh.mark_error()
+                    attempt += 1
+                    time.sleep(5)
+                    continue
                 elif e.code == 503:
                     log.warning(f"Service unavailable 503 for ...{key[-6:]} model {model}")
                     kh.mark_error()
@@ -257,9 +377,15 @@ class HTRProcessor:
         start = time.time()
         file_id = tiff_path.stem
 
+        # Atribui uma chave estável por ficheiro para espalhar a carga por
+        # várias chaves em paralelo (fallback para a mais saudável se bloqueada).
+        preferred_key = None
+        if GEMINI_KEYS:
+            preferred_key = GEMINI_KEYS[abs(hash(file_id)) % len(GEMINI_KEYS)]
+
         try:
             img_b64 = self.prepare_image(tiff_path)
-            result = self.call_gemini(img_b64)
+            result = self.call_gemini(img_b64, preferred_key)
             elapsed = time.time() - start
 
             metadata = {
@@ -282,20 +408,26 @@ class HTRProcessor:
             with open(METADATA_DIR / f"{file_id}.json", "w", encoding="utf-8") as f:
                 json.dump(metadata, f, indent=2, ensure_ascii=False, default=str)
 
-            self.state["processed"] += 1
-            self.state["total_time"] += elapsed
-            self.state["last_file"] = file_id
+            with self.state_lock:
+                self.state["processed"] += 1
+                self.state["total_time"] += elapsed
+                self.state["last_file"] = file_id
+                if result["status"] == "error":
+                    self.state["errors"] += 1
+                self.save_state()
 
             log.info(f"[{self.state['processed']}] {file_id}: {result['status']} ({elapsed:.1f}s, {metadata['text_length']} chars)")
 
-            if result["status"] == "error":
-                self.state["errors"] += 1
+            if self.state["processed"] % 25 == 0:
+                total_combos = len(GEMINI_KEYS) * len(GEMINI_MODELS)
+                vivos = total_combos - len(self.dead_combos) - len(self.daily_exhausted)
+                log.info(f"[STATUS] processados={self.state['processed']} combos_vivos={vivos} mortos={len(self.dead_combos)} esgotados_hoje={len(self.daily_exhausted)}")
 
         except Exception as e:
             log.error(f"[ERROR] {file_id}: {e}")
-            self.state["errors"] += 1
-
-        self.save_state()
+            with self.state_lock:
+                self.state["errors"] += 1
+                self.save_state()
 
     def run(self):
         signal.signal(signal.SIGTERM, self.signal_handler)
@@ -309,35 +441,18 @@ class HTRProcessor:
         processed = self.get_processed_files()
         to_process = [f for f in tiff_files if f.stem not in processed]
 
-        log.info(f"=== HTR V2 Started: {len(processed)}/{len(tiff_files)} already done, {len(to_process)} remaining ===")
-        log.info(f"Keys: {len(GEMINI_KEYS)} | Models: {len(GEMINI_MODELS)} | Target: all remaining")
+        log.info(f"=== HTR V2 Started: {len(processed)}/{len(tiff_files)} done, {len(to_process)} remaining ===")
+        log.info(f"Concurrent mode: workers={CONCURRENT_REQUESTS}, key_interval={KEY_INTERVAL}s, keys={len(GEMINI_KEYS)}, models={len(GEMINI_MODELS)}")
 
         if not to_process:
             log.info("All done!")
             return
 
-        for i, tiff_path in enumerate(to_process):
-            if self.shutdown_requested:
-                log.info("Shutdown requested. Exiting gracefully.")
-                break
-
-            self.process_single(tiff_path)
-
-            # Rate-limit-aware delay between requests
-            # With 8 keys: 300s = 288 imgs/day total = 36/key/day (well within 150 free tier)
-            if self.global_errors > 0 and self.global_success > 0:
-                error_rate = self.global_errors / (self.global_success + self.global_errors)
-                if error_rate > 0.5:
-                    sleep_time = 900  # 15 min if many errors
-                elif error_rate > 0.2:
-                    sleep_time = 600   # 10 min if some errors
-                else:
-                    sleep_time = 300    # 5 min base delay (8 keys)
-            else:
-                sleep_time = 300       # 5 min base delay between requests (8 keys)
-
-            if i > 0:  # Don't delay on first run
-                time.sleep(sleep_time)
+        try:
+            with ThreadPoolExecutor(max_workers=CONCURRENT_REQUESTS) as ex:
+                list(ex.map(self.process_single, to_process))
+        except Exception as e:
+            log.error(f"Executor error: {e}")
 
         log.info(f"=== Done: {self.state['processed']} processed, {self.state['errors']} errors ===")
 
