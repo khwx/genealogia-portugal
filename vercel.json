@@ -1,19 +1,18 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    }
+    { "src": "api/index.py", "use": "@vercel/python" },
+    { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/(.*)", "dest": "api/index.py" },
+    { "src": "/validar", "dest": "api/index.py" },
+    { "src": "/mapa", "dest": "api/index.py" },
+    { "src": "/family-tree", "dest": "api/index.py" },
+    { "src": "/(.*)", "dest": "/$1" }
   ],
   "env": {
-    "VITE_SUPABASE_URL": "https://qljopxbxgflozrcdblrl.supabase.co",
-    "VITE_SUPABASE_KEY": "sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1"
+    "SUPABASE_URL": "https://qljopxbxgflozrcdblrl.supabase.co",
+    "SUPABASE_KEY": "sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1"
   }
 }

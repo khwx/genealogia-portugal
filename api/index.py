@@ -16,7 +16,7 @@ if os.path.exists(env_file):
                 k, v = line.split('=', 1)
                 os.environ[k.strip()] = v.strip()
 
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__, template_folder=os.path.join(_root, 'templates'))
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://qljopxbxgflozrcdblrl.supabase.co')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '') or os.environ.get('SUPABASE_ANON_KEY', '')
@@ -89,11 +89,11 @@ def api_mapa():
 
 @app.route('/validar')
 def validar():
-    # Buscar um registo com qualidade abaixo de 0.8 para revisão
+    # Buscar um registo ainda não validado (com nome) para revisão
     resp = requests.get(
         f"{SUPABASE_URL}/rest/v1/pessoas",
         headers=HEADERS,
-        params={"qualidade": "lt.0.8", "limit": 1, "order": "qualidade"},
+        params={"validado": "eq.false", "nome": "not.is.null", "limit": 1, "order": "criado_em.desc"},
         timeout=30
     )
     registo = resp.json()[0] if resp.status_code == 200 and resp.json() else None
