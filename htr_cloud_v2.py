@@ -62,8 +62,8 @@ RPM_INTERVAL = float(os.environ.get("RPM_INTERVAL", "12"))
 MODEL_INTERVAL = {
     "gemini-3-flash-preview": 4320,   # RPD 20
     "gemini-2.5-flash": 4320,         # RPD 20
-    "gemini-3.5-flash-lite": 175,     # RPD 500 -> 172.8s
-    "gemini-3.1-flash-lite": 175,     # RPD 500 -> 172.8s
+    "gemini-3.5-flash-lite": 300,     # RPD 500; 300s = 288/dia (calmo, ~58% do limite)
+    "gemini-3.1-flash-lite": 300,     # RPD 500; 300s = 288/dia (calmo)
     "gemini-3.6-flash": 4320,         # RPD 20
     "gemini-3.7-flash": 4320,         # RPD 20
 }
@@ -78,8 +78,8 @@ MODEL_RPD = {
 }
 # Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL.
 MODEL_RPM_INTERVAL = {
-    "gemini-3.5-flash-lite": 4,       # RPM 15
-    "gemini-3.1-flash-lite": 4,       # RPM 15
+    "gemini-3.5-flash-lite": 5,       # RPM 15 (5s = 12/min, folga segura)
+    "gemini-3.1-flash-lite": 5,       # RPM 15
 }
 
 logging.basicConfig(
@@ -340,11 +340,14 @@ class HTRProcessor:
                     kh.mark_error(is_rate_limit=True)
                     self.consecutive_429[combo] = self.consecutive_429.get(combo, 0) + 1
                     self.daily_count[combo] = self.daily_count.get(combo, 0) + 1
-                    # 2+ 429 seguidos => quota diária esgotada: salta até meia-noite.
-                    if self.consecutive_429[combo] >= 2:
+                    # Só marca esgotado (quota diária) se: 2+ 429 seguidos E já
+                    # usou ~80% do RPD. 429 isolado (ex.: RPM) não desativa o
+                    # combo — isso evita desligar o lite (RPD 500) por erro de RPM.
+                    rpd = MODEL_RPD.get(model, 20)
+                    if self.consecutive_429[combo] >= 2 and self.daily_count[combo] >= 0.8 * rpd:
                         self.daily_exhausted[combo] = self._next_midnight()
                         log.warning(f"Quota diária esgotada ...{key[-6:]} {model}; salta até à meia-noite.")
-                    kh.block(180)
+                    kh.block(120)
                 elif e.code in (400, 404):
                     # Chave inválida (400) ou modelo indisponível (404): morto para sempre.
                     log.error(f"HTTP {e.code} (combo morto) ...{key[-6:]} {model}: {body[:80]}")
