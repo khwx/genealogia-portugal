@@ -187,6 +187,39 @@ Este projeto não viola nenhuma restrição de proteção de dados (RGPD).
 
 ---
 
+## Configuração e Segurança
+
+**Nenhum segredo está no repositório.** Todas as chaves de API (Gemini, Supabase, Transkribus, FamilySearch, etc.) vêm de um ficheiro `.env` **local**, que está no `.gitignore` e nunca é comitado. O repo traz apenas `.env.example` com placeholders.
+
+### Configurar o ambiente
+```bash
+cp .env.example .env
+# Edita .env e preenche (ex.):
+#   SUPABASE_URL=https://teu-projeto.supabase.co
+#   SUPABASE_ANON_KEY=sb_publishable_...
+#   GEMINI_KEYS=AIzaSy...,AIzaSy...
+```
+
+### Supabase
+A app usa as tabelas `pessoas` e `livros`. Para o endpoint `POST /api/validar` gravar, a tabela `pessoas` precisa das colunas `qualidade` (numeric) e `validado` (boolean) e de uma política de UPDATE anon (correr o SQL em `.env.example`/Supabase SQL Editor). As leituras (`/api/pessoas`, `/api/livros`, `/api/mapa`) funcionam com a chave anon.
+
+### Clonar noutra máquina e pôr a funcionar
+```bash
+git clone https://github.com/khwx/genealogia-portugal.git
+cd genealogia-portugal
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # preenche os teus valores (nunca comites o .env)
+# Coloca as tuas imagens em INPUT_DIR e corre o pipeline
+```
+
+### Pipeline de óbitos (resumo)
+1. `python htr_cloud_v2.py` — transcreve as imagens `.tiff` de `output/full_images/` para `output/htr_text/*.json` (via Gemini).
+2. `python sync_htr_supabase.py` — envia as transcrições para a tabela `pessoas` no Supabase.
+3. `python api/index.py` — API Flask (rotas `/api/pessoas`, `/api/livros`, `/api/mapa`, `POST /api/validar`).
+
+---
+
 ## Contribuindo
 
 Contribuições são bem-vindas! Qualquer pessoa pode ajudar.
