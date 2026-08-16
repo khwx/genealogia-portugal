@@ -52,18 +52,26 @@ MAX_IMAGE_WIDTH = int(os.environ.get("MAX_IMAGE_WIDTH", "1500"))
 JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "80"))
 CONCURRENT_REQUESTS = max(1, int(os.environ.get("CONCURRENT_REQUESTS", "1")))
 
-# Pacing conforme limites free tier da API Gemini (site):
-#   RPD = 20 pedidos/dia por MODELO por chave  -> 86400/20 = 4320s por (chave,modelo)
-#   RPM = 5 pedidos/min por MODELO por chave    -> 60/5 = 12s entre pedidos no mesmo modelo
+# Limites free tier da API Gemini (confirmados pelo utilizador, Google AI Studio):
+#   Por CHAVE e por MODELO.  RPD = pedidos/dia; RPM = pedidos/min; TPM = tokens entrada/min.
+#   Gemini 2.5 Flash      : RPD 20  RPM 5   TPM 250K
+#   Gemini 3 Flash        : RPD 20  RPM 5   TPM 250K
+#   Gemini 3.5 Flash      : RPD 20  RPM 5   TPM 250K
+#   Gemini 3.6 Flash      : RPD 20  RPM 5   TPM 250K
+#   Gemini 3.7 Flash      : RPD 20  RPM 5   TPM 250K
+#   Gemini 3.5 Flash Lite : RPD 500 RPM 15 TPM 250K
+#   Gemini 3.1 Flash Lite : RPD 500 RPM 15 TPM 250K
+# TPM não é pacial ativamente (imagens pequenas + ritmo calmo mantêm bem abaixo de 250K/min).
 KEY_INTERVAL = float(os.environ.get("KEY_INTERVAL", "4320"))
 RPM_INTERVAL = float(os.environ.get("RPM_INTERVAL", "12"))
 
-# Intervalo (s) por MODELO = 86400 / RPD free tier. Fallback KEY_INTERVAL.
+# RPD por MODELO (pedidos/dia/chave). 86400/RPD = intervalo seguro por (chave,modelo).
+# O lite usa 300s (~288/dia, ~58% do limite 500) por decisão de ritmo calmo.
 MODEL_INTERVAL = {
     "gemini-3-flash-preview": 4320,   # RPD 20
     "gemini-2.5-flash": 4320,         # RPD 20
-    "gemini-3.5-flash-lite": 300,     # RPD 500; 300s = 288/dia (calmo, ~58% do limite)
-    "gemini-3.1-flash-lite": 300,     # RPD 500; 300s = 288/dia (calmo)
+    "gemini-3.5-flash-lite": 300,     # RPD 500 (calmo: 288/dia)
+    "gemini-3.1-flash-lite": 300,     # RPD 500 (calmo: 288/dia)
     "gemini-3.6-flash": 4320,         # RPD 20
     "gemini-3.7-flash": 4320,         # RPD 20
 }
@@ -76,10 +84,23 @@ MODEL_RPD = {
     "gemini-3.6-flash": 20,
     "gemini-3.7-flash": 20,
 }
-# Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL.
+# Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL (12s = 5/min).
 MODEL_RPM_INTERVAL = {
-    "gemini-3.5-flash-lite": 5,       # RPM 15 (5s = 12/min, folga segura)
+    "gemini-3-flash-preview": 12,     # RPM 5
+    "gemini-2.5-flash": 12,           # RPM 5
+    "gemini-3.6-flash": 12,           # RPM 5
+    "gemini-3.7-flash": 12,           # RPM 5
+    "gemini-3.5-flash-lite": 5,       # RPM 15 (5s = 12/min, folga)
     "gemini-3.1-flash-lite": 5,       # RPM 15
+}
+# TPM (tokens entrada/min) por MODELO — documentação; não pacial ativamente.
+MODEL_TPM = {
+    "gemini-3-flash-preview": 250000,
+    "gemini-2.5-flash": 250000,
+    "gemini-3.5-flash-lite": 250000,
+    "gemini-3.1-flash-lite": 250000,
+    "gemini-3.6-flash": 250000,
+    "gemini-3.7-flash": 250000,
 }
 
 logging.basicConfig(
@@ -330,7 +351,7 @@ class HTRProcessor:
                     self.global_success += 1
                     self.daily_count[combo] = self.daily_count.get(combo, 0) + 1
                     self.consecutive_429[combo] = 0
-                    return {"status": "success", "text": text, "model": model}
+                    return {"status": "success", "text": text, "model": model, "key": key}
 
             except urllib.error.HTTPError as e:
                 body = e.read().decode()[:200] if e.fp else ""
@@ -416,6 +437,7 @@ class HTRProcessor:
                 "file_id": file_id,
                 "status": result["status"],
                 "model": result.get("model", ""),
+                "key": result.get("key", ""),
                 "text_length": len(result.get("text", "")),
                 "wall_time_s": elapsed,
                 "processed_at": datetime.now().isoformat(),
