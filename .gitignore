@@ -64,3 +64,6 @@ output/full_images/
 
 # OCR text (can be regenerated)
 output/ocr_text/
+
+# Ignore all generated output (already-tracked files remain in clones)
+output/

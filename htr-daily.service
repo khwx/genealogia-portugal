@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily HTR Processing
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/pxtkhw/projetos/obitos
+ExecStart=/home/pxtkhw/projetos/obitos/htr_daily.sh 3
+StandardOutput=append:/home/pxtkhw/projetos/obitos/output/daily_logs/cron.log
+StandardError=append:/home/pxtkhw/projetos/obitos/output/daily_logs/cron.log
+
+[Install]
+WantedBy=multi-user.target
