@@ -63,6 +63,7 @@ MODEL_INTERVAL = {
     "gemini-3-flash-preview": 4320,   # RPD 20
     "gemini-2.5-flash": 4320,         # RPD 20
     "gemini-3.5-flash-lite": 175,     # RPD 500 -> 172.8s
+    "gemini-3.1-flash-lite": 175,     # RPD 500 -> 172.8s
     "gemini-3.6-flash": 4320,         # RPD 20
     "gemini-3.7-flash": 4320,         # RPD 20
 }
@@ -71,12 +72,14 @@ MODEL_RPD = {
     "gemini-3-flash-preview": 20,
     "gemini-2.5-flash": 20,
     "gemini-3.5-flash-lite": 500,
+    "gemini-3.1-flash-lite": 500,
     "gemini-3.6-flash": 20,
     "gemini-3.7-flash": 20,
 }
 # Intervalo RPM (s) por MODELO = 60 / RPM. Fallback RPM_INTERVAL.
 MODEL_RPM_INTERVAL = {
     "gemini-3.5-flash-lite": 4,       # RPM 15
+    "gemini-3.1-flash-lite": 4,       # RPM 15
 }
 
 logging.basicConfig(
@@ -157,6 +160,7 @@ class HTRProcessor:
         self.daily_exhausted = {}         # (key,model) -> timestamp de revival (quota diária)
         self.daily_count = {}             # (key,model) -> nº de sucessos hoje
         self.consecutive_429 = {}         # (key,model) -> 429 seguidos
+        self.model_used = {}              # model -> nº total de selecções (balancear lites)
         self.today = datetime.now().strftime("%Y-%m-%d")
 
     def signal_handler(self, signum, frame):
@@ -271,10 +275,15 @@ class HTRProcessor:
             # Prefere o modelo com MAIS quota diária livre (evita martelar
             # modelos esgotados que só devolvem 429, roubando workers ao lite).
             remaining = MODEL_RPD.get(kh.model, 20) - used
-            return (hint_first, -remaining, used, -kh.health_score, -kh.last_success)
+            # Entre modelos com quota igual (ex.: os dois flash-lite RPD 500),
+            # prefere o modelo MENOS usado no total (balanceia a carga).
+            model_used = self.model_used.get(kh.model, 0)
+            return (hint_first, -remaining, model_used, -kh.health_score, -kh.last_success)
 
         candidates.sort(key=sortkey)
-        return candidates[0]
+        chosen = candidates[0]
+        self.model_used[chosen.model] = self.model_used.get(chosen.model, 0) + 1
+        return chosen
 
     def call_gemini(self, img_b64, preferred_key=None):
         """Call Gemini API with circuit breaker pattern"""
