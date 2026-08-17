@@ -37,8 +37,16 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   `htr_cloud_v2.py` e `sync_htr_supabase.py` (trabalho do passo pendente).
 - `.env` continua ignorado; nenhuma chave exposta no repo.
 - `py_compile` OK para ambos os scripts.
+- BUG CRÍTICO encontrado em `htr_cloud_v2.py:470`: `parsed` era usado no dict
+  de metadata ANTES de ser definido (linha 475) → `NameError` em EVERY ficheiro
+  logo que o processo recarregasse o ficheiro. O processo em execução (pid 71970)
+  usava código antigo em memória (só escrevia `raw_text`), por isso não tinha
+  estoirado ainda — mas quebraria no próximo arranque.
 
-### Tarefa implementada — usar `deceased` estruturado no sync
+### Tarefa implementada — usar `deceased` estruturado no sync + correção de bug
+- CORRIGIDO o `NameError` em `htr_cloud_v2.py`: `parsed` (e `transcription`/
+  `deceased`) é agora calculado ANTES do dict de metadata. Smoke-test com Gemini
+  stub confirmou escrita correta de `deceased`/`parsed_ok`.
 - Implementado e finalizado o passo pendente de 2026-08-16: o `sync_htr_supabase.py`
   passa a consumir o campo `deceased` (JSON estruturado do Gemini) em vez de só
   regex sobre `raw_text`.
@@ -57,8 +65,15 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 ### Decisão registada
 - Mantém-se o pacing do HTR; o sync agora tira partido do JSON estruturado já
   produzido, sem mudar o ritmo do pipeline nem a schema da base de dados.
+- O processo HTR em execução (pid 71970, código antigo em memória, sem
+  supervisor) foi parado e relançado com o código corrigido (pid 102975) para
+  começar a gerar `deceased` estruturado. Verificado: novo ficheiro de output
+  já inclui `deceased`=[{'name','death_date','age','father','mother','spouse'}].
+  Reinício idempotente (por ficheiro), sem perda de progresso.
 
 ### Próximos passos sugeridos
 - Correr `sync_htr_supabase.py` (DRY_RUN off) num lote e validar contagem de
   `data_obito` preenchidos vs. fallback regex.
+- Migração da schema `pessoas` p/ colunas `pai`/`mae`/`conjuge` (hoje ausentes)
+  para persistir as relações já capturadas no `deceased`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
