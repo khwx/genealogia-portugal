@@ -193,3 +193,40 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
   `data_obito` nos registos existentes com data em falta.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-17 (4ª passagem autónoma)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado.
+- Scanner de segredos executado localmente: 133 ficheiros rastreados,
+  **0 segredos** (nem `AIza…`, `ya29.`, `sk-`, `xox-`, `sb_secret_`, nem
+  chaves privadas). `py_compile`/execução OK.
+- Pipeline HTR continua parado (óbitos concluídos, 8576/0); sem quota em uso.
+
+### Tarefa implementada — portão de segurança automático (sem expor segredos)
+- Criado `scripts/scan_secrets.py`: portão de segurança que analisa SÓ os
+  ficheiros rastreados pelo git (`git ls-files`) — o `.env` local (untracked)
+  nunca é lido. Deteta padrões reais (Google `AIza…`, `ya29.`, OpenAI `sk-`,
+  Slack `xox-`, Supabase `sb_secret_`, AWS `AKIA…`, blocos de chave privada) e
+  IGNORA placeholders óbvios (`.env.example`, chaves com >3 carateres únicos ou
+  padding `x/0`) para evitar falsos positivos. `sb_publishable_` (pública) não
+  é sinalizada.
+- Criado `.github/workflows/security-scan.yml`: corre o scanner em cada push e
+  PR (e manualmente), falhando o pipeline se algum segredo real for detetado —
+  garante que nada confidencial chega ao GitHub.
+- Testado isoladamente: deteta `AIzaSy…` real + `sk-…`, e omite corretamente
+  placeholders. CI pronto a bloquear futuros leaks.
+
+### Decisão registada
+- Avançou o pilar "garantir segurança sem expor segredos" do objetivo: o repo
+  ganha uma barreira automática (local + CI) contra fugas de chaves, cumprindo
+  o mandato sem mexer no pacing nem na lógica de OCR (já concluída p/ óbitos).
+- Não se relançou o pipeline HTR (processo pesado/quota) nem se tocou na BD
+  remota (backfill fica para quando houver credenciais/DDL disponíveis).
+
+### Próximos passos sugeridos
+- Aplicar a migração de relações + `SYNC_RELATIONS=1` para backfill de
+  `pai`/`mae`/`conjuge` (requer SQL Editor/DDL no Supabase).
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
+  `data_obito`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).

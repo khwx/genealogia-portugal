@@ -30,6 +30,11 @@ CELORICO_JSON = Path(os.environ.get("CELORICO_JSON", "/home/pxtkhw/projetos/obit
 FREGUESIA_MAPPING_JSON = Path(os.environ.get("FREGUESIA_MAPPING_JSON", "/home/pxtkhw/projetos/obitos/output/data/freguesia_file_mapping.json"))
 STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/sync_htr_state.json"))
 
+# Original digitization source — kept as a link so we don't store images locally.
+DIGITARQ_BASE = os.environ.get("DIGITARQ_BASE", "https://digitarq.arquivos.pt")
+def imagem_url_for(file_id):
+    return f"{DIGITARQ_BASE}/rdigital/dissemination?fileId={file_id}"
+
 DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
 
 # When the Supabase `pessoas` schema has been migrated (see
@@ -528,6 +533,64 @@ def get_synced_file_ids():
     except:
         return set()
 
+def backfill_url():
+    """Backfill imagem_url (link to digitarq) on existing records that lack it."""
+    import urllib.request
+    import urllib.error
+
+    print("=== Backfill imagem_url on existing records ===\n")
+
+    updated = 0
+    skipped = 0
+    errors = 0
+    offset = 0
+    page = 1000
+    total = 0
+    while True:
+        url = (f"{SUPABASE_URL}/rest/v1/pessoas"
+               f"?select=id,file_id,imagem_url&file_id=not.is.null"
+               f"&limit={page}&offset={offset}&order=id.asc")
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            records = json.loads(resp.read())
+        if not records:
+            break
+        total += len(records)
+        for i, rec in enumerate(records):
+            file_id = rec.get("file_id")
+            existing = rec.get("imagem_url")
+            if not file_id:
+                skipped += 1
+                continue
+            new_url = imagem_url_for(file_id)
+            if existing and existing == new_url:
+                skipped += 1
+                continue
+            if DRY_RUN:
+                print(f"  Would set record {rec['id']}: imagem_url = {new_url}")
+                updated += 1
+            else:
+                result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", {"imagem_url": new_url})
+                if result["status"] == "success":
+                    updated += 1
+                else:
+                    print(f"  Error updating record {rec['id']}: {result}")
+                    errors += 1
+        print(f"  Page done (offset {offset}, {len(records)} rows): updated={updated}, errors={errors}")
+        if len(records) < page:
+            break
+        offset += page
+
+    print(f"\n=== Backfill URL Complete ===")
+    print(f"Total scanned: {total}")
+    print(f"Updated: {updated}")
+    print(f"Skipped (already set): {skipped}")
+    print(f"Errors: {errors}")
+
 def update_dates():
     """Backfill data_obito on existing records where it's NULL."""
     import urllib.request
@@ -604,9 +667,15 @@ def update_dates():
     print(f"No date found: {skipped_no_date}")
     print(f"Errors: {errors}")
 
+BACKFILL_URL = "--backfill-url" in sys.argv
+
 def main():
     if UPDATE_DATES:
         update_dates()
+        return
+
+    if BACKFILL_URL:
+        backfill_url()
         return
 
     state = load_state()
@@ -692,6 +761,7 @@ def main():
                     "concelho": "Celorico da Beira",
                     "distrito": "Guarda",
                     "fonte": "HTR Gemini 3 Flash Preview",
+                    "imagem_url": imagem_url_for(file_id),
                     "file_id": file_id,
                     "criado_em": datetime.now().isoformat(),
                 }
