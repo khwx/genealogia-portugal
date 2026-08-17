@@ -668,6 +668,93 @@ def update_dates():
     print(f"Errors: {errors}")
 
 BACKFILL_URL = "--backfill-url" in sys.argv
+BACKFILL_RELATIONS = "--backfill-relations" in sys.argv
+
+def backfill_relations():
+    """Backfill pai/mae/conjuge on existing records by re-reading HTR files."""
+    import urllib.request
+    import urllib.error
+
+    print("=== Backfill Relations (pai, mae, conjuge) on existing records ===\n")
+    if not SYNC_RELATIONS:
+        print("Error: SYNC_RELATIONS must be enabled to backfill relations.")
+        return
+
+    offset = 0
+    page = 1000
+    updated = 0
+    errors = 0
+    total = 0
+    
+    while True:
+        url = (f"{SUPABASE_URL}/rest/v1/pessoas"
+               f"?select=id,file_id&file_id=not.is.null"
+               f"&limit={page}&offset={offset}&order=id.asc")
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+        }
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            records = json.loads(resp.read())
+        if not records:
+            break
+        
+        total += len(records)
+        for i, rec in enumerate(records):
+            file_id = rec.get("file_id")
+            if not file_id: continue
+            
+            json_path = INPUT_DIR / f"{file_id}.json"
+            if not json_path.exists(): continue
+            
+            with open(json_path) as f:
+                data = json.load(f)
+            
+            deceased = data.get("deceased")
+            if not isinstance(deceased, list) or not deceased:
+                continue
+            
+            # Use same logic as sync to get persons
+            persons = extract_persons_from_deceased(deceased)
+            if not persons: continue
+            
+            # For backfill, we assume 1 person per file_id for now 
+            # (matches current sync logic for death records)
+            person = persons[0]
+            patch_data = {
+                "pai": person.get("pai", ""),
+                "mae": person.get("mae", ""),
+                "conjuge": person.get("conjuge", "")
+            }
+            
+            # Skip if all empty
+            if not any(patch_data.values()):
+                continue
+
+            if DRY_RUN:
+                print(f"  Would update {rec['id']}: {patch_data}")
+                updated += 1
+            else:
+                result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", patch_data)
+                if result["status"] == "success":
+                    updated += 1
+                else:
+                    # If this fails with 400, columns probably don't exist
+                    print(f"  Error updating {rec['id']}: {result}")
+                    errors += 1
+                    if "column" in str(result).lower():
+                        print("\n!!! ERROR: Columns 'pai', 'mae' or 'conjuge' not found.")
+                        print("Did you run the SQL migration in Supabase SQL Editor?")
+                        return
+
+        print(f"  Page done (offset {offset}): updated={updated}")
+        if len(records) < page: break
+        offset += page
+
+    print(f"\n=== Backfill Relations Complete ===")
+    print(f"Updated: {updated}")
+    print(f"Errors: {errors}")
 
 def main():
     if UPDATE_DATES:
@@ -676,6 +763,10 @@ def main():
 
     if BACKFILL_URL:
         backfill_url()
+        return
+
+    if BACKFILL_RELATIONS:
+        backfill_relations()
         return
 
     state = load_state()
