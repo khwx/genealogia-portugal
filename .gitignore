@@ -48,6 +48,10 @@ output/text/
 !output/obitos_*.json
 !output/obitos_*.csv
 !output/obitos_*.xlsx
+!output/inventario_*.json
+!output/inventario_*.csv
+!output/inventario_*.xlsx
+!output/data/
 
 # OS files
 .DS_Store
@@ -64,6 +68,12 @@ output/full_images/
 
 # OCR text (can be regenerated)
 output/ocr_text/
+
+# Generated HTR OCR output (regenerable, not source) — keeps the repo lean
+output/htr_metadata/
+output/htr_text/
+output/images/
+output/sync_htr_state.json
 
 # Ignore all generated output (already-tracked files remain in clones)
 output/

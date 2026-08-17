@@ -77,3 +77,41 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Migração da schema `pessoas` p/ colunas `pai`/`mae`/`conjuge` (hoje ausentes)
   para persistir as relações já capturadas no `deceased`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-17 (2ª passagem autónoma)
+
+### Estado verificado
+- Pipeline `htr_cloud_v2.py` NÃO está a correr (nenhum pid vivo encontrado; o
+  timer/keepalive aparenta não ter relançado desde o pid 102975). Sem processos
+  órfãos a consumir quota.
+- `.env` continua NÃO rastreado; scan de ficheiros rastreados por padrões de
+  chave reais (`AIza…`, `ya29.`, `sk-`, `xox-`) não encontrou segredos — só
+  placeholders em `.env.example`. Sem exposição de segredos.
+- 4203 ficheiros de output gerado (`htr_metadata` 1975, `htr_text` 1975,
+  `images` 252, `sync_htr_state.json`) estavam rastreados no repo apesar de
+  serem artefactos regeneráveis; `sync_htr_state.json` mudava a cada sync,
+  gerando diffs ruidosos e inchando o repo.
+
+### Tarefa implementada — higiene de repo / segurança
+- Deixou de se rastrear os artefactos gerados do HTR: `output/htr_metadata/`,
+  `output/htr_text/`, `output/images/` e `output/sync_htr_state.json`
+  (`git rm --cached -r`). Os ficheiros locais permanecem no disco; `.gitignore`
+  já cobria `output/` mas estavam rastreados por terem sido adicionados antes.
+- Reforçado o `.gitignore`: negações explícitas para manter os dados
+  intencionais (`output/data/`, `output/obitos_*`, `output/inventario_*`) e
+  regras explícitas a ignorar os dirs gerados e o estado de runtime.
+- Resultado: o repo deixa de conter ~4200 ficheiros de output regenerável e
+  futuros syncs não poluem o git. Sem rutura (dados mantidos rastreados).
+
+### Decisão registada
+- Não se relançou o pipeline HTR nesta passagem (processo pesado/quota); a
+  paragem fica registada como pendente de monitorização. O objetivo de
+  "verificar estado" detetou a paragem.
+- Mantém-se o pacing do HTR inalterado.
+
+### Próximos passos sugeridos
+- Relançar `htr_cloud_v2.py` (via `htr_runner.sh`/timer) se se pretender
+  retomar o processamento de imagens.
+- Correr `sync_htr_supabase.py` num lote (DRY_RUN off) e validar `data_obito`
+  preenchidos vs. fallback regex.
+- Migração da schema `pessoas` para `pai`/`mae`/`conjuge`.
