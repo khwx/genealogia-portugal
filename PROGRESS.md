@@ -155,3 +155,41 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py` num lote (DRY_RUN off) e validar `data_obito`
   preenchidos vs. fallback regex.
 - Migração da schema `pessoas` para `pai`/`mae`/`conjuge`.
+
+## 2026-08-17 (3ª passagem autónoma)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado
+  (sem chaves no repo — confirmado por `git check-ignore`).
+- Scan de segredos nos ficheiros rastreados: nenhum `AIza…`/`ya29.`/`sk-`
+  encontrado. `py_compile` OK para `sync_htr_supabase.py`.
+- Pipeline `htr_cloud_v2.py`: NÃO está a correr (óbitos já concluídos,
+  8576/0 done) — sem consumo de quota, sem processos órfãos.
+
+### Tarefa implementada — preparar persistência de relações do `deceased`
+- Avançou o passo pendente de migração da schema `pessoas`: criado
+  `migrations/add_pessoa_relation_columns.sql` (`ALTER TABLE … ADD COLUMN
+  pai/mae/conjuge text`), idempotente (`IF NOT EXISTS`), pronto a aplicar no
+  SQL Editor do Supabase sem tocar em registos existentes.
+- `extract_persons_from_deceased()` em `sync_htr_supabase.py` agora mapeia
+  `father`→`pai`, `mother`→`mae`, `spouse`→`conjuge` nos dicts de pessoa.
+- Adicionado o flag `SYNC_RELATIONS` (env, default off): o `main()` só
+  inclui `pai`/`mae`/`conjuge` no POST ao Supabase quando ativado, mantendo o
+  sync 100% funcional contra a schema atual (que ainda NÃO tem estas colunas)
+  — zero rutura até a migração ser aplicada.
+- Adicionado `test_sync_relations.py` (isolado, sem rede): valida o mapeamento
+  de relações (honoríficos ignorados) e a normalize_death_date
+  (`2020-3-5`→2020-03-05, `05/12/1899`→1899-12-05, mês-extenso,
+  inválidos→None, ano-fora-range→None). Testes PASS.
+
+### Decisão registada
+- A migração é "pronta mas inativa": não se alterou a schema remota (sem
+  credenciais/DDL nesta passagem) nem o comportamento default do sync. Quando
+  aplicada, basta `SYNC_RELATIONS=1 python3 sync_htr_supabase.py`.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` no Supabase e correr
+  `SYNC_RELATIONS=1 python3 sync_htr_supabase.py` para backfill de relações.
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
+  `data_obito` nos registos existentes com data em falta.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).

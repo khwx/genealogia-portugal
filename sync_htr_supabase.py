@@ -32,6 +32,12 @@ STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/out
 
 DRY_RUN = os.environ.get("DRY_RUN", "").lower() in ("1", "true", "yes")
 
+# When the Supabase `pessoas` schema has been migrated (see
+# migrations/add_pessoa_relation_columns.sql), set SYNC_RELATIONS=1 to also
+# persist the structured father/mother/spouse relations. Off by default so the
+# sync keeps working against the current schema (which lacks those columns).
+SYNC_RELATIONS = os.environ.get("SYNC_RELATIONS", "").lower() in ("1", "true", "yes")
+
 UPDATE_DATES = "--update-dates" in sys.argv
 
 # Portuguese number-word parsing tables
@@ -256,9 +262,10 @@ def extract_persons_from_deceased(deceased_list):
     """Convert structured `deceased` entries (from Gemini) into person dicts.
 
     Each entry may have: name, death_date, age, father, mother, spouse.
-    The `pessoas` table has no relation columns, so father/mother/spouse are
-    carried on the dict for callers that can use them, but are not pushed to
-    Supabase until a schema migration adds those columns.
+    The relations (father/mother/spouse) are mapped to the DB column names
+    `pai`/`mae`/`conjuge` so they can be persisted once the schema migration
+    `migrations/add_pessoa_relation_columns.sql` is applied. They are only
+    pushed to Supabase when SYNC_RELATIONS=1 (see main()).
     """
     persons = []
     if not isinstance(deceased_list, list):
@@ -273,15 +280,18 @@ def extract_persons_from_deceased(deceased_list):
         parts = [p for p in name.split() if p.lower().strip('.,;:') not in TITLE_WORDS]  # noqa
         if not parts:
             continue
+        pai = (entry.get("father") or "").strip()[:100]
+        mae = (entry.get("mother") or "").strip()[:100]
+        conjuge = (entry.get("spouse") or "").strip()[:100]
         if len(parts) == 1:
             persons.append({
                 "nome": parts[0][:100],
                 "sobrenome": "",
                 "death_date": entry.get("death_date"),
                 "age": entry.get("age"),
-                "father": entry.get("father"),
-                "mother": entry.get("mother"),
-                "spouse": entry.get("spouse"),
+                "pai": pai,
+                "mae": mae,
+                "conjuge": conjuge,
             })
             continue
         sobrenome = parts[-1][:50]
@@ -291,9 +301,9 @@ def extract_persons_from_deceased(deceased_list):
             "sobrenome": sobrenome,
             "death_date": entry.get("death_date"),
             "age": entry.get("age"),
-            "father": entry.get("father"),
-            "mother": entry.get("mother"),
-            "spouse": entry.get("spouse"),
+            "pai": pai,
+            "mae": mae,
+            "conjuge": conjuge,
         })
     return persons
 
@@ -685,6 +695,11 @@ def main():
                     "file_id": file_id,
                     "criado_em": datetime.now().isoformat(),
                 }
+                if SYNC_RELATIONS:
+                    for rel_col in ("pai", "mae", "conjuge"):
+                        val = (person.get(rel_col) or "").strip()
+                        if val:
+                            record[rel_col] = val[:100]
                 
                 if not DRY_RUN:
                     result = supabase_request("POST", "pessoas", record)
