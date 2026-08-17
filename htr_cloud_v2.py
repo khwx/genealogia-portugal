@@ -461,6 +461,10 @@ class HTRProcessor:
             result = self.call_gemini(img_b64, preferred_key)
             elapsed = time.time() - start
 
+            parsed = parse_gemini_json(result.get("text", ""))
+            transcription = parsed.get("transcription") if parsed else None
+            deceased = parsed.get("deceased") if parsed else None
+
             metadata = {
                 "file_id": file_id,
                 "status": result["status"],
@@ -471,10 +475,6 @@ class HTRProcessor:
                 "wall_time_s": elapsed,
                 "processed_at": datetime.now().isoformat(),
             }
-
-            parsed = parse_gemini_json(result.get("text", ""))
-            transcription = parsed.get("transcription") if parsed else None
-            deceased = parsed.get("deceased") if parsed else None
 
             output_data = {
                 "file_id": file_id,

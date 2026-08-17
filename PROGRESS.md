@@ -29,3 +29,36 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 ### Próximos passos sugeridos
 - Usar `deceased` estruturado no `sync_htr_supabase.py` para popular nomes/relações.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-17 (execução autónoma)
+
+### Estado verificado
+- `git status` com 2 ficheiros modificados não commitados:
+  `htr_cloud_v2.py` e `sync_htr_supabase.py` (trabalho do passo pendente).
+- `.env` continua ignorado; nenhuma chave exposta no repo.
+- `py_compile` OK para ambos os scripts.
+
+### Tarefa implementada — usar `deceased` estruturado no sync
+- Implementado e finalizado o passo pendente de 2026-08-16: o `sync_htr_supabase.py`
+  passa a consumir o campo `deceased` (JSON estruturado do Gemini) em vez de só
+  regex sobre `raw_text`.
+- `extract_persons_from_deceased()`: converte cada entrada em pessoa
+  (`nome`/`sobrenome`, mantendo honoríficos em `TITLE_WORDS` de fora), e transporta
+  `death_date`, `age`, `father`, `mother`, `spouse` para uso futuro (a tabela
+  `pessoas` ainda não tem colunas de relação — sem rutura).
+- `normalize_death_date()`: normaliza ISO, `DD/MM/YYYY` e "D? de MES? de YYYY"
+  para `YYYY-MM-DD`; devolve `None` se inválido (ex.: mês 13, ano fora 1500–2100).
+- `main()`: usa `deceased` estruturado quando disponível (mais fiável) e faz
+  fallback para o extrator regex nos ficheiros HTR antigos só com `raw_text`.
+- Testado em modo isolado: `normalize_death_date` ('2020-3-5'→2020-03-05,
+  '05/12/1899'→1899-12-05, '3 de Maio de 1901'→1901-05-03, lixo→None) e
+  `extract_persons_from_deceased` (honoríficos, `nome`/`nome` alternativos).
+
+### Decisão registada
+- Mantém-se o pacing do HTR; o sync agora tira partido do JSON estruturado já
+  produzido, sem mudar o ritmo do pipeline nem a schema da base de dados.
+
+### Próximos passos sugeridos
+- Correr `sync_htr_supabase.py` (DRY_RUN off) num lote e validar contagem de
+  `data_obito` preenchidos vs. fallback regex.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).

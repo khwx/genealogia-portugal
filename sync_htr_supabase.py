@@ -219,6 +219,84 @@ def clean_name(parts):
             cleaned.append(part)
     return cleaned
 
+TITLE_WORDS = {'d', 'don', 'dom', 'doña', 'dona', 'sr', 'sra', 's', 'snr', 'snra'}
+
+def normalize_death_date(value):
+    """Normalize a death_date from the structured `deceased` field.
+
+    Accepts 'YYYY-MM-DD', 'YYYY-M-D', 'DD/MM/YYYY', 'D-M-YYYY' (or with
+    month names). Returns 'YYYY-MM-DD' or None if unparseable/invalid.
+    """
+    if not value or not isinstance(value, str):
+        return None
+    v = value.strip()
+    if not v:
+        return None
+
+    # ISO-like: YYYY-MM-DD or YYYY-M-D
+    m = re.match(r'^(\d{4})-(\d{1,2})-(\d{1,2})$', v)
+    if m:
+        y, mo, d = (int(x) for x in m.groups())
+        if 1500 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+        return None
+
+    # DD/MM/YYYY or D/M/YYYY
+    m = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', v)
+    if m:
+        d, mo, y = (int(x) for x in m.groups())
+        if 1500 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+        return None
+
+    # D? MES? YYYY or D? de MES? de YYYY (extended pattern of extract_date)
+    return extract_date(v)
+
+def extract_persons_from_deceased(deceased_list):
+    """Convert structured `deceased` entries (from Gemini) into person dicts.
+
+    Each entry may have: name, death_date, age, father, mother, spouse.
+    The `pessoas` table has no relation columns, so father/mother/spouse are
+    carried on the dict for callers that can use them, but are not pushed to
+    Supabase until a schema migration adds those columns.
+    """
+    persons = []
+    if not isinstance(deceased_list, list):
+        return persons
+    for entry in deceased_list:
+        if not isinstance(entry, dict):
+            continue
+        name = (entry.get("name") or entry.get("nome") or "").strip()
+        if not name:
+            continue
+        # Drop leading honorifics/titles before splitting into given/surname.
+        parts = [p for p in name.split() if p.lower().strip('.,;:') not in TITLE_WORDS]  # noqa
+        if not parts:
+            continue
+        if len(parts) == 1:
+            persons.append({
+                "nome": parts[0][:100],
+                "sobrenome": "",
+                "death_date": entry.get("death_date"),
+                "age": entry.get("age"),
+                "father": entry.get("father"),
+                "mother": entry.get("mother"),
+                "spouse": entry.get("spouse"),
+            })
+            continue
+        sobrenome = parts[-1][:50]
+        nome = " ".join(parts[:-1])[:100]
+        persons.append({
+            "nome": nome,
+            "sobrenome": sobrenome,
+            "death_date": entry.get("death_date"),
+            "age": entry.get("age"),
+            "father": entry.get("father"),
+            "mother": entry.get("mother"),
+            "spouse": entry.get("spouse"),
+        })
+    return persons
+
 def extract_persons(raw_text):
     """Extract person names from HTR text - STRICT mode."""
     if not raw_text or len(raw_text.strip()) < 50:
@@ -558,26 +636,44 @@ def main():
                 data = json.load(f)
             
             raw_text = data.get("raw_text", "")
-            
-            # Filter: check if valid death record
-            is_valid, reason = is_valid_death_record(raw_text)
-            if not is_valid:
-                filtered_count += 1
-                synced.add(file_id)
-                if (i + 1) % 50 == 0:
-                    print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
-                continue
-            
-            persons = extract_persons(raw_text)
+
+            # Prefer structured `deceased` (Gemini JSON) when available; it is
+            # far more reliable than regex over raw_text. Fall back to the
+            # regex extractor for older HTR files that only have raw_text.
+            deceased = data.get("deceased")
+            structured = (
+                isinstance(deceased, list)
+                and bool([d for d in deceased if isinstance(d, dict) and (d.get("name") or d.get("nome"))])
+            )
+
+            if structured:
+                persons = extract_persons_from_deceased(deceased)
+                used_structured = True
+            else:
+                # Filter: check if valid death record
+                is_valid, reason = is_valid_death_record(raw_text)
+                if not is_valid:
+                    filtered_count += 1
+                    synced.add(file_id)
+                    if (i + 1) % 50 == 0:
+                        print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
+                    continue
+                persons = extract_persons(raw_text)
+                used_structured = False
+
             if not persons:
                 filtered_count += 1
                 synced.add(file_id)
                 continue
-            
-            death_date = extract_date(raw_text)
+
             freguesia = file_to_freguesia.get(file_id, "Celorico da Beira")
-            
+
             for person in persons:
+                # Prefer the structured death_date; otherwise regex the text.
+                if used_structured and person.get("death_date"):
+                    death_date = normalize_death_date(person["death_date"])
+                else:
+                    death_date = extract_date(raw_text)
                 record = {
                     "nome": person["nome"],
                     "sobrenome": person.get("sobrenome", ""),
