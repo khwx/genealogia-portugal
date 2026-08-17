@@ -37,6 +37,21 @@ if os.path.exists(env_file):
                 k, v = line.split('=', 1)
                 os.environ[k.strip()] = v.strip()
 
+
+def mask_key(key):
+    """Return a redacted fingerprint of an API key (never the full secret).
+
+    Only the first 4 and last 4 characters are kept; the middle is masked.
+    Empty/invalid input returns an empty string. This prevents leaking real
+    Gemini keys into on-disk metadata while keeping the value identifiable.
+    """
+    if not key or not isinstance(key, str):
+        return ""
+    key = key.strip()
+    if len(key) <= 8:
+        return "*" * len(key)
+    return f"{key[:4]}{'*' * (len(key) - 8)}{key[-4:]}"
+
 INPUT_DIR = Path(os.environ.get("INPUT_DIR", "/home/pxtkhw/projetos/obitos/output/full_images/tiff"))
 OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/home/pxtkhw/projetos/obitos/output/htr_text"))
 METADATA_DIR = Path(os.environ.get("METADATA_DIR", "/home/pxtkhw/projetos/obitos/output/htr_metadata"))
@@ -469,7 +484,7 @@ class HTRProcessor:
                 "file_id": file_id,
                 "status": result["status"],
                 "model": result.get("model", ""),
-                "key": result.get("key", ""),
+                "key": mask_key(result.get("key", "")),
                 "text_length": len(result.get("text", "")),
                 "parsed_ok": parsed is not None,
                 "wall_time_s": elapsed,

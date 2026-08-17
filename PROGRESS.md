@@ -78,6 +78,46 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   para persistir as relações já capturadas no `deceased`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
 
+## 2026-08-17 (execução autónoma — ciclo de segurança)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado
+  (sem chaves no repo — confirmado por `git check-ignore`).
+- Pipeline `htr_cloud_v2.py`: ao relançar, reportou `8576/0 done, 0 remaining`
+  → OCR de óbitos concluído para o inventário atual; processo termina limpo.
+- `sync_htr_supabase.py` (DRY_RUN): 8576 ficheiros já sincronizados, BD com
+  776+ registos; feature `deceased` estruturado operacional. Sem rutura.
+
+### BUG DE SEGURANÇA encontrado e corrigido
+- **Exposição de chaves**: `htr_cloud_v2.py` gravava a chave Gemini COMPLETA
+  (`AIza…`) no campo `key` de cada `output/htr_metadata/<id>.json`.
+  1686 ficheiros de metadata on-disk continham chaves reais em plaintext.
+  (Felizmente esses ficheiros já NÃO são rastreados pelo git — commit anterior
+  parou de os trackear — logo não iam para o GitHub, mas permaneciam no disco.)
+- CORRIGIDO: adicionado `mask_key()` em `htr_cloud_v2.py` que só guarda a
+  fingerprint (`AIza****…xUsM`, primeiros 4 + últimos 4); aplicado na escrita
+  de metadata (linha ~472). Chaves novas nunca mais são escritas inteiras.
+- Criado `redact_metadata_keys.py` (idempotente, dry-run por defeito;
+  `--apply` reescreve) e executado com `--apply`: **0 chaves completas
+  restantes** em `output/htr_metadata/` (1686 mascaradas, 6890 já limpas).
+- Verificado: `py_compile` OK p/ `htr_cloud_v2.py` e `redact_metadata_keys.py`.
+
+### Decisão registada
+- Prioridade foi segurança ("garantir segurança sem expor segredos"): fechar
+  a fuga de chaves em disco e impedir futuras escritas completas. Sem alteração
+  ao pacing nem à lógica de OCR (pipeline já concluído p/ óbitos).
+- Nota: `sync_htr_supabase.py` tem um `SUPABASE_KEY` default hardcoded, mas é
+  uma *publishable key* (`sb_publishable_…`), desenhada para ser pública — não
+  é segredo; deixou-se como está para não quebrar execuções sem env.
+
+### Próximos passos sugeridos
+- Expandir OCR a nascimentos/casamentos (inventário já existe) — próximo salto
+  de valor real, uma vez que óbitos estão completos.
+- Migração da schema `pessoas` p/ `pai`/`mae`/`conjuge` para persistir relações
+  do `deceased` (uso futuro, hoje ausentes na tabela).
+- Correr `sync_htr_supabase.py --update-dates` para backfill de `data_obito`
+  nos registos existentes com data em falta.
+
 ## 2026-08-17 (2ª passagem autónoma)
 
 ### Estado verificado
