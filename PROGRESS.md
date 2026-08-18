@@ -343,3 +343,46 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) p/ backfill de
   `data_obito`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-18 (8ª passagem autónoma)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main` (antes desta passagem); `.env` continua
+  ignorado. Scanner de segredos: **0 segredos** em 139 ficheiros rastreados
+  (após adicionar o novo teste). Segurança intacta.
+- Pipeline `htr_cloud_v2.py` a correr (pids 165069+), sem 429 graves. OCR de óbitos
+  avançou: 11162 ficheiros de output (parse rate 60.2%, 5593 pessoas falecidas
+  estruturadas, 89.3% com ≥1 relação).
+- `py_compile` OK para `scripts/coverage_report.py` e `scripts/test_coverage_report.py`.
+
+### Tarefa implementada — testes unitários para o portão de segurança
+- `scripts/scan_secrets.py` (portão de segurança CI: corre a cada push/PR) não
+  tinha nenhum teste com compromisso. Criado `scripts/test_scan_secrets.py`
+  (isolado, sem rede) com 7 testes que verificam:
+  - deteção de chaves reais (Google/OpenAI/Slack/Supabase-service/AWS/chave
+    privada) com label e número de linha corretos;
+  - que placeholders de baixa entropia são ignorados (`AIza` + ≤3 unique chars ou
+    corpo em `[xX0_-]`);
+  - `_looks_like_placeholder`, `_is_allowed_path` (.env.example / scan_secrets.py
+    permitidos) e skip de extensões binárias;
+  - ausência de falsos positivos em ficheiro limpo;
+  - `main()` end-to-end a mantar o repo em 0 segredos.
+- CRUCIAL: os segredos são construídos em runtime (`"AIza" + "SyA1b" * 7`, etc.)
+  para que a forma contígua nunca apareça como literal neste ficheiro rastreado —
+  o scanner inspeciona este próprio ficheiro e confirma 0 segredos (139 tracked).
+  Testes PASS. `py_compile` OK.
+
+### Decisão registada
+- Reforçou o pilar "garantir segurança sem expor segredos": o portão de segurança
+  passa a ser verificado por testes automatizados no CI local, não apenas testado
+  de forma ad-hoc. Sem alteração ao pacing do HTR, à BD remota nem a segredos.
+- `output/htr_coverage.json` + `htr_coverage_history.json` regenerados localmente
+  (gitignored) para registrar a evolução; a snapshot fica registada em memória do
+  ciclo.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  (alto ROI: 89.3% dos falecidos já têm relações) — requer SQL Editor/DDL.
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) p/ backfill de
+  `data_obito`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
