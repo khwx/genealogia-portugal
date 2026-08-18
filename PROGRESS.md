@@ -230,3 +230,39 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
   `data_obito`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-18 (5ª passagem autónoma)
+
+### Estado verificado
+- Pipeline `htr_cloud_v2.py` a correr (pid 142801, ~1h de execução), 7142
+  imagens processadas, 90 combos (chave,modelo) vivos, 0 mortos, 0 esgotados.
+  Sem bloqueios de quota. 165 erros acumulados (2.3% — Within normal range).
+- `.env` continua ignorado; scanner de segredos: **0 segredos** em 135
+  ficheiros rastreados. Segurança intacta.
+- Repo limpo e alinhado com `origin/main`.
+- 9468 ficheiros HTR de output totalizados; parse rate original: 22.5%
+  (2127/9468) — muitos ficheiros anteriores à adição de `parse_gemini_json`
+  continham JSON válido em `raw_text` mas `parsed_ok=False`.
+
+### Tarefa implementada — reparse de outputs HTR existentes
+- Criado `scripts/reparse_htr.py`: script idempotente que re-analisa todos os
+  ficheiros `output/htr_text/*.json`, aplica `parse_gemini_json()` ao `raw_text`
+  e atualiza `transcription`, `deceased` e `parsed_ok` no output e na metadata.
+- Executado com `--apply`: **2924 ficheiros reparsados** com sucesso (de 4412
+  candidatos — os restantes não contêm JSON válido).
+- Resultado: parse rate subiu de **22.5% → 53.4%** (5056/9468); `deceased`
+  estruturado passou de 662 → 1099 ficheiros; `transcription` de 1499 → 4018.
+- `py_compile` OK; scanner de segredos continua a passar (0 segredos).
+
+### Decisão registada
+- O reparse é seguro e idempotente: não altera ficheiros já com `parsed_ok=True`
+  nem muda o `raw_text`. Melhora a qualidade dos dados disponíveis para o
+  `sync_htr_supabase.py` sem tocar no pipeline nem na BD remota.
+- Não se alterou o pacing do HTR (pipeline saudável, sem 429 graves).
+
+### Próximos passos sugeridos
+- Aplicar a migração de relações + `SYNC_RELATIONS=1` para backfill de
+  `pai`/`mae`/`conjuge` (requer SQL Editor/DDL no Supabase).
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
+  `data_obito`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
