@@ -295,12 +295,51 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   ciclo de 8h passa a poder quantificar a qualidade do OCR sem risco (sem quota,
   sem BD remota, sem exposição de segredos). Não se alterou o pacing nem a
   lógica do pipeline em execução.
-- Backfill de relações/datas no Supabase e expansão a nascimentos/casamentos
-  mantêm-se como próximos passos (requerem DDL/credenciais ou download pesado).
+  - Backfill de relações/datas no Supabase e expansão a nascimentos/casamentos
+   mantêm-se como próximos passos (requerem DDL/credenciais ou download pesado).
 
 ### Próximos passos sugeridos
 - Aplicar a migração de relações + `SYNC_RELATIONS=1` para backfill de
   `pai`/`mae`/`conjuge` (requer SQL Editor/DDL no Supabase).
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
+  `data_obito`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-18 (7ª passagem autónoma)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main` (antes desta passagem); `.env`
+  continua ignorado. Scanner de segredos: **0 segredos** em 138 ficheiros
+  rastreados. Segurança intacta.
+- Pipeline `htr_cloud_v2.py` a correr (pids 165069+), sem 429 graves.
+- `py_compile` OK para `coverage_report.py` e `test_coverage_report.py`;
+  testes unitários PASS.
+
+### Tarefa implementada — métricas de prontidão de relações + trend histórico
+- Estendeu `scripts/coverage_report.py`: a função `analyze()` passa a calcular
+  métricas de relação do `deceased` estruturado — `persons_with_father`,
+  `persons_with_mother`, `persons_with_spouse`, `persons_with_any_relation` e
+  `relation_readiness_pct` (%). Lógica pura/determinística (sem I/O, sem rede).
+- Adicionado `record_trend()`: anexa um snapshot timestamped (UTC) a
+  `output/htr_coverage_history.json` quando se passa `--trend`, permitindo a
+  cada ciclo de 8h medir a evolução da qualidade do OCR sem tocar no pipeline.
+- `main()` imprime as novas métricas; `--write --trend` atualiza relatório e
+  histórico local (fora do git — artefacto regenerável).
+- Testes estendidos em `test_coverage_report.py`: cobrem relações,
+  `_nonempty_relation` e `record_trend` (isolados, sem I/O de rede). PASS.
+
+### Decisão registada / valor quantificado
+- Executado contra o output atual (10699 ficheiros): **89.3%** dos 5344
+  falecidos estruturados trazem pelo menos uma relação (pai 4187, mãe 4128,
+  cônjuge 1871). Isto valida com dados que o próximo passo (migração de
+  relações + `SYNC_RELATIONS=1`) teria alto impacto — reforça a prioridade sem
+  exigir DDL/credenciais agora.
+- Melhoria segura e mensurável do pilar "melhorar autonomamente"; não se tocou
+  no pacing, na BD remota nem em segredos.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  (alto ROI: 89.3% dos falecidos já têm relações) — requer SQL Editor/DDL.
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) p/ backfill de
   `data_obito`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).

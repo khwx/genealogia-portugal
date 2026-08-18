@@ -2,16 +2,24 @@
 """Unit tests for scripts/coverage_report.py (no network, no I/O)."""
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from scripts.coverage_report import analyze, _nonempty_transcription
+from scripts.coverage_report import (
+    analyze,
+    _nonempty_transcription,
+    _nonempty_relation,
+    record_trend,
+)
 
 SAMPLE = [
-    {"file_id": "1", "parsed_ok": True, "transcription": "João faleceu", "deceased": [{"name": "João"}]},
+    {"file_id": "1", "parsed_ok": True, "transcription": "João faleceu",
+     "deceased": [{"name": "João", "father": "Manuel", "mother": "", "spouse": None}]},
     {"file_id": "2", "parsed_ok": True, "transcription": "[ilegível]", "deceased": []},
     {"file_id": "3", "parsed_ok": False, "transcription": "", "deceased": None},
-    {"file_id": "4", "parsed_ok": True, "transcription": "Maria e Pedro", "deceased": [{"name": "Maria"}, {"name": "Pedro"}]},
+    {"file_id": "4", "parsed_ok": True, "transcription": "Maria e Pedro",
+     "deceased": [{"name": "Maria", "spouse": "Pedro"}, {"name": "Pedro"}]},
 ]
 
 
@@ -25,6 +33,23 @@ def test_analyze_counts():
     assert m["deceased_persons"] == 3
     assert m["transcription_rate_pct"] == 50.0
     assert m["deceased_rate_pct"] == 50.0
+
+
+def test_analyze_relations():
+    m = analyze(SAMPLE)
+    # João has father; Maria has spouse; Pedro has none -> 2 with any relation
+    assert m["persons_with_father"] == 1
+    assert m["persons_with_mother"] == 0
+    assert m["persons_with_spouse"] == 1
+    assert m["persons_with_any_relation"] == 2
+    assert m["relation_readiness_pct"] == round(100.0 * 2 / 3, 1)
+
+
+def test_nonempty_relation():
+    assert _nonempty_relation("Manuel")
+    assert not _nonempty_relation("")
+    assert not _nonempty_relation(None)
+    assert not _nonempty_relation(42)
 
 
 def test_empty_input():
@@ -41,8 +66,20 @@ def test_nonempty_transcription_markers():
     assert _nonempty_transcription("texto real")
 
 
+def test_record_trend(tmp_path=None):
+    path = tmp_path or Path(tempfile.mkdtemp()) / "trend.json"
+    h1 = record_trend({"total": 1, "deceased_persons": 3}, trend_path=path)
+    assert len(h1) == 1 and "timestamp" in h1[0]
+    h2 = record_trend({"total": 2, "deceased_persons": 5}, trend_path=path)
+    assert len(h2) == 2
+    assert h2[0]["deceased_persons"] == 3 and h2[1]["deceased_persons"] == 5
+
+
 if __name__ == "__main__":
     test_analyze_counts()
+    test_analyze_relations()
+    test_nonempty_relation()
     test_empty_input()
     test_nonempty_transcription_markers()
+    test_record_trend()
     print("ALL TESTS PASSED")
