@@ -266,3 +266,41 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
   `data_obito`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-18 (6ª passagem autónoma)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado.
+- Scanner de segredos: **0 segredos** em 136 ficheiros rastreados. Segurança
+  intacta (portão local+CI ativo).
+- Pipeline `htr_cloud_v2.py` a correr (pid 142801), estado `running`, 8001
+  imagens processadas, 165 erros (2.1% — dentro do normal). Sem 429 graves.
+- `py_compile` OK p/ `scripts/coverage_report.py` e `scripts/test_coverage_report.py`.
+
+### Tarefa implementada — relatório de cobertura/qualidade do HTR
+- Criado `scripts/coverage_report.py`: ferramenta de leitura-only que varre
+  `output/htr_text/*.json` e calcula métricas de progresso (parse rate,
+  cobertura de `transcription`, cobertura de `deceased` estruturado e total de
+  pessoas falecidas). Idempotente, sem rede, sem tocar no pipeline nem em
+  segredos. `python3 scripts/coverage_report.py --write` gera
+  `output/htr_coverage.json`.
+- Criado `scripts/test_coverage_report.py` (isolado, sem I/O): valida a função
+  `analyze()` (contagens, rates, marcadores de texto vazio) — TESTES PASS.
+- Executado contra o output atual: **10324 ficheiros**, parse rate **57.2%**
+  (5905), `transcription` em 36.6% (3780), `deceased` estruturado em 14.2%
+  (1465 ficheiros → 4670 pessoas). Métrica quantificável para ciclos futuros.
+
+### Decisão registada
+- Avançou "melhorar autonomamente" com uma melhoria segura e mensurável: cada
+  ciclo de 8h passa a poder quantificar a qualidade do OCR sem risco (sem quota,
+  sem BD remota, sem exposição de segredos). Não se alterou o pacing nem a
+  lógica do pipeline em execução.
+- Backfill de relações/datas no Supabase e expansão a nascimentos/casamentos
+  mantêm-se como próximos passos (requerem DDL/credenciais ou download pesado).
+
+### Próximos passos sugeridos
+- Aplicar a migração de relações + `SYNC_RELATIONS=1` para backfill de
+  `pai`/`mae`/`conjuge` (requer SQL Editor/DDL no Supabase).
+- Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) para backfill de
+  `data_obito`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
