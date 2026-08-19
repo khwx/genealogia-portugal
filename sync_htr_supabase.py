@@ -515,23 +515,47 @@ def supabase_request(method, path, data=None):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-def get_synced_file_ids():
-    """Get file_ids already in Supabase."""
+def fetch_paginated(select, base_filter="file_id=not.is.null", order="id.asc",
+                    page=1000, timeout=30):
+    """Fetch all rows from `pessoas` paginating past Supabase's 1000-row cap.
+
+    Returns a flat list of dicts. Used by every backfill/sync routine so the
+    pagination logic lives in exactly one place (DRY + easy to test). A network
+    error mid-stream stops pagination and returns whatever was collected so far
+    instead of crashing the whole run.
+    """
     import urllib.request
     import urllib.error
-    
-    url = f"{SUPABASE_URL}/rest/v1/pessoas?select=file_id&file_id=not.is.null"
-    headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-    }
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
-            return set(str(r["file_id"]) for r in data if r.get("file_id"))
-    except:
-        return set()
+
+    rows = []
+    offset = 0
+    while True:
+        url = (f"{SUPABASE_URL}/rest/v1/pessoas"
+               f"?select={select}&{base_filter}"
+               f"&limit={page}&offset={offset}&order={order}")
+        headers = {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+        }
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                batch = json.loads(resp.read())
+        except Exception:
+            break
+        if not batch:
+            break
+        rows.extend(batch)
+        if len(batch) < page:
+            break
+        offset += page
+    return rows
+
+def get_synced_file_ids():
+    """Get file_ids already in Supabase (paginated — Supabase caps at 1000/query)."""
+    data = fetch_paginated("file_id", base_filter="file_id=not.is.null",
+                           order="file_id.asc")
+    return set(str(r["file_id"]) for r in data if r.get("file_id"))
 
 def backfill_url():
     """Backfill imagem_url (link to digitarq) on existing records that lack it."""
@@ -543,47 +567,30 @@ def backfill_url():
     updated = 0
     skipped = 0
     errors = 0
-    offset = 0
-    page = 1000
     total = 0
-    while True:
-        url = (f"{SUPABASE_URL}/rest/v1/pessoas"
-               f"?select=id,file_id,imagem_url&file_id=not.is.null"
-               f"&limit={page}&offset={offset}&order=id.asc")
-        headers = {
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}",
-        }
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            records = json.loads(resp.read())
-        if not records:
-            break
-        total += len(records)
-        for i, rec in enumerate(records):
-            file_id = rec.get("file_id")
-            existing = rec.get("imagem_url")
-            if not file_id:
-                skipped += 1
-                continue
-            new_url = imagem_url_for(file_id)
-            if existing and existing == new_url:
-                skipped += 1
-                continue
-            if DRY_RUN:
-                print(f"  Would set record {rec['id']}: imagem_url = {new_url}")
+
+    records = fetch_paginated("id,file_id,imagem_url")
+    total = len(records)
+    for i, rec in enumerate(records):
+        file_id = rec.get("file_id")
+        existing = rec.get("imagem_url")
+        if not file_id:
+            skipped += 1
+            continue
+        new_url = imagem_url_for(file_id)
+        if existing and existing == new_url:
+            skipped += 1
+            continue
+        if DRY_RUN:
+            print(f"  Would set record {rec['id']}: imagem_url = {new_url}")
+            updated += 1
+        else:
+            result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", {"imagem_url": new_url})
+            if result["status"] == "success":
                 updated += 1
             else:
-                result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", {"imagem_url": new_url})
-                if result["status"] == "success":
-                    updated += 1
-                else:
-                    print(f"  Error updating record {rec['id']}: {result}")
-                    errors += 1
-        print(f"  Page done (offset {offset}, {len(records)} rows): updated={updated}, errors={errors}")
-        if len(records) < page:
-            break
-        offset += page
+                print(f"  Error updating record {rec['id']}: {result}")
+                errors += 1
 
     print(f"\n=== Backfill URL Complete ===")
     print(f"Total scanned: {total}")
@@ -598,15 +605,11 @@ def update_dates():
 
     print("=== Backfill data_obito on existing records ===\n")
 
-    # Get all records with file_id and NULL data_obito
-    url = f"{SUPABASE_URL}/rest/v1/pessoas?select=id,file_id,nome,sobrenome&file_id=not.is.null&data_obito=is.null"
-    headers = {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-    }
-    req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        records = json.loads(resp.read())
+    # Get all records with file_id and NULL data_obito (paginated)
+    records = fetch_paginated(
+        "id,file_id,nome,sobrenome",
+        base_filter="file_id=not.is.null&data_obito=is.null",
+    )
 
     print(f"Records with NULL data_obito: {len(records)}")
     if not records:
@@ -680,28 +683,13 @@ def backfill_relations():
         print("Error: SYNC_RELATIONS must be enabled to backfill relations.")
         return
 
-    offset = 0
-    page = 1000
     updated = 0
     errors = 0
     total = 0
-    
-    while True:
-        url = (f"{SUPABASE_URL}/rest/v1/pessoas"
-               f"?select=id,file_id&file_id=not.is.null"
-               f"&limit={page}&offset={offset}&order=id.asc")
-        headers = {
-            "apikey": SUPABASE_KEY,
-            "Authorization": f"Bearer {SUPABASE_KEY}",
-        }
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            records = json.loads(resp.read())
-        if not records:
-            break
-        
-        total += len(records)
-        for i, rec in enumerate(records):
+
+    records = fetch_paginated("id,file_id")
+    total = len(records)
+    for i, rec in enumerate(records):
             file_id = rec.get("file_id")
             if not file_id: continue
             
@@ -747,10 +735,6 @@ def backfill_relations():
                         print("\n!!! ERROR: Columns 'pai', 'mae' or 'conjuge' not found.")
                         print("Did you run the SQL migration in Supabase SQL Editor?")
                         return
-
-        print(f"  Page done (offset {offset}): updated={updated}")
-        if len(records) < page: break
-        offset += page
 
     print(f"\n=== Backfill Relations Complete ===")
     print(f"Updated: {updated}")

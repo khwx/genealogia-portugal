@@ -386,3 +386,81 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `sync_htr_supabase.py --update-dates` (DRY_RUN off) p/ backfill de
   `data_obito`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-19 (retoma manual — Sync + Backfill Supabase)
+
+### Estado verificado
+- Pipeline HTR `htr_cloud_v2.py` NÃO está a correr (pid inválido; state diz
+  `running` mas o processo já não existe). Óbitos: 11764 ficheiros de output HTR.
+- Supabase: 8551 registos (8528 com file_id, 4922 com `data_obito` preenchida).
+- `git status` limpo; `.env` continua ignorado; scanner de segredos intacto.
+
+### BUG encontrado e corrigido — paginação do sync
+- `get_synced_file_ids()` e `update_dates()` faziam uma única query sem
+  paginação (limite 1000 do Supabase), logo subestimavam o que já estava na BD
+  (líam 198 / 1000 em vez de 8528 / 3629). O sync achava que "tudo feito" e
+  não empurrava os registos em falta.
+- CORRIGIDO: ambas as funções agora paginam (`limit=1000&offset=…`) até esgotar.
+- O dry-run prévio tinha poluído `output/sync_htr_state.json` marcando todos os
+  11764 como `synced`; resetado `synced_ids=[]` para forçar revalidação.
+- `py_compile` OK.
+
+### Tarefa executada — sync + backfill
+- `sync_htr_supabase.py` (DRY_RUN off): revalidou contra a BD paginada e
+  inseriu **203 novos registos válidos** (os em falta); 7418 filtrados
+  (não são assentos de óbito válidos), 17 erros (JSON corrompido/local).
+- `sync_htr_supabase.py --update-dates` (DRY_RUN off): backfill de `data_obito`
+  sobre 3637 registos com data nula → **160 atualizados** (regex), 2953 sem
+  data extraível, 1 erro.
+- Resultado final na BD: **8754 registos** (8731 com file_id, 5260 com
+  `data_obito`). Sem duplicados (POST com 409 tratado como já-existente).
+
+### Decisão registada
+- Avançou o pilar "sync + backfill" com correção de bug de paginação que
+  impedia o backfill completo. Não se tocou na schema remota (relações ficam
+  pendentes de migração/DDL) nem no pipeline HTR (parado, sem quota).
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge` (89.3% dos falecidos já têm relações).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url` (link
+  digitarq) nos registos que ainda não têm.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-19 (execução autónoma — refactor de paginação + testes)
+
+### Estado verificado
+- Repo tinha 2 ficheiros modificados não commitados (PROGRESS.md + o fix de
+  paginação em `sync_htr_supabase.py` da "retoma manual" de 2026-08-19). Pipeline
+  HTR parado; `.env` continua ignorado.
+- Scanner de segredos: **0 segredos** em 139 ficheiros rastreados. Segurança intacta.
+- Coverage report (snapshot 8h): 12166 ficheiros HTR, parse rate **63.3%**,
+  `transcription` 40.4%, `deceased` estruturado 17.8% (6722 pessoas),
+  `relation_readiness` **88.3%** (5938/6722 com ≥1 relação).
+
+### Tarefa implementada — unificar lógica de paginação (DRY + testável)
+- O bug de paginação corrigido na retoma manual estava duplicado em 4 sítios
+  (`get_synced_file_ids`, `backfill_url`, `update_dates`, `backfill_relations`),
+  cada um com o seu próprio `while`/offset — frágil e fácil de regredir.
+- Extraído `fetch_paginated(select, base_filter, order, page, timeout)` em
+  `sync_htr_supabase.py`: única implementação da paginação (Supabase cap 1000);
+  pára em batch vazio ou < page e tolera erro de rede devolvendo o recolhido
+  até aí. As 4 funções agora chamam o helper (comportamento preservado: mesmas
+  queries, mesmos filtros `file_id=not.is.null`, mesma ordem).
+- `py_compile` OK; `test_sync_pagination.py` (6 testes, sem rede — monkeypatch
+  de `urllib.request.urlopen`) valida: merge de múltiplas páginas (1000+500→1500),
+  paragem em página < cap, página única, resultado vazio, erro de rede gracioso
+  e `get_synced_file_ids` a usar a paginação. **TESTES PASS**.
+
+### Decisão registada
+- Refactor seguro e idempotente: não altera o pacing, a BD remota nem segredos;
+  apenas centraliza lógica duplicada e adiciona cobertura de testes à correção
+  de bug crítica. Mantém-se o mesmo comportamento observado na retoma manual.
+- Próximos passos remotos (DDL/credenciais) continuam pendentes; este ciclo
+  focou-se em "melhorar autonomamente" com qualidade de código mensurável.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1` para
+  backfill de `pai`/`mae`/`conjuge` (88.3% dos falecidos já têm relações).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).
