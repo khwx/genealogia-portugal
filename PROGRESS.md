@@ -534,3 +534,59 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url` (helper
   agora resiliente) quando houver acesso à BD.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-19 (execução autónoma — preparar OCR para nascimentos/casamentos)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main` (antes desta passagem) — excepto `index.html`
+  (UI pré-existente, não relacionado; não foi comitado). `.env` continua ignorado;
+  scanner de segredos: **0 segredos** em 140 ficheiros rastreados. Segurança intacta.
+- Pipeline HTR `htr_cloud_v2.py` parado (óbitos concluídos); sem quota em uso.
+- `doc_file_listings.json` (4152 fileIds) cobre só os 116 livros de óbitos de
+  Celorico; os livros de nascimentos/batismos (236) e casamentos (1030) já estão
+  no inventário (`obitos_inventario.json`, tipo_cod BIRT/MARR/DEAT) mas os seus
+  *page listings* ainda não foram descarregados.
+
+### Tarefa implementada — pipeline HTR record-type aware (preparação)
+- `htr_cloud_v2.py`: substituído o `PROMPT` único (hardcoded óbitos) por
+  `PROMPT_BY_TYPE = {DEAT, BIRT, MARR}` com schemas distintos:
+  - DEAT: `{"transcription","deceased":[...]}` (inalterado — 100% backward compat)
+  - BIRT: `{"transcription","persons":[{name,birth_date,father,mother,godfather,godmother}]}`
+  - MARR: `{"transcription","persons":[{name,marriage_date,spouse,father,mother,spouse_father,spouse_mother}]}`
+- Adicionada `build_type_map()`: junta `doc_file_listings.json` (file_id→doc_id)
+  com `obitos_inventario.json` (doc_id→tipo_cod) produzindo `{file_id: tipo_cod}`.
+  file_ids sem mapeamento caem no `DEFAULT_RECORD_TYPE="DEAT"` (comportamento
+  actual preservado — zero rutura). Degradação segura ({}) se ficheiros ausentes.
+- `process_single()` agora seleciona o prompt pelo tipo do ficheiro e grava
+  `record_type` em `output/htr_text/<id>.json` e `output/htr_metadata/<id>.json`,
+  mantendo `raw_text`/`transcription`/`deceased` para não quebrar o sync.
+  `call_gemini()` recebe o `prompt` por parâmetro (default DEAT). Chave Gemini
+  continua mascarada via `mask_key()` (sem exposição).
+- Smoke-test end-to-end (call_gemini stubbed, tiff real): `record_type=DEAT`
+  escrito em output+metadata; key fingerprint `AIza***…***BbRM` (sem key inteira).
+- Criado `test_htr_type_aware.py` (isolado, sem rede) com 10 testes: schemas de
+  prompt, default DEAT, selector, jointure listing+inventário, precedência do
+  inventário, degradação com ficheiros ausentes, skip de páginas não-lista,
+  regressão de `parse_gemini_json` e `mask_key` (chave construída em runtime —
+  nenhum literal de chave neste ficheiro rastreado). **TESTES PASS** (10/10).
+- `py_compile` OK; scanner de segredos confirma 0 segredos em
+  `test_htr_type_aware.py` e `htr_cloud_v2.py`.
+
+### Decisão registada
+- Passo de "melhorar autonomamente" seguro e sem rutura: a pipeline HTR passa a
+  ser *pronta* a transcrever correctamente nascimentos e casamentos. Não altera
+  o ritmo (KEY_INTERVAL/MODEL_INTERVAL), a BD remota nem segredos; o comportamento
+  sobre os 11764 óbitos processados permanece idêntico (DEAT). A expansão só
+  requer agora: (1) descarregar os *page listings* + TIFFs de BIRT/MARR — que
+  podem ser alimentados no `doc_file_listings.json`/INPUT_DIR sem alterar código;
+  (2) opcionalmente estender o `sync_htr_supabase.py` para ingerior `persons`.
+- Não se efectuou o download de imagens de nascimentos/casamentos neste ciclo
+  (pesado, GBs + quota Gemini); fica como próximo passo quando houver capacidade.
+
+### Próximos passos sugeridos
+- Descarregar inventários de páginas (page listings) dos livros BIRT/MARR de
+  Celorico e alimentá-los a `output/data/doc_file_listings.json`; o `type_map`
+  passa a mapear esses fileIds a BIRT/MARR automaticamente.
+- Correr `htr_cloud_v2.py` para OCR de nascimentos/casamentos (prompts já prontos).
+- Extensão opcional do sync para ingerir `persons` (nascimentos/casamentos).
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`.

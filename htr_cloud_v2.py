@@ -57,6 +57,11 @@ OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", "/home/pxtkhw/projetos/obitos/out
 METADATA_DIR = Path(os.environ.get("METADATA_DIR", "/home/pxtkhw/projetos/obitos/output/htr_metadata"))
 LOG_FILE = Path(os.environ.get("LOG_FILE", "/home/pxtkhw/projetos/obitos/output/htr_cloud_v2.log"))
 STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/htr_cloud_v2_state.json"))
+OUTPUT_PARENT = OUTPUT_DIR.parent
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(OUTPUT_PARENT / "data")))
+# Page listings + inventory feed the record-type (BIRT/MARR/DEAT) of each TIFF.
+DOC_FILE_LISTINGS = Path(os.environ.get("DOC_FILE_LISTINGS", str(DATA_DIR / "doc_file_listings.json")))
+INVENTARIO_JSON = Path(os.environ.get("INVENTARIO_JSON", str(OUTPUT_PARENT / "obitos_inventario.json")))
 
 GEMINI_KEYS = os.environ.get("GEMINI_KEYS", "")
 GEMINI_KEYS = [k.strip() for k in GEMINI_KEYS.split(",") if k.strip()]
@@ -156,14 +161,80 @@ def parse_gemini_json(text):
     return obj
 
 
-PROMPT = """You are a transcription assistant for Portuguese historical documents.
+PROMPT_BY_TYPE = {
+    "DEAT": """You are a transcription assistant for Portuguese historical documents.
 This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal.
 Output ONLY a JSON object (no other text) with this structure:
 {
   "transcription": "full transcribed text here",
   "deceased": [ { "name": "...", "death_date": "YYYY-MM-DD", "age": "...", "father": "...", "mother": "...", "spouse": "..." } ]
 }
-If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON."""
+If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
+    "BIRT": """You are a transcription assistant for Portuguese historical documents.
+This image shows a page from a birth/baptism register (livro de nascimentos/batismos) from Celorico da Beira, Portugal.
+Output ONLY a JSON object (no other text) with this structure:
+{
+  "transcription": "full transcribed text here",
+  "persons": [ { "name": "nome do recém-nascido", "birth_date": "YYYY-MM-DD", "father": "...", "mother": "...", "godfather": "...", "godmother": "..." } ]
+}
+If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
+    "MARR": """You are a transcription assistant for Portuguese historical documents.
+This image shows a page from a marriage register (livro de casamentos) from Celorico da Beira, Portugal.
+Output ONLY a JSON object (no other text) with this structure:
+{
+  "transcription": "full transcribed text here",
+  "persons": [ { "name": "cônjuge 1", "marriage_date": "YYYY-MM-DD", "spouse": "cônjuge 2", "father": "...", "mother": "...", "spouse_father": "...", "spouse_mother": "..." } ]
+}
+If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
+}
+# Default record type when a file_id cannot be resolved to a book type. All
+# currently downloaded TIFFs are óbitos (DEAT); defaulting to DEAT preserves the
+# existing, tested behaviour exactly (no regression) while keeping BIRT/MARR
+# ready: adding their page listings to doc_file_listings activates them with no
+# further code change.
+DEFAULT_RECORD_TYPE = "DEAT"
+
+
+def build_type_map():
+    """Build {file_id: tipo_cod} from page listings joined with the inventory.
+
+    - doc_file_listings.json maps doc_id (hash) -> list of pages; each page has a
+      numeric `id` (the digitarq fileId that names the downloaded TIFF) and a
+      `name` (book title + series suffix).
+    - obitos_inventario.json maps each book (by doc_id hash found in url_info)
+      to its tipo_cod (BIRT/MARR/DEAT). This is the canonical record type.
+    Unmapped file_ids (e.g. listings not yet fetched for nascimentos/casamentos)
+    resolve to DEFAULT_RECORD_TYPE (DEAT) so the death pipeline keeps its exact
+    behaviour. Returns {} if source files are missing (safe degradation, no
+    exception, no rutura).
+    """
+    type_map = {}
+    try:
+        with open(INVENTARIO_JSON, encoding="utf-8") as f:
+            inv = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        inv = []
+    inv_tipo = {}
+    if isinstance(inv, list):
+        for r in inv:
+            m = re.search(r"documentDetails/([0-9a-fA-F]+)", r.get("url_info", ""))
+            if m:
+                inv_tipo[m.group(1).lower()] = r.get("tipo_cod", DEFAULT_RECORD_TYPE)
+    try:
+        with open(DOC_FILE_LISTINGS, encoding="utf-8") as f:
+            listings = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        listings = {}
+    if isinstance(listings, dict):
+        for doc_id, pages in listings.items():
+            if not isinstance(pages, list):
+                continue
+            tipo = inv_tipo.get(str(doc_id).lower(), DEFAULT_RECORD_TYPE)
+            for p in pages:
+                fid = str(p.get("id", ""))
+                if fid:
+                    type_map[fid] = tipo
+    return type_map
 
 
 class KeyHealth:
@@ -213,6 +284,14 @@ class HTRProcessor:
         self.global_success = 0
         self.global_errors = 0
         self.state = self.load_state()
+        # Record-type (BIRT/MARR/DEAT) per file_id, joined from page listings +
+        # inventory. Drives which prompt is used and is written to the output
+        # for downstream consumers (sync). Defaults to DEAT when unresolvable.
+        self.type_map = build_type_map()
+        log.info(f"Loaded type map: {len(self.type_map)} file_ids mapped "
+                 f"({sum(1 for v in self.type_map.values() if v == 'DEAT')} DEAT, "
+                 f"{sum(1 for v in self.type_map.values() if v == 'BIRT')} BIRT, "
+                 f"{sum(1 for v in self.type_map.values() if v == 'MARR')} MARR).")
         # Per-(key,model) pacing (RPD) and per-model pacing (RPM).
         self.combo_last = {(k, m): 0.0 for k in GEMINI_KEYS for m in GEMINI_MODELS}
         self.combo_locks = {(k, m): threading.Lock() for k in GEMINI_KEYS for m in GEMINI_MODELS}
@@ -349,8 +428,10 @@ class HTRProcessor:
         self.model_used[chosen.model] = self.model_used.get(chosen.model, 0) + 1
         return chosen
 
-    def call_gemini(self, img_b64, preferred_key=None):
+    def call_gemini(self, img_b64, preferred_key=None, prompt=None):
         """Call Gemini API with circuit breaker pattern"""
+        # Select the record-type prompt (death by default).
+        prompt = prompt or PROMPT_BY_TYPE["DEAT"]
         attempt = 0
         max_attempts = 5
 
@@ -471,9 +552,14 @@ class HTRProcessor:
         if GEMINI_KEYS:
             preferred_key = GEMINI_KEYS[abs(hash(file_id)) % len(GEMINI_KEYS)]
 
+        # Pick the prompt for this record type (BIRT/MARR/DEAT). Falls back to
+        # DEAT for unmapped file_ids, preserving the existing death behaviour.
+        record_type = self.type_map.get(file_id, DEFAULT_RECORD_TYPE)
+        prompt = PROMPT_BY_TYPE.get(record_type, PROMPT_BY_TYPE["DEAT"])
+
         try:
             img_b64 = self.prepare_image(tiff_path)
-            result = self.call_gemini(img_b64, preferred_key)
+            result = self.call_gemini(img_b64, preferred_key, prompt=prompt)
             elapsed = time.time() - start
 
             parsed = parse_gemini_json(result.get("text", ""))
@@ -486,6 +572,7 @@ class HTRProcessor:
                 "model": result.get("model", ""),
                 "key": mask_key(result.get("key", "")),
                 "text_length": len(result.get("text", "")),
+                "record_type": record_type,
                 "parsed_ok": parsed is not None,
                 "wall_time_s": elapsed,
                 "processed_at": datetime.now().isoformat(),
@@ -493,6 +580,7 @@ class HTRProcessor:
 
             output_data = {
                 "file_id": file_id,
+                "record_type": record_type,
                 "raw_text": result.get("text", ""),
                 "transcription": transcription,
                 "deceased": deceased,
