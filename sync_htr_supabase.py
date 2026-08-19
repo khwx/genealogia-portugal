@@ -557,6 +557,23 @@ def get_synced_file_ids():
                            order="file_id.asc")
     return set(str(r["file_id"]) for r in data if r.get("file_id"))
 
+def build_url_patch(rec):
+    """Build the {"imagem_url": ...} patch for a record, or None if nothing to do.
+
+    Pure, network-free helper used by `backfill_url`. Returns None when the
+    record has no file_id or when imagem_url is already set to the expected
+    digitarq dissemination link (so we skip needless writes).
+    """
+    file_id = rec.get("file_id")
+    if not file_id:
+        return None
+    new_url = imagem_url_for(file_id)
+    existing = rec.get("imagem_url")
+    if existing and existing == new_url:
+        return None
+    return {"imagem_url": new_url}
+
+
 def backfill_url():
     """Backfill imagem_url (link to digitarq) on existing records that lack it."""
     import urllib.request
@@ -572,23 +589,20 @@ def backfill_url():
     records = fetch_paginated("id,file_id,imagem_url")
     total = len(records)
     for i, rec in enumerate(records):
-        file_id = rec.get("file_id")
-        existing = rec.get("imagem_url")
-        if not file_id:
-            skipped += 1
-            continue
-        new_url = imagem_url_for(file_id)
-        if existing and existing == new_url:
+        patch_data = build_url_patch(rec)
+        if patch_data is None:
             skipped += 1
             continue
         if DRY_RUN:
-            print(f"  Would set record {rec['id']}: imagem_url = {new_url}")
+            print(f"  Would set record {rec['id']}: imagem_url = {patch_data['imagem_url']}")
             updated += 1
         else:
-            result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", {"imagem_url": new_url})
+            result = supabase_request("PATCH", f"pessoas?id=eq.{rec['id']}", patch_data)
             if result["status"] == "success":
                 updated += 1
             else:
+                # Transient errors (5xx, network) are counted and the backfill
+                # continues with the remaining records instead of aborting.
                 print(f"  Error updating record {rec['id']}: {result}")
                 errors += 1
 

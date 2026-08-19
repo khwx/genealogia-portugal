@@ -78,6 +78,26 @@ def test_build_relation_patch():
     assert patch == {"pai": "Manuel", "mae": "Maria", "conjuge": "Ana"}
 
 
+def test_build_url_patch():
+    # No file_id -> nothing to write
+    assert sync.build_url_patch({"id": 1, "imagem_url": None}) is None
+    assert sync.build_url_patch({"id": 1}) is None
+
+    # Missing imagem_url -> patch with dissemination link
+    patch = sync.build_url_patch({"id": 1, "file_id": "ABC123"})
+    assert patch == {
+        "imagem_url": "https://digitarq.arquivos.pt/rdigital/dissemination?fileId=ABC123"
+    }
+
+    # Already set to the exact link -> skip (None)
+    url = "https://digitarq.arquivos.pt/rdigital/dissemination?fileId=ABC123"
+    assert sync.build_url_patch({"id": 1, "file_id": "ABC123", "imagem_url": url}) is None
+
+    # Wrong/empty imagem_url -> patch (correct it)
+    patch = sync.build_url_patch({"id": 1, "file_id": "ABC123", "imagem_url": ""})
+    assert patch["imagem_url"].endswith("fileId=ABC123")
+
+
 def test_normalize_death_date():
     assert sync.normalize_death_date("2020-3-5") == "2020-03-05"
     assert sync.normalize_death_date("05/12/1899") == "1899-12-05"
@@ -90,5 +110,7 @@ def test_normalize_death_date():
 
 if __name__ == "__main__":
     test_extract_persons_relations()
+    test_build_relation_patch()
+    test_build_url_patch()
     test_normalize_death_date()
     print("OK: all sync_relations tests passed")
