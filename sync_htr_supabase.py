@@ -673,6 +673,27 @@ def update_dates():
 BACKFILL_URL = "--backfill-url" in sys.argv
 BACKFILL_RELATIONS = "--backfill-relations" in sys.argv
 
+def build_relation_patch(persons):
+    """Build the {pai,mae,conjuge} patch dict for the first deceased person.
+
+    Pure, network-free helper used by `backfill_relations`. Returns None when
+    there are no persons or when all three relation fields are empty (nothing to
+    write). Relations are already truncated to 100 chars by
+    `extract_persons_from_deceased`.
+    """
+    if not persons:
+        return None
+    person = persons[0]
+    patch_data = {
+        "pai": person.get("pai", ""),
+        "mae": person.get("mae", ""),
+        "conjuge": person.get("conjuge", ""),
+    }
+    if not any(patch_data.values()):
+        return None
+    return patch_data
+
+
 def backfill_relations():
     """Backfill pai/mae/conjuge on existing records by re-reading HTR files."""
     import urllib.request
@@ -707,17 +728,10 @@ def backfill_relations():
             persons = extract_persons_from_deceased(deceased)
             if not persons: continue
             
-            # For backfill, we assume 1 person per file_id for now 
+            # For backfill, we assume 1 person per file_id for now
             # (matches current sync logic for death records)
-            person = persons[0]
-            patch_data = {
-                "pai": person.get("pai", ""),
-                "mae": person.get("mae", ""),
-                "conjuge": person.get("conjuge", "")
-            }
-            
-            # Skip if all empty
-            if not any(patch_data.values()):
+            patch_data = build_relation_patch(persons)
+            if patch_data is None:
                 continue
 
             if DRY_RUN:
@@ -728,13 +742,17 @@ def backfill_relations():
                 if result["status"] == "success":
                     updated += 1
                 else:
-                    # If this fails with 400, columns probably don't exist
-                    print(f"  Error updating {rec['id']}: {result}")
-                    errors += 1
-                    if "column" in str(result).lower():
+                    msg = str(result).lower()
+                    # A 400 mentioning "column" means the migration was not
+                    # applied yet — there is no point retrying every record.
+                    if "column" in msg:
                         print("\n!!! ERROR: Columns 'pai', 'mae' or 'conjuge' not found.")
                         print("Did you run the SQL migration in Supabase SQL Editor?")
                         return
+                    # Any other error (transient 5xx, network) is counted and
+                    # the backfill continues with the remaining records.
+                    print(f"  Error updating {rec['id']}: {result}")
+                    errors += 1
 
     print(f"\n=== Backfill Relations Complete ===")
     print(f"Updated: {updated}")

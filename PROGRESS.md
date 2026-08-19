@@ -464,3 +464,38 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   backfill de `pai`/`mae`/`conjuge` (88.3% dos falecidos já têm relações).
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
 - Expandir OCR a nascimentos/casamentos (inventário já existe).
+
+## 2026-08-19 (execução autónoma — robustez do backfill de relações)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado
+  (scan: **0 segredos** em 140 ficheiros rastreados — segurança intacta).
+- Pipeline HTR `htr_cloud_v2.py` NÃO está a correr (óbitos concluídos).
+- Coverage snapshot (8h): 12781 ficheiros, parse rate **65.1%**,
+  `deceased` estruturado 18.6% (7163 pessoas), `relation_readiness` 88.3%.
+- `py_compile` OK; `test_sync_relations.py`, `test_coverage_report.py` e
+  `test_scan_secrets.py` todos PASS.
+
+### Tarefa implementada — tornar o backfill de relações resilience + testável
+- Extraído `build_relation_patch(persons)` em `sync_htr_supabase.py`: helper
+  puro (sem rede) que devolve `{pai,mae,conjuge}` do 1º falecido, ou `None`
+  se não houver pessoas ou relações (nada a escrever). O `backfill_relations()`
+  passa a usá-lo.
+- `backfill_relations()` agora tolera erros transientes (5xx/rede): conta o
+  erro e continua com os registos restantes; mantém a paragem limpa apenas
+  quando a coluna em falta (`column` no erro) indica que a migração ainda não
+  foi aplicada no Supabase — evita 8000 retries inúteis.
+- Adicionado `test_build_relation_patch` em `test_sync_relations.py` (casos
+  vazios, sem relações e com relações; só o 1º falecido é usado). TESTES PASS.
+
+### Decisão registada
+- Melhoria segura e idempotente do pilar "melhorar autonomamente": o backfill
+  de relações (quando a migração DDL for aplicada) ficou mais resiliente a
+  falhas de rede e coberto por teste unitário, sem tocar no pacing, na BD
+  remota nem em segredos. Não se aplicou a migração DDL (requer SQL Editor).
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge` (88.3% dos falecidos já têm relações).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+- Expandir OCR a nascimentos/casamentos (inventário já existe).

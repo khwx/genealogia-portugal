@@ -50,6 +50,34 @@ def test_extract_persons_relations():
     assert p1["conjuge"] == ""
 
 
+def test_build_relation_patch():
+    # Empty / no person -> None (nothing to write)
+    assert sync.build_relation_patch([]) is None
+    assert sync.build_relation_patch(None) is None
+
+    # Person with no relations -> None
+    persons = [{"nome": "Maria", "pai": "", "mae": "", "conjuge": ""}]
+    assert sync.build_relation_patch(persons) is None
+
+    # Person with relations -> patch dict (only first person used)
+    persons = [
+        {
+            "nome": "João",
+            "pai": "Manuel",
+            "mae": "Maria",
+            "conjuge": "Ana",
+        },
+        {
+            "nome": "Outro",
+            "pai": "Ignorado",
+            "mae": "",
+            "conjuge": "",
+        },
+    ]
+    patch = sync.build_relation_patch(persons)
+    assert patch == {"pai": "Manuel", "mae": "Maria", "conjuge": "Ana"}
+
+
 def test_normalize_death_date():
     assert sync.normalize_death_date("2020-3-5") == "2020-03-05"
     assert sync.normalize_death_date("05/12/1899") == "1899-12-05"
