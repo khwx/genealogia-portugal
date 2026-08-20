@@ -669,3 +669,39 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   para backfill de `pai`/`mae`/`conjuge` (87.1% dos falecidos já têm relações).
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
 
+## 2026-08-20 (execução autónoma — robustez de chaves de relação no OCR)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado. Scanner de
+  segredos: **0 segredos** em 142 ficheiros rastreados. Segurança intacta.
+- Pipeline `htr_cloud_v2.py` NÃO está a correr (óbitos concluídos; sem quota).
+- `bash scripts/run_tests.sh` → **ALL TESTS PASSED** (incl. 10/10
+  htr_type_aware, test_sync_relations, test_scan_secrets, test_coverage_report).
+
+### Tarefa implementada — suporte a chaves PT nas relações (`deceased`)
+- O `extract_persons_from_deceased()` em `sync_htr_supabase.py` só lia as chaves
+  Inglesas (`father`/`mother`/`spouse`). Amostras reais mostram que o Gemini
+  por vezes devolve variantes Portuguesas (`pai`, `mae`, `cônjuge`), fazendo
+  perder relações silenciosamente e subestimando o `relation_readiness`.
+- Passou a aceitar ambas as variantes (Inglês tem precedência se ambas
+  presentes, sem duplicar): `father`/`pai`, `mother`/`mae`,
+  `spouse`/`conjuge`/`cônjuge`.
+- Adicionado `test_extract_persons_relations_pt_keys` em `test_sync_relations.py`
+  (chaves PT só, e precedência EN quando ambas presentes). **TESTES PASS**.
+- Mudança puramente local/read-only no parsing; não toca na BD remota, no
+  pacing nem em segredos. Aumenta o yield real do backfill de relações quando
+  a migração `add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1` for aplicada.
+
+### Decisão registada
+- Melhoria segura e mensurável do pilar "melhorar autonomamente": o futuro
+  backfill de `pai`/`mae`/`conjuge` (passo seguinte sugerido) aproveitará mais
+  registos sem qualquer risco (sem escrita remota, sem nova quota de OCR).
+- Não se aplicou a migração remota nem `SYNC_RELATIONS=1` (escrita em BD de
+  produção fora de escopo do ciclo seguro de 8h).
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge` (agora com maior yield após este fix).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+- Descarregar page listings de BIRT/MARR e correr `htr_cloud_v2.py`.
+

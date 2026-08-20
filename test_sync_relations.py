@@ -50,6 +50,32 @@ def test_extract_persons_relations():
     assert p1["conjuge"] == ""
 
 
+def test_extract_persons_relations_pt_keys():
+    # Gemini sometimes returns Portuguese relation keys; they must be picked up.
+    deceased = [
+        {
+            "name": "João de Sousa",
+            "death_date": "1888-01-02",
+            "pai": "Manuel de Sousa",
+            "mae": "Maria da Luz",
+            "cônjuge": "Ana Pires",
+        }
+    ]
+    persons = sync.extract_persons_from_deceased(deceased)
+    assert len(persons) == 1
+    p0 = persons[0]
+    assert p0["nome"] == "João de"
+    assert p0["sobrenome"] == "Sousa"
+    assert p0["pai"] == "Manuel de Sousa"
+    assert p0["mae"] == "Maria da Luz"
+    assert p0["conjuge"] == "Ana Pires"
+
+    # English key takes precedence when both are present (no double-up).
+    mixed = [{"name": "Pedro", "father": "Ingles", "pai": "Portugues"}]
+    p1 = sync.extract_persons_from_deceased(mixed)[0]
+    assert p1["pai"] == "Ingles"
+
+
 def test_build_relation_patch():
     # Empty / no person -> None (nothing to write)
     assert sync.build_relation_patch([]) is None
@@ -110,6 +136,7 @@ def test_normalize_death_date():
 
 if __name__ == "__main__":
     test_extract_persons_relations()
+    test_extract_persons_relations_pt_keys()
     test_build_relation_patch()
     test_build_url_patch()
     test_normalize_death_date()

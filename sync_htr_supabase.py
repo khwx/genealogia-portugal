@@ -285,9 +285,12 @@ def extract_persons_from_deceased(deceased_list):
         parts = [p for p in name.split() if p.lower().strip('.,;:') not in TITLE_WORDS]  # noqa
         if not parts:
             continue
-        pai = (entry.get("father") or "").strip()[:100]
-        mae = (entry.get("mother") or "").strip()[:100]
-        conjuge = (entry.get("spouse") or "").strip()[:100]
+        # Gemini usually returns English relation keys, but some responses use
+        # Portuguese variants (e.g. `cônjuge` for spouses, `pai`/`mãe`). Accept
+        # both so relation yield does not silently drop on key drift.
+        pai = (entry.get("father") or entry.get("pai") or "").strip()[:100]
+        mae = (entry.get("mother") or entry.get("mae") or "").strip()[:100]
+        conjuge = (entry.get("spouse") or entry.get("conjuge") or entry.get("cônjuge") or "").strip()[:100]
         if len(parts) == 1:
             persons.append({
                 "nome": parts[0][:100],
