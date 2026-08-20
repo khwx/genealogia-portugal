@@ -699,9 +699,36 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Não se aplicou a migração remota nem `SYNC_RELATIONS=1` (escrita em BD de
   produção fora de escopo do ciclo seguro de 8h).
 
+## 2026-08-21 (execução autónoma)
+
+### Estado verificado
+- Pipeline `htr_cloud_v2.py` NÃO está a correr (óbitos concluídos; sem quota).
+- `fetch_page_listings.py` script ran successfully: 1217 doc_ids fetchados
+  (BIRT: 211, MARR: 1006), 61019 páginas totais adicionadas.
+- `doc_file_listings.json` agora tem 1334 doc_ids (de 117), cobrindo todos
+  os livros de nascimentos/batismos (236) e casamentos (1030) do inventário.
+- `.env` continua ignorado; scanner de segredos: **0 segredos** em ficheiros
+  rastreados. Segurança intacta.
+- Repo alinhado com `origin/main`; push realizado com sucesso.
+
+### Tarefa implementada — page listings BIRT/MARR
+- Executado `fetch_page_listings.py` que leia o inventário (`obitos_inventario.json`),
+  filtra livros BIRT e MARR, e faz fetch de listings de páginas via API Digitarq.
+- Resultado: 1217 doc_ids novos buscados e 61019 páginas adicionadas a
+  `output/data/doc_file_listings.json`.
+- Isso habilita a pipeline `htr_cloud_v2.py` com `PROMPT_BY_TYPE` a processar
+  corretamente nascimentos (BIRT) e casamentos (MARR), antes limitados apenas a
+  óbitos (DEAT).
+- O script `fetch_page_listings.py` foi adicionado ao repositório para execuções
+  futuras de automação a cada 8h.
+- Verificado: `py_compile` OK.
+
 ### Próximos passos sugeridos
+- Correr `htr_cloud_v2.py` para OCR de nascimentos/casamentos (prompts já prontos
+  via `PROMPT_BY_TYPE` — BIRT e MARR schemas definidos).
 - Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
-  para backfill de `pai`/`mae`/`conjuge` (agora com maior yield após este fix).
+  para backfill de `pai`/`mae`/`conjuge`.
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
-- Descarregar page listings de BIRT/MARR e correr `htr_cloud_v2.py`.
+
+## 2026-08-20 (execução autónoma — cobertura por tipo de registo)
 
