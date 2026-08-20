@@ -590,3 +590,38 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Correr `htr_cloud_v2.py` para OCR de nascimentos/casamentos (prompts já prontos).
 - Extensão opcional do sync para ingerir `persons` (nascimentos/casamentos).
 - Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`.
+
+## 2026-08-20 (execução autónoma — portão de testes no CI + UI)
+
+### Estado verificado
+- Pipeline HTR `htr_cloud_v2.py` NÃO está a correr (óbitos concluídos; sem quota).
+- Scanner de segredos: **0 segredos** em 141 ficheiros rastreados. Segurança intacta.
+- Testes existentes (`test_coverage_report`, `test_scan_secrets`, `test_sync_pagination`,
+  `test_sync_relations`, `test_htr_type_aware`) todos PASS manualmente.
+- `index.html` (UI de pesquisa) continuava modificado e não comitado desde sessões
+  anteriores — melhoria legítima (usa colunas pai/mae/conjuge/imagem_url, navegação,
+  badges), sem chaves secretas (só `sb_publishable_` pública).
+
+### Tarefa implementada — portão de testes automatizado (autonomia + qualidade)
+- Criado `scripts/run_tests.sh`: corre o secret-scanner + todos os testes unitários
+  puros (sem rede/credenciais) e devolve exit-code ≠ 0 em falha, permitindo ao CI
+  bloquear regressões. Idempotente e legível.
+- Estendido `.github/workflows/security-scan.yml` com job `unit-tests` que corre
+  `scripts/run_tests.sh` em cada push/PR — o repo ganha agora barreira de
+  **segurança + qualidade** automáticas no GitHub.
+- Verificado: `bash scripts/run_tests.sh` → `RESULT: ALL TESTS PASSED`.
+
+### Decisão registada
+- Melhoria segura e mensurável do pilar "melhorar autonomamente": cada ciclo de 8h
+  (e cada push) passa a validar automaticamente que o scanner e os testes não
+  regridem, sem tocar no pacing, na BD remota nem em segredos. Não se relançou o
+  HTR nem se aplicou DDL remoto (fora de escopo/ciclo).
+- Comitado também o `index.html` pendente (UI), que estava há várias sessões por
+  fazer push — mantém-se a regra de "nunca expor segredos".
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge` (88.3% dos falecidos já têm relações).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+- Descarregar page listings de BIRT/MARR e correr `htr_cloud_v2.py` para
+  nascimentos/casamentos (prompts já prontos).
