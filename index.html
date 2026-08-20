@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genealogia Portugal — Pesquisa</title>
+    <title>Genealogia Portugal — Pesquisa de Óbitos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -11,65 +11,75 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
         .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .logo span { color: var(--accent2); }
-        .hero { text-align: center; padding: 60px 20px 40px; }
-        .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 16px; letter-spacing: -0.5px; }
-        .hero p { color: var(--text2); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.5; }
-        .search-container { max-width: 700px; margin: 0 auto 40px; padding: 0 20px; }
+        .nav-links { display: flex; gap: 16px; }
+        .nav-link { color: var(--text2); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color .2s; }
+        .nav-link:hover, .nav-link.active { color: var(--text); }
+        .hero { text-align: center; padding: 50px 20px 30px; }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .hero p { color: var(--text2); font-size: 1.1rem; max-width: 650px; margin: 0 auto; line-height: 1.5; }
+        .search-container { max-width: 750px; margin: 0 auto 30px; padding: 0 20px; }
         .search-box { display: flex; background: var(--bg2); border: 2px solid var(--border); border-radius: 100px; padding: 6px; transition: .3s; }
-        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,99,255,0.1); }
-        .search-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; padding: 12px 20px; outline: none; font-family: inherit; }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,99,255,0.15); }
+        .search-input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 1.1rem; padding: 12px 24px; outline: none; font-family: inherit; }
         .search-btn { background: var(--accent); color: white; border: none; border-radius: 100px; padding: 0 32px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; font-family: inherit; }
         .search-btn:hover { background: var(--accent2); }
-        .results-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-        .result-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; transition: .2s; }
-        .result-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .result-name { font-size: 1.2rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-        .result-meta { display: flex; gap: 16px; color: var(--text2); font-size: 0.9rem; flex-wrap: wrap; }
+        .stats-bar { display: flex; justify-content: center; gap: 16px; padding: 16px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+        .stat-chip { padding: 6px 16px; border-radius: 100px; font-size: 0.9rem; font-weight: 500; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); display: flex; gap: 6px; }
+        .stat-chip span { color: var(--text); font-weight: 600; }
+        .results-container { max-width: 1000px; margin: 0 auto 60px; padding: 0 20px; width: 100%; }
+        .result-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; transition: .2s; position: relative; }
+        .result-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        .result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .result-name { font-size: 1.25rem; font-weight: 600; color: var(--text); }
+        .result-badge { background: rgba(108,99,255,0.15); color: var(--accent2); font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; font-weight: 500; border: 1px solid rgba(108,99,255,0.3); }
+        .result-meta { display: flex; gap: 20px; color: var(--text2); font-size: 0.92rem; flex-wrap: wrap; margin-bottom: 12px; }
         .result-meta span { display: flex; align-items: center; gap: 6px; }
-        .result-meta .icon { color: var(--accent2); }
-        .loading { text-align: center; padding: 40px; color: var(--text2); }
-        .stats-bar { display: flex; gap: 12px; padding: 16px 24px; background: var(--bg2); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-        .stat-chip { padding: 6px 14px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; background: var(--bg3); border: 1px solid var(--border); color: var(--text2); }
-        .stat-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .result-relations { background: var(--bg3); border-radius: 8px; padding: 10px 14px; font-size: 0.88px; color: var(--text2); display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; border: 1px solid var(--border); }
+        .result-relations div { display: flex; gap: 6px; }
+        .result-relations span { color: var(--text); font-weight: 500; }
+        .result-footer { display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+        .doc-link { background: var(--bg3); color: var(--text); text-decoration: none; font-size: 0.85rem; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); transition: .2s; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+        .doc-link:hover { background: var(--accent); border-color: var(--accent); color: white; }
+        .loading { text-align: center; padding: 60px; color: var(--text2); font-size: 1.05rem; }
     </style>
 </head>
 <body>
     <div class="topbar">
-        <a href="#" class="logo">Genealogia <span>Portugal</span></a>
-        <nav class="nav-links">
-            <a href="#" class="nav-link active">Pesquisa</a>
-            <a href="review.html" class="nav-link">Revisão</a>
-        </nav>
+        <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link active">Pesquisa</a>
+            <a href="/mapa" class="nav-link">Mapa</a>
+            <a href="/validar" class="nav-link">Revisão</a>
+        </div>
     </div>
 
-    <div class="stats-bar" id="statsBar">
-        <div class="stat-chip">Total: <span id="totalCount">...</span></div>
-        <div class="stat-chip">Com Data: <span id="dateCount">...</span></div>
-        <div class="stat-chip">Freguesias: <span id="freguesiaCount">...</span></div>
+    <div class="stats-bar">
+        <div class="stat-chip">Total Registos: <span id="totalCount">8.754</span></div>
+        <div class="stat-chip">Com Data: <span id="dateCount">5.260</span></div>
+        <div class="stat-chip">Concelho: <span>Celorico da Beira</span></div>
     </div>
 
     <div class="hero">
         <h1>Descobre a tua história</h1>
-        <p>Pesquisa em registos de óbitos de Celorico da Beira. Mais de 850 pessoas transcritas e digitalizadas.</p>
+        <p>Pesquisa inteligente em milhares de registos paroquiais e de óbitos digitalizados de Portugal.</p>
     </div>
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome, freguesia ou data...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome (ex: Maria Silva), freguesia ou data...">
             <button id="searchBtn" class="search-btn">Pesquisar</button>
         </div>
     </div>
 
     <div class="results-container" id="resultsContainer">
-        <div class="loading">A carregar dados...</div>
+        <div class="loading">A carregar registos recentes...</div>
     </div>
 
     <script>
-        // Configuração Supabase (Vai buscar às variáveis de ambiente do Vercel)
-        const SUPABASE_URL = import.meta.env?.VITE_SUPABASE_URL || 'https://qljopxbxgflozrcdblrl.supabase.co';
-        const SUPABASE_KEY = import.meta.env?.VITE_SUPABASE_KEY || 'sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
+        const SUPABASE_URL = 'https://qljopxbxgflozrcdblrl.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
         
         const headers = {
             'apikey': SUPABASE_KEY,
@@ -77,81 +87,95 @@
             'Content-Type': 'application/json'
         };
 
-        let allData = [];
-        let filteredData = [];
-
-        // Carregar dados iniciais
-        async function loadData() {
+        async function loadInitial() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&limit=2000`, { headers });
-                if (!response.ok) throw new Error('Erro ao carregar dados');
-                allData = await response.json();
-                
-                // Atualizar estatísticas
-                const total = allData.length;
-                const withDate = allData.filter(p => p.data_obito).length;
-                const freguesias = new Set(allData.map(p => p.freguesia).filter(Boolean)).size;
-                
-                document.getElementById('totalCount').textContent = total;
-                document.getElementById('dateCount').textContent = withDate;
-                document.getElementById('freguesiaCount').textContent = freguesias;
-                
-                filteredData = allData;
-                renderResults(filteredData);
-            } catch (error) {
-                document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:var(--red)">Erro: ${error.message}</div>`;
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=50`, { headers });
+                if (!response.ok) throw new Error('Erro ao ligar à base de dados');
+                const data = await response.json();
+                renderResults(data);
+            } catch (err) {
+                document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro ao carregar dados: ${err.message}</div>`;
             }
         }
 
-        // Renderizar resultados
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '<div class="loading">A pesquisar na base de dados...</div>';
+
+            try {
+                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=100`;
+                if (query) {
+                    url += `&or=(nome.ilike.*${query}*,sobrenome.ilike.*${query}*,freguesia.ilike.*${query}*)`;
+                }
+                const response = await fetch(url, { headers });
+                if (!response.ok) throw new Error('Erro na pesquisa');
+                const data = await response.json();
+                renderResults(data);
+            } catch (err) {
+                container.innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
+            }
+        }
+
         function renderResults(data) {
             const container = document.getElementById('resultsContainer');
-            if (data.length === 0) {
-                container.innerHTML = '<div class="loading">Nenhum resultado encontrado.</div>';
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="loading">Nenhum registo encontrado com esses critérios.</div>';
                 return;
             }
 
             container.innerHTML = data.map(person => {
-                const nome = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Desconhecido';
-                const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Sem data';
+                const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
+                const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Data não especificada';
                 const freguesia = person.freguesia || 'Celorico da Beira';
+                const concelho = person.concelho || 'Celorico da Beira';
                 
+                let relationsHtml = '';
+                if (person.pai || person.mae || person.conjuge) {
+                    relationsHtml = `
+                        <div class="result-relations" style="font-size:0.85rem;">
+                            ${person.pai ? `<div>Pai: <span>${person.pai}</span></div>` : ''}
+                            ${person.mae ? `<div>Mãe: <span>${person.mae}</span></div>` : ''}
+                            ${person.conjuge ? `<div>Cônjuge: <span>${person.conjuge}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
+                let docLinkHtml = '';
+                if (person.imagem_url) {
+                    docLinkHtml = `
+                        <div class="result-footer">
+                            <a href="${person.imagem_url}" target="_blank" class="doc-link">
+                                📄 Ver Documento Original (Digitarq) ↗
+                            </a>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="result-card">
-                        <div class="result-name">${nome}</div>
-                        <div class="result-meta">
-                            <span><span class="icon">📅</span> ${dataObito}</span>
-                            <span><span class="icon">📍</span> ${freguesia}</span>
-                            ${person.concelho ? `<span><span class="icon">🏛️</span> ${person.concelho}</span>` : ''}
+                        <div class="result-header">
+                            <div class="result-name">${fullName}</div>
+                            <div class="result-badge">Óbito</div>
                         </div>
+                        <div class="result-meta">
+                            <span>📅 ${dataObito}</span>
+                            <span>📍 ${freguesia}, ${concelho}</span>
+                        </div>
+                        ${relationsHtml}
+                        ${docLinkHtml}
                     </div>
                 `;
             }).join('');
         }
 
-        // Pesquisa
         document.getElementById('searchBtn').addEventListener('click', performSearch);
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performSearch();
         });
 
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            if (!query) {
-                filteredData = allData;
-            } else {
-                filteredData = allData.filter(person => {
-                    const nome = `${person.nome || ''} ${person.sobrenome || ''}`.toLowerCase();
-                    const freguesia = (person.freguesia || '').toLowerCase();
-                    const data = (person.data_obito || '').toLowerCase();
-                    return nome.includes(query) || freguesia.includes(query) || data.includes(query);
-                });
-            }
-            renderResults(filteredData);
-        }
-
-        // Iniciar
-        loadData();
+        // Load initial records on start
+        loadInitial();
     </script>
 </body>
 </html>
