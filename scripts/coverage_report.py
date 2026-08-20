@@ -14,6 +14,9 @@ Metrics produced:
   - relation-readiness (% deceased persons carrying father/mother/spouse),
     which quantifies the value of the pending relation-backfill migration
     (see migrations/add_pessoa_relation_columns.sql)
+  - per-record_type breakdown (DEAT/BIRT/MARR): lets each 8h cycle measure the
+    upcoming nascimentos/casamentos expansion independently of the concluded
+    óbitos work (see htr_cloud_v2.py PROMPT_BY_TYPE)
 
 Idempotent and read-only: never writes to the HTR output dir. Writes a JSON
 report to OUTPUT_REPORT (default output/htr_coverage.json) when --write is set,
@@ -39,6 +42,8 @@ OUTPUT_REPORT = Path(os.environ.get("OUTPUT_REPORT", "/home/pxtkhw/projetos/obit
 OUTPUT_TREND = Path(os.environ.get("OUTPUT_TREND", "/home/pxtkhw/projetos/obitos/output/htr_coverage_history.json"))
 
 RELATION_KEYS = ("father", "mother", "spouse")
+KNOWN_RECORD_TYPES = ("DEAT", "BIRT", "MARR")
+DEFAULT_RECORD_TYPE = "DEAT"
 
 
 def _nonempty_transcription(text):
@@ -72,6 +77,10 @@ def analyze(files):
     persons_with_spouse = 0
     persons_with_any_relation = 0
 
+    by_type = {t: {"total": 0, "parsed_ok": 0, "with_transcription": 0,
+                   "with_deceased": 0, "deceased_persons": 0,
+                   "persons_with_any_relation": 0} for t in KNOWN_RECORD_TYPES}
+
     for d in files:
         total += 1
         if d.get("parsed_ok"):
@@ -97,8 +106,36 @@ def analyze(files):
                 if has_father or has_mother or has_spouse:
                     persons_with_any_relation += 1
 
+        rtype = d.get("record_type") or DEFAULT_RECORD_TYPE
+        if rtype not in by_type:
+            rtype = DEFAULT_RECORD_TYPE
+        slot = by_type[rtype]
+        slot["total"] += 1
+        if d.get("parsed_ok"):
+            slot["parsed_ok"] += 1
+        if _nonempty_transcription(d.get("transcription")):
+            slot["with_transcription"] += 1
+        if isinstance(deceased, list) and len(deceased) > 0:
+            slot["with_deceased"] += 1
+            slot["deceased_persons"] += len(deceased)
+            slot_persons_rel = 0
+            for person in deceased:
+                if not isinstance(person, dict):
+                    continue
+                if (_nonempty_relation(person.get("father")) or
+                        _nonempty_relation(person.get("mother")) or
+                        _nonempty_relation(person.get("spouse"))):
+                    slot_persons_rel += 1
+            slot["persons_with_any_relation"] += slot_persons_rel
+
     def pct(n, d):
         return round(100.0 * n / d, 1) if d else 0.0
+
+    for t, slot in by_type.items():
+        slot["parse_rate_pct"] = pct(slot["parsed_ok"], slot["total"])
+        slot["transcription_rate_pct"] = pct(slot["with_transcription"], slot["total"])
+        slot["deceased_rate_pct"] = pct(slot["with_deceased"], slot["total"])
+        slot["relation_readiness_pct"] = pct(slot["persons_with_any_relation"], slot["deceased_persons"])
 
     return {
         "total": total,
@@ -114,6 +151,7 @@ def analyze(files):
         "persons_with_spouse": persons_with_spouse,
         "persons_with_any_relation": persons_with_any_relation,
         "relation_readiness_pct": pct(persons_with_any_relation, deceased_persons),
+        "by_type": by_type,
     }
 
 
@@ -164,6 +202,13 @@ def main():
     print(f"  persons w/ mother    : {metrics['persons_with_mother']}")
     print(f"  persons w/ spouse    : {metrics['persons_with_spouse']}")
     print(f"  persons w/ relation  : {metrics['persons_with_any_relation']} ({metrics['relation_readiness_pct']}%)")
+    print("=== by record_type ===")
+    for t in ("DEAT", "BIRT", "MARR"):
+        s = metrics["by_type"][t]
+        print(f"  {t}: total={s['total']} parsed={s['parsed_ok']} ({s['parse_rate_pct']}%) "
+              f"transc={s['with_transcription']} ({s['transcription_rate_pct']}%) "
+              f"deceased={s['with_deceased']} persons={s['deceased_persons']} "
+              f"rel_ready={s['relation_readiness_pct']}%")
     if write:
         OUTPUT_REPORT.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT_REPORT.write_text(json.dumps(metrics, indent=2, ensure_ascii=False), encoding="utf-8")

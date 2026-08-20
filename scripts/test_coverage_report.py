@@ -22,6 +22,16 @@ SAMPLE = [
      "deceased": [{"name": "Maria", "spouse": "Pedro"}, {"name": "Pedro"}]},
 ]
 
+TYPE_SAMPLE = [
+    {"file_id": "a", "record_type": "DEAT", "parsed_ok": True, "transcription": "óbito",
+     "deceased": [{"name": "A", "father": "F"}]},
+    {"file_id": "b", "record_type": "BIRT", "parsed_ok": True, "transcription": "batismo",
+     "deceased": []},
+    {"file_id": "c", "record_type": "MARR", "parsed_ok": False, "transcription": "",
+     "deceased": []},
+    {"file_id": "d", "parsed_ok": True, "transcription": "sem tipo", "deceased": []},  # -> DEAT default
+]
+
 
 def test_analyze_counts():
     m = analyze(SAMPLE)
@@ -33,6 +43,25 @@ def test_analyze_counts():
     assert m["deceased_persons"] == 3
     assert m["transcription_rate_pct"] == 50.0
     assert m["deceased_rate_pct"] == 50.0
+
+
+def test_analyze_by_type():
+    m = analyze(TYPE_SAMPLE)
+    bt = m["by_type"]
+    assert set(bt) == {"DEAT", "BIRT", "MARR"}
+    # DEAT: files a + d(default) = 2 total, 2 parsed, 2 transcription
+    assert bt["DEAT"]["total"] == 2
+    assert bt["DEAT"]["parsed_ok"] == 2
+    assert bt["DEAT"]["with_transcription"] == 2
+    assert bt["DEAT"]["with_deceased"] == 1
+    assert bt["DEAT"]["deceased_persons"] == 1
+    assert bt["DEAT"]["relation_readiness_pct"] == 100.0
+    # BIRT: 1 file, parsed
+    assert bt["BIRT"]["total"] == 1 and bt["BIRT"]["parsed_ok"] == 1
+    # MARR: 1 file, not parsed
+    assert bt["MARR"]["total"] == 1 and bt["MARR"]["parsed_ok"] == 0
+    # unknown type falls back to DEAT default
+    assert bt["BIRT"]["total"] + bt["MARR"]["total"] + bt["DEAT"]["total"] == 4
 
 
 def test_analyze_relations():
@@ -82,4 +111,5 @@ if __name__ == "__main__":
     test_empty_input()
     test_nonempty_transcription_markers()
     test_record_trend()
+    test_analyze_by_type()
     print("ALL TESTS PASSED")

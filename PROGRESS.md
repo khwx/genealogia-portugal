@@ -625,3 +625,47 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
 - Descarregar page listings de BIRT/MARR e correr `htr_cloud_v2.py` para
   nascimentos/casamentos (prompts já prontos).
+
+## 2026-08-20 (execução autónoma — cobertura por tipo de registo)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado. Scanner de
+  segredos: **0 segredos** em 142 ficheiros rastreados. Segurança intacta.
+- Pipeline `htr_cloud_v2.py` NÃO está a correr (óbitos concluídos; sem quota).
+- Testes existentes (`test_coverage_report`, `test_scan_secrets`,
+  `test_sync_pagination`, `test_sync_relations`, `test_htr_type_aware`) PASS no
+  portão `scripts/run_tests.sh`.
+
+### Tarefa implementada — quebra de cobertura por record_type no relatório
+- O `scripts/coverage_report.py` media só agregados (DEAT/BIRT/MARR misturados).
+  Como a pipeline é agora record-type aware (`PROMPT_BY_TYPE` em
+  `htr_cloud_v2.py`, que já grava `record_type`), a próxima expansão
+  (nascimentos/casamentos) precisava de métrica própria.
+- `analyze()` passa a agregar `by_type` (DEAT/BIRT/MARR): total, parsed_ok,
+  parse/transcription/deceased rates, deceased_persons e relation_readiness por
+  tipo. Ficheiros sem `record_type` caem no `DEFAULT_RECORD_TYPE="DEAT"`
+  (preserva comportamento dos 13291 óbitos antigos) e tipos desconhecidos
+  também caem para DEAT (degradação segura, sem KeyError).
+- A relação por tipo é contada **por pessoa** (igual à métrica agregada),
+  corrigindo uma inconsistência inicial em que contava só por ficheiro.
+- `main()` imprime o bloco `=== by record_type ===` (DEAT/BIRT/MARR).
+- `test_coverage_report.py` estendido com `test_analyze_by_type` (tipos
+  conhecidos, default DEAT, fallback de tipo desconhecido, soma = total).
+  **TESTES PASS** (incl. 10/10 htr_type_aware, todos os gates).
+- Verificado contra output real: 13291 ficheiros, parse 66.2%,
+  `rel_ready` DEAT **87.1%** (igual ao agregado — consistente); BIRT/MARR a 0
+  (ainda não processados — exatamente o que a métrica vai passar a medir).
+
+### Decisão registada
+- Melhoria segura e mensurável do pilar "melhorar autonomamente": cada ciclo de
+  8h passa a conseguir quantificar a cobertura de nascimentos/casamentos de forma
+  isolada assim que esses registos entrarem no pipeline, sem tocar no pacing, na
+  BD remota nem em segredos. Sem risco (analisador read-only).
+
+### Próximos passos sugeridos
+- Descarregar page listings de BIRT/MARR e correr `htr_cloud_v2.py` — a nova
+  métrica `by_type` passará a mostrar progresso real de nascimentos/casamentos.
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge` (87.1% dos falecidos já têm relações).
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+
