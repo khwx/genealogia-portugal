@@ -71,11 +71,37 @@
             <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome (ex: Maria Silva), freguesia ou data...">
             <button id="searchBtn" class="search-btn">Pesquisar</button>
         </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;" id="parishFilters">
+            <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Freguesias:</span>
+            <button class="parish-tag active" onclick="filterByParish('')">Todas</button>
+            <button class="parish-tag" onclick="filterByParish('Santa Maria')">Santa Maria</button>
+            <button class="parish-tag" onclick="filterByParish('Barcal')">Barcal</button>
+            <button class="parish-tag" onclick="filterByParish('Lajeosa')">Lajeosa</button>
+            <button class="parish-tag" onclick="filterByParish('Cortiço')">Cortiço da Serra</button>
+            <button class="parish-tag" onclick="filterByParish('Jejua')">Jejua</button>
+        </div>
+    </div>
+
+    <div style="max-width: 1000px; margin: 0 auto 10px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span id="resultsCount" style="color: var(--text2); font-size: 0.9rem;">A carregar...</span>
     </div>
 
     <div class="results-container" id="resultsContainer">
         <div class="loading">A carregar registos recentes...</div>
     </div>
+
+    <!-- Modal de Detalhe -->
+    <div id="detailModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative;">
+            <button onclick="closeModal()" style="position: absolute; top: 20px; right: 20px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <style>
+        .parish-tag { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: .2s; }
+        .parish-tag:hover, .parish-tag.active { background: var(--accent); color: white; border-color: var(--accent); }
+    </style>
 
     <script>
         const SUPABASE_URL = 'https://qljopxbxgflozrcdblrl.supabase.co';
@@ -86,6 +112,8 @@
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json'
         };
+
+        let currentParish = '';
 
         async function loadInitial() {
             try {
@@ -105,8 +133,15 @@
 
             try {
                 let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=100`;
+                let conditions = [];
                 if (query) {
-                    url += `&or=(nome.ilike.*${query}*,sobrenome.ilike.*${query}*,freguesia.ilike.*${query}*)`;
+                    conditions.push(`or(nome.ilike.*${query}*,sobrenome.ilike.*${query}*,freguesia.ilike.*${query}*)`);
+                }
+                if (currentParish) {
+                    conditions.push(`freguesia.ilike.*${currentParish}*`);
+                }
+                if (conditions.length > 0) {
+                    url += '&' + conditions.join('&');
                 }
                 const response = await fetch(url, { headers });
                 if (!response.ok) throw new Error('Erro na pesquisa');
@@ -117,14 +152,25 @@
             }
         }
 
+        function filterByParish(parish) {
+            currentParish = parish;
+            document.querySelectorAll('.parish-tag').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(parish || 'Todas'));
+            });
+            performSearch();
+        }
+
         function renderResults(data) {
             const container = document.getElementById('resultsContainer');
+            const countEl = document.getElementById('resultsCount');
+            countEl.textContent = `A mostrar ${data.length} registos`;
+
             if (!data || data.length === 0) {
                 container.innerHTML = '<div class="loading">Nenhum registo encontrado com esses critérios.</div>';
                 return;
             }
 
-            container.innerHTML = data.map(person => {
+            container.innerHTML = data.map((person, index) => {
                 const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
                 const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Data não especificada';
                 const freguesia = person.freguesia || 'Celorico da Beira';
@@ -144,16 +190,14 @@
                 let docLinkHtml = '';
                 if (person.imagem_url) {
                     docLinkHtml = `
-                        <div class="result-footer">
-                            <a href="${person.imagem_url}" target="_blank" class="doc-link">
-                                📄 Ver Documento Original (Digitarq) ↗
-                            </a>
-                        </div>
+                        <a href="${person.imagem_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">
+                            📄 Ver Documento Original ↗
+                        </a>
                     `;
                 }
 
                 return `
-                    <div class="result-card">
+                    <div class="result-card" onclick="openDetail(${JSON.stringify(person).replace(/"/g, '&quot;')})" style="cursor: pointer;">
                         <div class="result-header">
                             <div class="result-name">${fullName}</div>
                             <div class="result-badge">Óbito</div>
@@ -163,10 +207,54 @@
                             <span>📍 ${freguesia}, ${concelho}</span>
                         </div>
                         ${relationsHtml}
-                        ${docLinkHtml}
+                        <div class="result-footer">
+                            <span style="color: var(--accent2); font-size: 0.85rem; align-self: center;">Ver transcrição completa ➔</span>
+                            ${docLinkHtml}
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function openDetail(person) {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalContent');
+            const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
+            
+            content.innerHTML = `
+                <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text);">${fullName}</h2>
+                <div style="display: grid; gap: 12px; margin-bottom: 20px; color: var(--text2); font-size: 0.95rem;">
+                    <div><strong>Data de Óbito:</strong> <span style="color:var(--text);">${person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Não especificada'}</span></div>
+                    <div><strong>Freguesia:</strong> <span style="color:var(--text);">${person.freguesia || 'Celorico da Beira'}</span></div>
+                    <div><strong>Concelho / Distrito:</strong> <span style="color:var(--text);">${person.concelho || 'Celorico'} / ${person.distrito || 'Guarda'}</span></div>
+                    ${person.pai ? `<div><strong>Pai:</strong> <span style="color:var(--text);">${person.pai}</span></div>` : ''}
+                    ${person.mae ? `<div><strong>Mãe:</strong> <span style="color:var(--text);">${person.mae}</span></div>` : ''}
+                    ${person.conjuge ? `<div><strong>Cônjuge:</strong> <span style="color:var(--text);">${person.conjuge}</span></div>` : ''}
+                </div>
+                ${person.imagem_url ? `
+                    <div style="margin-bottom: 20px;">
+                        <a href="${person.imagem_url}" target="_blank" class="doc-link" style="display: inline-block; padding: 10px 20px; background: var(--accent); color: white; border-color: var(--accent);">
+                            📄 Abrir Imagem Original no Digitarq ↗
+                        </a>
+                    </div>
+                ` : ''}
+                ${person.texto_original ? `
+                    <div>
+                        <h4 style="margin-bottom: 8px; color: var(--text);">Transcrição do Registo (HTR):</h4>
+                        <div style="background: var(--bg); padding: 14px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; color: var(--text2); max-height: 200px; overflow-y: auto; white-space: pre-wrap;">${person.texto_original}</div>
+                    </div>
+                ` : ''}
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) closeModal();
         }
 
         document.getElementById('searchBtn').addEventListener('click', performSearch);
@@ -174,7 +262,6 @@
             if (e.key === 'Enter') performSearch();
         });
 
-        // Load initial records on start
         loadInitial();
     </script>
 </body>
