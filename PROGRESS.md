@@ -2,6 +2,37 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-21 (execução autónoma — filtro temporal por ano na web)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` continua ignorado. Pipeline HTR
+  inativo (óbitos concluídos). Sem risco de regressão em testes existentes.
+- `WEB_IMPROVEMENTS_PLAN.md` (Fase 1) lista como pendente "Filtros Temporais:
+  seletor de intervalo de anos". A web (`index.html`) já tinha filtros por
+  freguesia, mas não por intervalo de anos.
+
+### Tarefa implementada — filtro de intervalo de anos (Fase 1 do plano web)
+- Adicionados dois inputs numéricos (`#fromYear` / `#toYear`) e botão
+  "Todos os anos" à barra de pesquisa de `index.html`.
+- `performSearch()` passa a adicionar condições Supabase `data_obito.gte.AAAA-01-01`
+  e `data_obito.lte.AAAA-12-31` quando preenchidos (anos validados com regex
+  `^\d{4}$`; entradas inválidas são ignoradas, degradação segura).
+- `applyYearFilter()`/`resetYear()` ligam os inputs e o botão; os inputs disparam
+  a pesquisa em `change` e `Enter`. Estilo `.year-input` adicionado.
+- Alteração puramente front-end (Semba REST), sem escrita remota, sem segredos,
+  sem quota de OCR. `node --check` ao bloco `<script>` confirma sintaxe OK.
+
+### Decisão registada
+- Melhoria segura e funcional do pilar "melhorar autonomamente": entrega um item
+  pendente do roadmap web (Fase 1) com risco zero. Os próximos itens do plano
+  (referência do livro paroquial, paginação/scroll infinito) ficam para ciclos
+  seguintes.
+
+### Próximos passos sugeridos
+- Filtro por tipo de registo (Óbito/Casamento/Nascimento) quando as tabelas
+  BIRT/MARR estiverem populadas no Supabase.
+- Paginação/scroll infinito para explorar os 8.700+ registos além do limite 100.
+
 ## 2026-08-16 (execução autónoma)
 
 ### Estado verificado

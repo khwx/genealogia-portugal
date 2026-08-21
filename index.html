@@ -80,6 +80,13 @@
             <button class="parish-tag" onclick="filterByParish('Cortiço')">Cortiço da Serra</button>
             <button class="parish-tag" onclick="filterByParish('Jejua')">Jejua</button>
         </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+            <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Ano:</span>
+            <input type="number" id="fromYear" class="year-input" placeholder="De (ex: 1700)" min="1600" max="2000">
+            <span style="color: var(--text2); align-self: center;">→</span>
+            <input type="number" id="toYear" class="year-input" placeholder="Até (ex: 1900)" min="1600" max="2000">
+            <button class="parish-tag" onclick="resetYear()">Todos os anos</button>
+        </div>
     </div>
 
     <div style="max-width: 1000px; margin: 0 auto 10px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -101,6 +108,8 @@
     <style>
         .parish-tag { background: var(--bg2); border: 1px solid var(--border); color: var(--text2); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; transition: .2s; }
         .parish-tag:hover, .parish-tag.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .year-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; width: 110px; }
+        .year-input:focus { outline: none; border-color: var(--accent); }
     </style>
 
     <script>
@@ -114,6 +123,8 @@
         };
 
         let currentParish = '';
+        let currentFromYear = '';
+        let currentToYear = '';
 
         async function loadInitial() {
             try {
@@ -140,6 +151,12 @@
                 if (currentParish) {
                     conditions.push(`freguesia.ilike.*${currentParish}*`);
                 }
+                if (currentFromYear) {
+                    conditions.push(`data_obito.gte.${currentFromYear}-01-01`);
+                }
+                if (currentToYear) {
+                    conditions.push(`data_obito.lte.${currentToYear}-12-31`);
+                }
                 if (conditions.length > 0) {
                     url += '&' + conditions.join('&');
                 }
@@ -157,6 +174,22 @@
             document.querySelectorAll('.parish-tag').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent.includes(parish || 'Todas'));
             });
+            performSearch();
+        }
+
+        function applyYearFilter() {
+            const from = document.getElementById('fromYear').value.trim();
+            const to = document.getElementById('toYear').value.trim();
+            currentFromYear = from && /^\d{4}$/.test(from) ? from : '';
+            currentToYear = to && /^\d{4}$/.test(to) ? to : '';
+            performSearch();
+        }
+
+        function resetYear() {
+            document.getElementById('fromYear').value = '';
+            document.getElementById('toYear').value = '';
+            currentFromYear = '';
+            currentToYear = '';
             performSearch();
         }
 
@@ -260,6 +293,14 @@
         document.getElementById('searchBtn').addEventListener('click', performSearch);
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performSearch();
+        });
+        document.getElementById('fromYear').addEventListener('change', applyYearFilter);
+        document.getElementById('fromYear').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyYearFilter();
+        });
+        document.getElementById('toYear').addEventListener('change', applyYearFilter);
+        document.getElementById('toYear').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyYearFilter();
         });
 
         loadInitial();
