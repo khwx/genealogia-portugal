@@ -132,7 +132,9 @@
 
         async function loadInitial() {
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=50`, { headers });
+                // Selecionar um lote aleatório para variar os nomes apresentados a cada visita
+                const randomOffset = Math.floor(Math.random() * 5000);
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&limit=50&offset=${randomOffset}`, { headers });
                 if (!response.ok) throw new Error('Erro ao ligar à base de dados');
                 const data = await response.json();
                 renderResults(data);
