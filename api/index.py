@@ -55,35 +55,41 @@ def mapa():
 def api_mapa():
     try:
         # Carregar coordenadas
-        with open('parish_coords.json', 'r') as f:
+        with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
             coords = json.load(f)
         
-        # Obter contagem por freguesia do Supabase
-        resp = requests.get(
-            f"{SUPABASE_URL}/rest/v1/pessoas",
-            headers=HEADERS,
-            params={"select": "freguesia"},
-            timeout=30
-        )
-        
-        if resp.status_code == 200:
-            data = resp.json()
-            counts = {}
-            for item in data:
-                f = item.get('freguesia', 'Other')
+        # Obter contagem por freguesia do Supabase (com paginação para abranger todos os 8700+ registos)
+        counts = {}
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "freguesia", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for item in batch:
+                f = item.get('freguesia') or 'Outras'
                 counts[f] = counts.get(f, 0) + 1
-            
-            # Combinar coordenadas com contagens
-            map_data = []
-            for f, coord in coords.items():
-                map_data.append({
-                    'freguesia': f,
-                    'coords': coord,
-                    'count': counts.get(f, 0)
-                })
-            return jsonify(map_data)
+            if len(batch) < page:
+                break
+            offset += page
         
-        return jsonify([]), 500
+        # Combinar coordenadas com contagens
+        map_data = []
+        for f, coord in coords.items():
+            map_data.append({
+                'freguesia': f,
+                'coords': coord,
+                'count': counts.get(f, 0)
+            })
+        return jsonify(map_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

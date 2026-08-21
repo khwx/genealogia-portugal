@@ -1,41 +1,79 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Óbitos - Celorico da Beira</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Genealogia Portugal — Mapa de Distribuição</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        #map { height: 80vh; width: 100%; border-radius: 0.5rem; }
+        :root { --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a; --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8; --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e; --radius: 12px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 16px; }
+        .nav-link { color: var(--text2); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color .2s; }
+        .nav-link:hover, .nav-link.active { color: var(--text); }
+        .hero { text-align: center; padding: 40px 20px 20px; }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .hero p { color: var(--text2); font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+        .map-wrapper { max-width: 1100px; margin: 0 auto 50px; padding: 0 20px; width: 100%; }
+        .map-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        #map { height: 65vh; width: 100%; border-radius: 8px; z-index: 1; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
+        .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--accent2); margin-top: 4px; }
+        .stat-lbl { color: var(--text2); font-size: 0.85rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-green-800 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">🗺️ Distribuição Geográfica</h1>
-            <div class="flex gap-4">
-                <a href="/" class="hover:text-green-200">Início</a>
-                <a href="/family-tree" class="hover:text-green-200">Árvore</a>
-                <a href="/validar" class="hover:text-green-200">Validar</a>
+<body>
+    <div class="topbar">
+        <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Pesquisa</a>
+            <a href="/mapa" class="nav-link active">Mapa</a>
+            <a href="/validar" class="nav-link">Revisão</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Distribuição Geográfica de Registos</h1>
+        <p>Análise de concentração de óbitos e registos paroquiais por freguesia em Celorico da Beira.</p>
+    </div>
+
+    <div class="map-wrapper">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-lbl">Total na BD</div>
+                <div class="stat-val" id="statTotal">8.754</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Freguesias Mapeadas</div>
+                <div class="stat-val" id="statFregs">12</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Freguesia com Mais Registos</div>
+                <div class="stat-val" style="font-size: 1.3rem; margin-top: 10px;" id="statTop">Mesquitela</div>
             </div>
         </div>
-    </nav>
 
-    <div class="container mx-auto p-4">
-        <div class="bg-white p-4 rounded shadow mb-4">
-            <h2 class="text-xl font-semibold mb-2">Análise de Registos por Freguesia</h2>
-            <p class="text-gray-600">Clique nos marcadores para ver o número de registos extraídos em cada freguesia.</p>
+        <div class="map-card">
+            <div id="map"></div>
         </div>
-        <div id="map"></div>
     </div>
 
     <script>
-        const map = L.map('map').setView([40.44, -7.55], 11);
+        const map = L.map('map').setView([40.633, -7.392], 12);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Usar tema escuro para o mapa (CartoDB Dark Matter)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
         }).addTo(map);
 
         async function loadMapData() {
@@ -43,19 +81,42 @@
                 const resp = await fetch('/api/mapa');
                 const data = await resp.json();
 
+                let total = 0;
+                let maxCount = 0;
+                let topFreguesia = '-';
+
                 data.forEach(item => {
-                    const radius = Math.max(5, Math.sqrt(item.count) * 2);
-                    L.circleMarker([item.coords[0], item.coords[1]], {
-                        radius: radius,
-                        fillColor: '#10b981',
-                        color: '#059669',
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.6
-                    })
-                    .bindPopup(`<strong>${item.freguesia}</strong><br>${item.count} registos`)
-                    .addTo(map);
+                    total += item.count;
+                    if (item.count > maxCount) {
+                        maxCount = item.count;
+                        topFreguesia = `${item.freguesia} (${item.count})`;
+                    }
+
+                    if (item.coords && item.count > 0) {
+                        const radius = Math.max(8, Math.sqrt(item.count) * 2.5);
+                        L.circleMarker([item.coords[0], item.coords[1]], {
+                            radius: radius,
+                            fillColor: '#6c63ff',
+                            color: '#8b83ff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.65
+                        })
+                        .bindPopup(`
+                            <div style="color: #111; font-family: Inter, sans-serif; padding: 4px;">
+                                <strong style="font-size: 1.1rem; color: #4f46e5;">${item.freguesia}</strong><br>
+                                <span style="font-size: 0.95rem;"><strong>${item.count}</strong> registos indexados</span><br>
+                                <a href="/?q=${encodeURIComponent(item.freguesia)}" style="color: #2563eb; font-size: 0.85rem; text-decoration: underline; margin-top: 4px; display: inline-block;">Ver registos desta freguesia ➔</a>
+                            </div>
+                        `)
+                        .addTo(map);
+                    }
                 });
+
+                document.getElementById('statTotal').textContent = total.toLocaleString('pt-PT');
+                document.getElementById('statFregs').textContent = data.filter(d => d.count > 0).length;
+                document.getElementById('statTop').textContent = topFreguesia;
+
             } catch (e) {
                 console.error("Erro ao carregar dados do mapa:", e);
             }
