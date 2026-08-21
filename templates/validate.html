@@ -1,44 +1,134 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validar Registo - Celorico da Beira</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Genealogia Portugal — Validação Colaborativa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a; --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8; --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e; --radius: 12px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 16px; }
+        .nav-link { color: var(--text2); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color .2s; }
+        .nav-link:hover, .nav-link.active { color: var(--text); }
+        .hero { text-align: center; padding: 40px 20px 20px; }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .hero p { color: var(--text2); font-size: 1.05rem; max-width: 650px; margin: 0 auto; line-height: 1.5; }
+        .main-container { max-width: 800px; margin: 0 auto 60px; padding: 0 20px; width: 100%; }
+        .validation-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+        .legend-box { background: var(--bg3); border-left: 4px solid var(--accent); padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px; font-size: 0.9rem; color: var(--text2); line-height: 1.5; }
+        .legend-box strong { color: var(--text); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+        .form-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-size: 1rem; outline: none; font-family: inherit; transition: .2s; }
+        .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; background: var(--bg3); padding: 18px; border-radius: 8px; border: 1px solid var(--border); }
+        .meta-item { font-size: 0.9rem; color: var(--text2); }
+        .meta-item span { display: block; color: var(--text); font-weight: 600; margin-top: 2px; font-size: 1rem; }
+        .btn-primary { background: var(--green); color: white; border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .doc-link { background: var(--bg3); color: var(--text); text-decoration: none; font-size: 0.9rem; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border); transition: .2s; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 20px; }
+        .doc-link:hover { background: var(--accent); border-color: var(--accent); color: white; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); font-size: 1.1rem; }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold mb-4">Validar Registo</h1>
+<body>
+    <div class="topbar">
+        <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Pesquisa</a>
+            <a href="/mapa" class="nav-link">Mapa</a>
+            <a href="/validar" class="nav-link active">Revisão</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>Validação Comunitária de Registos</h1>
+        <p>Ajude a refinar e validar as transcrições históricas extraídas por inteligência artificial a partir de documentos paroquiais antigos.</p>
+    </div>
+
+    <div class="main-container">
         {% if registo %}
-        <div class="bg-white p-6 rounded shadow">
-            <p><strong>Nome extraído:</strong> {{ registo.nome }}</p>
-            <p><strong>Data:</strong> {{ registo.data_obito }}</p>
-            <p><strong>Freguesia:</strong> {{ registo.freguesia }}</p>
-            
-            <form id="form-validacao" class="mt-4">
-                <input type="hidden" id="id" value="{{ registo.id }}">
-                <label class="block mb-2">Nome correto:</label>
-                <input type="text" id="nome" value="{{ registo.nome }}" class="w-full p-2 border mb-4">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Validar</button>
+        <div class="validation-card">
+            <div class="legend-box">
+                <strong>Nota explicativa:</strong> O texto abaixo foi transcrito automaticamente por HTR (Inteligência Artificial) a partir de microfilmes do Arquivo Distrital. Confirme se o nome e os dados correspondem ao documento original e clique em validar.
+            </div>
+
+            {% if registo.imagem_url %}
+            <div>
+                <a href="{{ registo.imagem_url }}" target="_blank" class="doc-link">
+                    📄 Ver Documento Original no Digitarq (Arquivo Distrital) ↗
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="meta-grid">
+                <div class="meta-item">Freguesia de Origem: <span>{{ registo.freguesia or 'Celorico da Beira' }}</span></div>
+                <div class="meta-item">Data Estimada: <span>{{ registo.data_obito or 'Não especificada' }}</span></div>
+                <div class="meta-item">Fonte Original: <span>{{ registo.fonte or 'IA HTR Gemini' }}</span></div>
+            </div>
+
+            <form id="form-validacao">
+                <input type="hidden" id="registo-id" value="{{ registo.id }}">
+                
+                <div class="form-group">
+                    <label class="form-label" for="nome">Nome Completo Corrigido / Validado:</label>
+                    <input type="text" id="nome" value="{{ registo.nome }}" class="form-input" required>
+                    <span style="font-size: 0.8rem; color: var(--text2); margin-top: 6px; display: block;">Pode corrigir erros ortográficos antigos ou completar apelidos se necessário.</span>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    ✓ Validar e Aprovar Registo
+                </button>
             </form>
         </div>
+
         <script>
             document.getElementById('form-validacao').onsubmit = async (e) => {
                 e.preventDefault();
+                const btn = e.target.querySelector('button');
+                btn.textContent = 'A gravar...';
+                btn.disabled = true;
+
                 const dados = {
-                    id: document.getElementById('id').value,
+                    id: document.getElementById('registo-id').value,
                     nome: document.getElementById('nome').value
                 };
-                const resp = await fetch('/api/validar', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(dados)
-                });
-                if (resp.ok) window.location.reload();
+
+                try {
+                    const resp = await fetch('/api/validar', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(dados)
+                    });
+                    if (resp.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao guardar validação.');
+                        btn.textContent = '✓ Validar e Aprovar Registo';
+                        btn.disabled = false;
+                    }
+                } catch (err) {
+                    alert('Erro de ligação: ' + err.message);
+                    btn.textContent = '✓ Validar e Aprovar Registo';
+                    btn.disabled = false;
+                }
             };
         </script>
         {% else %}
-        <p>Não há registos pendentes de validação.</p>
+        <div class="validation-card empty-state">
+            <div style="font-size: 3rem; margin-bottom: 12px;">🎉</div>
+            <h2 style="font-size: 1.3rem; color: var(--text); margin-bottom: 8px;">Todos os registos atuais foram validados!</h2>
+            <p>Obrigado pelo contributo. Novos lotes de transcrições serão disponibilizados em breve.</p>
+            <div style="margin-top: 24px;">
+                <a href="/" class="doc-link" style="background: var(--accent); border-color: var(--accent); color: white;">Voltar à Pesquisa ➔</a>
+            </div>
+        </div>
         {% endif %}
     </div>
 </body>
