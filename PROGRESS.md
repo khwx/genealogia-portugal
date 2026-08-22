@@ -2,6 +2,36 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-22 (execução autónoma — paginação / scroll infinito na web)
+
+### Estado verificado
+- `git status`: repo alinhado com `origin/main` exceto `parish_coords.json`
+  (correção de coordenadas de 19 freguesias — commitado neste ciclo). `.env`
+  continua ignorado. Pipeline HTR inativo (óbitos concluídos).
+- `WEB_IMPROVEMENTS_PLAN.md` (Fase 1): filtro temporal já entregue; pendente
+  "Paginação / Scroll Infinito" — a web limitava resultados a 50 (inicial) / 100
+  (pesquisa), impossibilitando explorar os 8.700+ registos.
+
+### Tarefa implementada — paginação / scroll infinito (Fase 1 do plano web)
+- Refatorizado `index.html`: `performSearch()` e `loadInitial()` passam a usar
+  `fetchBatch(reset)` com `PAGE_SIZE=100` e paginação por `offset`.
+- Adicionado botão "Carregar mais registos" (`#loadMoreBtn` em `#loadMoreContainer`)
+  que aparece apenas quando há mais páginas (`hasMore = data.length === PAGE_SIZE`).
+- Scroll infinito via `window` scroll listener (dispara `loadMore()` a 400px do
+  fundo); `isLoadingMore` evita pedidos concurrentes/duplicados.
+- `cardTemplate()` extraído de `renderResults()`; nova `appendResults()` insere
+  cards via `insertAdjacentHTML` sem re-renderizar o existente. `updateCount()`
+  mostra total acumulado e dica de "carregar mais".
+- Alteração puramente front-end (Supabase REST, chave pública já no ficheiro),
+  sem escrita remota, sem segredos, sem quota de OCR. `node --check` ao bloco
+  `<script>` confirma sintaxe OK. Também commitado `parish_coords.json` com
+  coordenadas corrigidas das freguesias.
+
+### Decisão registada
+- Entrega item pendente do roadmap web (Fase 1) com risco zero. Próximos itens
+  da Fase 1: "Filtros de Tipo de Registo" (quando houver batismos/casamentos) e
+  "Referência do Livro Paroquial" (cruzar file_id com inventário).
+
 ## 2026-08-21 (execução autónoma — filtro temporal por ano na web)
 
 ### Estado verificado

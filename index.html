@@ -101,6 +101,11 @@
         <div class="loading">A carregar registos recentes...</div>
     </div>
 
+    <div id="loadMoreContainer" style="text-align:center; padding: 20px; display: none;">
+        <button id="loadMoreBtn" class="parish-tag" style="padding: 10px 24px; font-size: 0.9rem;">Carregar mais registos</button>
+        <div id="loadingMore" class="loading" style="display:none;">A carregar mais...</div>
+    </div>
+
     <!-- Modal de Detalhe -->
     <div id="detailModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
         <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 28px; position: relative;">
@@ -129,6 +134,12 @@
         let currentParish = '';
         let currentFromYear = '';
         let currentToYear = '';
+        let currentQuery = '';
+        let currentOffset = 0;
+        const PAGE_SIZE = 100;
+        let isLoadingMore = false;
+        let hasMore = false;
+        let totalLoaded = 0;
 
         async function loadInitial() {
             try {
@@ -138,21 +149,36 @@
                 if (!response.ok) throw new Error('Erro ao ligar à base de dados');
                 const data = await response.json();
                 renderResults(data);
+                totalLoaded = data.length;
+                hasMore = false;
+                hideLoadMore();
+                updateCount();
             } catch (err) {
                 document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro ao carregar dados: ${err.message}</div>`;
             }
         }
 
         async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
+            currentQuery = document.getElementById('searchInput').value.trim();
+            currentOffset = 0;
+            totalLoaded = 0;
+            hasMore = true;
             const container = document.getElementById('resultsContainer');
             container.innerHTML = '<div class="loading">A pesquisar na base de dados...</div>';
+            hideLoadMore();
+            await fetchBatch(true);
+        }
 
+        async function fetchBatch(reset) {
+            if (isLoadingMore) return;
+            if (reset === false && !hasMore) return;
+            isLoadingMore = true;
+            showLoadingMore();
             try {
-                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=100`;
-                let conditions = [];
-                if (query) {
-                    conditions.push(`or(nome.ilike.*${query}*,sobrenome.ilike.*${query}*,freguesia.ilike.*${query}*)`);
+                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
+                const conditions = [];
+                if (currentQuery) {
+                    conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
                 }
                 if (currentParish) {
                     conditions.push(`freguesia.ilike.*${currentParish}*`);
@@ -169,10 +195,30 @@
                 const response = await fetch(url, { headers });
                 if (!response.ok) throw new Error('Erro na pesquisa');
                 const data = await response.json();
-                renderResults(data);
+                if (reset) {
+                    totalLoaded = 0;
+                    renderResults(data);
+                } else {
+                    appendResults(data);
+                }
+                totalLoaded += data.length;
+                currentOffset += data.length;
+                hasMore = data.length === PAGE_SIZE;
+                updateCount();
+                if (hasMore) showLoadMore(); else hideLoadMore();
             } catch (err) {
-                container.innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
+                if (reset) {
+                    document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
+                }
+            } finally {
+                hideLoadingMore();
+                isLoadingMore = false;
             }
+        }
+
+        function loadMore() {
+            if (isLoadingMore || !hasMore) return;
+            fetchBatch(false);
         }
 
         function filterByParish(parish) {
@@ -199,60 +245,90 @@
             performSearch();
         }
 
+        function cardTemplate(person) {
+            const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
+            const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Data não especificada';
+            const freguesia = person.freguesia || 'Celorico da Beira';
+            const concelho = person.concelho || 'Celorico da Beira';
+
+            let relationsHtml = '';
+            if (person.pai || person.mae || person.conjuge) {
+                relationsHtml = `
+                    <div class="result-relations" style="font-size:0.85rem;">
+                        ${person.pai ? `<div>Pai: <span>${person.pai}</span></div>` : ''}
+                        ${person.mae ? `<div>Mãe: <span>${person.mae}</span></div>` : ''}
+                        ${person.conjuge ? `<div>Cônjuge: <span>${person.conjuge}</span></div>` : ''}
+                    </div>
+                `;
+            }
+
+            let docLinkHtml = '';
+            if (person.imagem_url) {
+                docLinkHtml = `
+                    <a href="${person.imagem_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">
+                        📄 Ver Documento Original ↗
+                    </a>
+                `;
+            }
+
+            return `
+                <div class="result-card" onclick="openDetail(${JSON.stringify(person).replace(/"/g, '&quot;')})" style="cursor: pointer;">
+                    <div class="result-header">
+                        <div class="result-name">${fullName}</div>
+                        <div class="result-badge">Óbito</div>
+                    </div>
+                    <div class="result-meta">
+                        <span>📅 ${dataObito}</span>
+                        <span>📍 ${freguesia}, ${concelho}</span>
+                    </div>
+                    ${relationsHtml}
+                    <div class="result-footer">
+                        <span style="color: var(--accent2); font-size: 0.85rem; align-self: center;">Ver transcrição completa ➔</span>
+                        ${docLinkHtml}
+                    </div>
+                </div>
+            `;
+        }
+
         function renderResults(data) {
             const container = document.getElementById('resultsContainer');
-            const countEl = document.getElementById('resultsCount');
-            countEl.textContent = `A mostrar ${data.length} registos`;
 
             if (!data || data.length === 0) {
                 container.innerHTML = '<div class="loading">Nenhum registo encontrado com esses critérios.</div>';
                 return;
             }
 
-            container.innerHTML = data.map((person, index) => {
-                const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
-                const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Data não especificada';
-                const freguesia = person.freguesia || 'Celorico da Beira';
-                const concelho = person.concelho || 'Celorico da Beira';
-                
-                let relationsHtml = '';
-                if (person.pai || person.mae || person.conjuge) {
-                    relationsHtml = `
-                        <div class="result-relations" style="font-size:0.85rem;">
-                            ${person.pai ? `<div>Pai: <span>${person.pai}</span></div>` : ''}
-                            ${person.mae ? `<div>Mãe: <span>${person.mae}</span></div>` : ''}
-                            ${person.conjuge ? `<div>Cônjuge: <span>${person.conjuge}</span></div>` : ''}
-                        </div>
-                    `;
-                }
+            container.innerHTML = data.map(cardTemplate).join('');
+        }
 
-                let docLinkHtml = '';
-                if (person.imagem_url) {
-                    docLinkHtml = `
-                        <a href="${person.imagem_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">
-                            📄 Ver Documento Original ↗
-                        </a>
-                    `;
-                }
+        function appendResults(data) {
+            const container = document.getElementById('resultsContainer');
+            if (!data || data.length === 0) return;
+            container.insertAdjacentHTML('beforeend', data.map(cardTemplate).join(''));
+        }
 
-                return `
-                    <div class="result-card" onclick="openDetail(${JSON.stringify(person).replace(/"/g, '&quot;')})" style="cursor: pointer;">
-                        <div class="result-header">
-                            <div class="result-name">${fullName}</div>
-                            <div class="result-badge">Óbito</div>
-                        </div>
-                        <div class="result-meta">
-                            <span>📅 ${dataObito}</span>
-                            <span>📍 ${freguesia}, ${concelho}</span>
-                        </div>
-                        ${relationsHtml}
-                        <div class="result-footer">
-                            <span style="color: var(--accent2); font-size: 0.85rem; align-self: center;">Ver transcrição completa ➔</span>
-                            ${docLinkHtml}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+        function updateCount() {
+            const hint = hasMore ? ' (carrega em "Carregar mais" para ver mais)' : '';
+            document.getElementById('resultsCount').textContent = `A mostrar ${totalLoaded} registos${hint}`;
+        }
+
+        function showLoadMore() {
+            document.getElementById('loadMoreContainer').style.display = 'block';
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+        }
+
+        function hideLoadMore() {
+            document.getElementById('loadMoreContainer').style.display = 'none';
+        }
+
+        function showLoadingMore() {
+            document.getElementById('loadMoreBtn').style.display = 'none';
+            document.getElementById('loadingMore').style.display = 'block';
+        }
+
+        function hideLoadingMore() {
+            document.getElementById('loadingMore').style.display = 'none';
+            if (hasMore) document.getElementById('loadMoreBtn').style.display = 'inline-block';
         }
 
         function openDetail(person) {
@@ -307,6 +383,14 @@
         document.getElementById('toYear').addEventListener('change', applyYearFilter);
         document.getElementById('toYear').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') applyYearFilter();
+        });
+        document.getElementById('loadMoreBtn').addEventListener('click', loadMore);
+
+        window.addEventListener('scroll', () => {
+            if (isLoadingMore || !hasMore) return;
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 400) {
+                loadMore();
+            }
         });
 
         loadInitial();
