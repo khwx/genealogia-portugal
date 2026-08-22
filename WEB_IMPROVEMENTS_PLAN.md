@@ -42,7 +42,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 
 ### Fase 4: Evolução do Mapa e Estatísticas
 - [ ] **Mapa Dinâmico (`/mapa`):** Mostrar popups interativos em cada freguesia com contagem detalhada por tipo de ato e períodos cronológicos.
-- [ ] **Gráficos de Natalidade/Mortalidade:** Adicionar gráficos simples de distribuição por século.
+- [x] **Gráficos de Natalidade/Mortalidade:** Adicionar gráficos simples de distribuição por século.
 
 ---
 

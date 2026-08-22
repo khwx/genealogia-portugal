@@ -2,6 +2,32 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-22 (execução autónoma — gráfico de distribuição por século)
+
+### Estado verificado
+- `git status`: working tree limpo antes do ciclo; `.env` continua ignorado.
+  Pipeline HTR inativo (óbitos concluídos). Fase 1 do plano web completa;
+  Fase 2 (modal de detalhe) já implementada em `index.html`. Próximo item
+  concreto da Fase 4: "Gráficos de Natalidade/Mortalidade — distribuição por século".
+
+### Tarefa implementada — gráfico de distribuição por século (Fase 4 do plano web)
+- `api/index.py`: novo endpoint `/api/seculos` (apenas leitura, sem segredos)
+  que pagina `pessoas` no Supabase e agrega `data_obito` por século civil
+  (testado: retorna XVII→60, XVIII→1202, XIX→5039, XX→1122, etc.).
+- `templates/map.html`: nova secção "Distribuição por Século" com gráfico de
+  barras horizontal (CSS puro, dark mode), etiquetas em algarismo romano e
+  total por século. `loadSeculos()` faz fetch com degradação segura.
+- Alteração puramente front-end/backend de leitura (Supabase REST, chave
+  pública), sem escrita remota, sem segredos, sem quota de OCR.
+  `python3 -c ast.parse` confirma sintaxe OK; smoke test do endpoint retorna 200.
+
+### Decisão registada
+- Entregue item da Fase 4 (risco zero). Restam do plano: Fase 3 (preparação
+  para casamentos/nascimentos — depende de dados) e Fase 4 "popups com
+  períodos cronológicos" no mapa (já parcialmente coberto pelos popups por
+  freguesia). Filtros de Tipo de Registo (Fase 1) continuam adiados por falta
+  de batismos/casamentos na base.
+
 ## 2026-08-22 (execução autónoma — referência do livro paroquial na web)
 
 ### Estado verificado

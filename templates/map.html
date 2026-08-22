@@ -64,6 +64,12 @@
         <div class="map-card">
             <div id="map"></div>
         </div>
+
+        <div class="map-card" style="margin-top: 24px;">
+            <h3 style="color: var(--text); margin-bottom: 6px; font-size: 1.15rem;">Distribuição por Século</h3>
+            <p style="color: var(--text2); font-size: 0.9rem; margin-bottom: 18px;">Volume de registos de óbitos indexados por século civil.</p>
+            <div id="seculosChart" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
     </div>
 
     <script>
@@ -122,7 +128,39 @@
             }
         }
 
+        async function loadSeculos() {
+            try {
+                const resp = await fetch('/api/seculos');
+                const json = await resp.json();
+                const data = json.seculos || [];
+                const container = document.getElementById('seculosChart');
+                if (!data.length) {
+                    container.innerHTML = '<div style="color: var(--text2); font-size: 0.9rem;">Sem dados de data disponíveis.</div>';
+                    return;
+                }
+                const max = Math.max(...data.map(d => d.count));
+                const roman = {16:'XVI',17:'XVII',18:'XVIII',19:'XIX',20:'XX',21:'XXI'};
+                container.innerHTML = data.map(d => {
+                    const pct = max > 0 ? (d.count / max) * 100 : 0;
+                    const label = roman[d.seculo] || d.seculo + 'º';
+                    const total = d.count.toLocaleString('pt-PT');
+                    return `
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 64px; text-align: right; color: var(--text); font-weight: 600; font-size: 0.9rem;">${label}</div>
+                            <div style="flex: 1; background: var(--bg3); border-radius: 8px; height: 26px; overflow: hidden; border: 1px solid var(--border);">
+                                <div style="width: ${pct}%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 8px; transition: width .6s ease;"></div>
+                            </div>
+                            <div style="width: 70px; color: var(--text2); font-size: 0.85rem; text-align: right;">${total}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error("Erro ao carregar distribuição por século:", e);
+            }
+        }
+
         loadMapData();
+        loadSeculos();
     </script>
 </body>
 </html>

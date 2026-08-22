@@ -93,6 +93,55 @@ def api_mapa():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/seculos')
+def api_seculos():
+    # Distribuição de registos por século (apenas leitura, sem segredos).
+    # Usa o mesmo padrão de paginação de /api/mapa para abranger todos os registos.
+    try:
+        centuries = {}
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "data_obito", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for item in batch:
+                d = item.get('data_obito')
+                if not d:
+                    continue
+                year = None
+                try:
+                    if 'T' in d:
+                        year = int(d[:4])
+                    else:
+                        year = int(str(d).split('-')[0])
+                except (ValueError, TypeError):
+                    continue
+                if year < 1000:
+                    continue
+                seculo = (year - 1) // 100 + 1
+                centuries[seculo] = centuries.get(seculo, 0) + 1
+            if len(batch) < page:
+                break
+            offset += page
+
+        result = [
+            {"seculo": f"{s}", "count": centuries[s]}
+            for s in sorted(centuries.keys())
+        ]
+        return jsonify({"seculos": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route('/validar')
 def validar():
     # Buscar um registo ainda não validado (com nome) para revisão
