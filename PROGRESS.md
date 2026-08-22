@@ -2,6 +2,33 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-22 (execução autónoma — referência do livro paroquial na web)
+
+### Estado verificado
+- `git status`: working tree limpo antes do ciclo; `.env` continua ignorado.
+  Pipeline HTR inativo (óbitos concluídos). Próximos itens da Fase 1 do plano
+  web: "Filtros de Tipo de Registo" (depende de existirem batismos/casamentos
+  na base — adiado) e "Visualização Detalhada" (modal já existe, Fase 2).
+- `WEB_IMPROVEMENTS_PLAN.md` (Fase 1): pendente "Referência do Livro Paroquial"
+  — cruzar `file_id` com inventário para mostrar o código do Arquivo Distrital.
+
+### Tarefa implementada — referência do livro paroquial (Fase 1 do plano web)
+- Novo script `gen_arquivo_refs.py`: gera `arquivo_refs.json` a partir de
+  `output/data/celorico_completo.json`, mapeando cada `file_id` (4152 no total)
+  para o `titulo` arquivístico (ex: `PT/TT/PRQ/PCLB19/003/O1`), freguesia,
+  datas e `doc_id`. Mapeamento 100% público, sem segredos.
+- `index.html`: `loadArquivoRefs()` faz fetch estático de `arquivo_refs.json`
+  (degradação segura se falhar); `getArquivoRef()` resolve o `file_id` do
+  registo (ou extrai de `imagem_url`) e `openDetail()` passa a mostrar a
+  "Referência do Arquivo" em monospace com link "🔗 Ver livro no Digitarq".
+- Alteração puramente front-end (Supabase REST, chave pública), sem escrita
+  remota, sem segredos, sem quota de OCR. `node --check` confirma sintaxe OK.
+
+### Decisão registada
+- Entregue item pendente da Fase 1 (risco zero). Fase 1 do plano web fica
+  completa. Restam da Fase 2+ a "Visualização Detalhada" (modal já parcialmente
+  implementado) e preparação para casamentos/nascimentos (depende de dados).
+
 ## 2026-08-22 (execução autónoma — paginação / scroll infinito na web)
 
 ### Estado verificado

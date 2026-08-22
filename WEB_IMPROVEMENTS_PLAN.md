@@ -26,7 +26,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 ### Fase 1: Enriquecimento da Pesquisa e Cartões de Dados
 - [ ] **Filtros de Tipo de Registo:** Adicionar seletor rápido (Todos, Óbitos ✝️, Casamentos 💍, Nascimentos 👶).
 - [ ] **Filtros Temporais:** Seletor de intervalo de anos (ex: 1700–1800, 1800–1900).
-- [ ] **Referência do Livro Paroquial:** Cruzar o `file_id` com o inventário (`celorico_completo.json`) para exibir o código do livro do Arquivo Distrital (ex: `PT/TT/PRQ/...`) e link para o fundo documental.
+- [x] **Referência do Livro Paroquial:** Cruzar o `file_id` com o inventário (`celorico_completo.json`) para exibir o código do livro do Arquivo Distrital (ex: `PT/TT/PRQ/...`) e link para o fundo documental.
 - [x] **Paginação / Scroll Infinito:** Substituir o limite estático de 50/100 resultados por paginação fluida ou scroll infinito para explorar os 8.700+ registos.
 
 ### Fase 2: Vista de Detalhe do Registo (Modal / Página Dedicada)

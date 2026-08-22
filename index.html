@@ -140,6 +140,26 @@
         let isLoadingMore = false;
         let hasMore = false;
         let totalLoaded = 0;
+        let arquivoRefs = null;
+
+        // Carrega o mapeamento estatico file_id -> referencia de livro paroquial
+        // (arquivo_refs.json, gerado a partir de celorico_completo.json). Sem
+        // segredos, sem escrita remota. Degradacao segura se falhar.
+        async function loadArquivoRefs() {
+            try {
+                const r = await fetch('arquivo_refs.json');
+                if (r.ok) arquivoRefs = (await r.json()).refs || null;
+            } catch (e) {
+                arquivoRefs = null;
+            }
+        }
+
+        function getArquivoRef(person) {
+            if (!arquivoRefs || !person) return null;
+            const fid = person.file_id || (person.imagem_url || '').match(/fileId=([^&]+)/)?.[1];
+            if (!fid) return null;
+            return arquivoRefs[fid] || null;
+        }
 
         async function loadInitial() {
             try {
@@ -335,7 +355,17 @@
             const modal = document.getElementById('detailModal');
             const content = document.getElementById('modalContent');
             const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
-            
+
+            const ref = getArquivoRef(person);
+            const refHtml = ref ? `
+                <div>
+                    <strong>Referência do Arquivo:</strong>
+                    <span style="color:var(--text); font-family: monospace;">${ref.ref}</span>
+                    ${ref.datas ? `<span style="color:var(--text2); font-size: 0.85rem;"> (${ref.datas})</span>` : ''}
+                    ${person.imagem_url ? `<a href="${person.imagem_url}" target="_blank" style="color:var(--accent2); margin-left:6px;">🔗 Ver livro no Digitarq ↗</a>` : ''}
+                </div>
+            ` : '';
+
             content.innerHTML = `
                 <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text);">${fullName}</h2>
                 <div style="display: grid; gap: 12px; margin-bottom: 20px; color: var(--text2); font-size: 0.95rem;">
@@ -345,6 +375,7 @@
                     ${person.pai ? `<div><strong>Pai:</strong> <span style="color:var(--text);">${person.pai}</span></div>` : ''}
                     ${person.mae ? `<div><strong>Mãe:</strong> <span style="color:var(--text);">${person.mae}</span></div>` : ''}
                     ${person.conjuge ? `<div><strong>Cônjuge:</strong> <span style="color:var(--text);">${person.conjuge}</span></div>` : ''}
+                    ${refHtml}
                 </div>
                 ${person.imagem_url ? `
                     <div style="margin-bottom: 20px;">
@@ -393,6 +424,7 @@
             }
         });
 
+        loadArquivoRefs();
         loadInitial();
     </script>
 </body>
