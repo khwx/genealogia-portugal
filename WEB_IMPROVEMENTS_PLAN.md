@@ -24,7 +24,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 ## 2. Lista Priorizada de Melhorias (Roadmap)
 
 ### Fase 1: Enriquecimento da Pesquisa e Cartões de Dados
-- [ ] **Filtros de Tipo de Registo:** Adicionar seletor rápido (Todos, Óbitos ✝️, Casamentos 💍, Nascimentos 👶) — adiado (falta de batismos/casamentos na base).
+- [x] **Filtros de Tipo de Registo:** Seletor rápido (Todos, Óbitos ✝️, Casamentos 💍, Nascimentos 👶) implementado no `index.html` com fallback seguro caso a coluna `tipo_registo` ainda não esteja migrada.
 - [x] **Filtros Temporais:** Seletor de intervalo de anos (ex: 1700–1800, 1800–1900).
 - [x] **Referência do Livro Paroquial:** Cruzar o `file_id` com o inventário (`celorico_completo.json`) para exibir o código do livro do Arquivo Distrital (ex: `PT/TT/PRQ/...`) e link para o fundo documental.
 - [x] **Paginação / Scroll Infinito:** Substituir o limite estático de 50/100 resultados por paginação fluida ou scroll infinito para explorar os 8.700+ registos.
@@ -37,8 +37,8 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
   - Visualizador incorporado ou link direto para a imagem de alta resolução no Digitarq.
 
 ### Fase 3: Transição para Casamentos e Nascimentos
-- [ ] **Expansão do Schema Supabase:** Garantir colunas para `tipo_registo` (`DEAT`, `MARR`, `BIRT`), `data_casamento`, `data_nascimento`.
-- [ ] **Páginas Específicas por Tipo:** Adaptar os cartões para destacar a informação relevante de cada tipo de evento (ex: cônjuges em casamentos, pais em batismos).
+- [x] **Expansão do Schema Supabase:** `migrations/add_tipo_registo.sql` adiciona a coluna `tipo_registo` (`DEAT`/`MARR`/`BIRT`) + índice; as colunas `data_nascimento` e `data_casamento` já existiam. A migração é idempotente e segura (nada é dropado).
+- [x] **Páginas Específicas por Tipo:** Cartões com badge de tipo (Óbito/Casamento/Nascimento) e modal de detalhe que revela `data_nascimento`/`data_casamento` quando presentes. Cartões totalmente específicos por evento ficam pendentes até existirem dados MARR/BIRT.
 
 ### Fase 4: Evolução do Mapa e Estatísticas
 - [x] **Mapa Dinâmico (`/mapa`):** Mostrar popups interativos em cada freguesia com contagem detalhada por tipo de ato e períodos cronológicos.

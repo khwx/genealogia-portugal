@@ -878,3 +878,40 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 
 ## 2026-08-20 (execução autónoma — cobertura por tipo de registo)
 
+
+## 2026-08-23 (execução autónoma — Fase 3: tipo de registo + filtro de tipo)
+
+### Estado verificado
+- `git status`: ciclo anterior deixou alterações não commitadas em
+  `api/index.py` e `index.html`, e o ficheiro novo `migrations/add_tipo_registo.sql`
+  (untracked). `.env` continua ignorado; scanner de segredos no diff: **0
+  segredos**. `ast.parse` de `api/index.py`: OK.
+
+### Tarefa finalizada — Fase 3 (transição para casamentos/nascimentos)
+- `migrations/add_tipo_registo.sql` (novo): adiciona coluna `tipo_registo`
+  (`DEAT`/`MARR`/`BIRT`, default 'DEAT') + índice `idx_pessoas_tipo_registo`,
+  idempotente e não destrutiva. A aplicar uma vez no Supabase SQL Editor.
+- `index.html`:
+  - Novo seletor de **Tipo** (Todos / Óbitos ✝️ / Casamentos 💍 / Nascimentos 👶)
+    com `filterByType()` e respetivo estado ativo.
+  - `fetchBatch` envia o filtro `tipo_registo=eq.{tipo}`; em falha (coluna não
+    migrada) faz fallback uma vez sem o filtro para manter a página funcional.
+  - Badge de tipo dinâmico nos cartões (`cardTemplate`) e modal de detalhe
+    (`openDetail`) que revela `data_nascimento`/`data_casamento` quando existem.
+- `api/index.py` (`/api/pessoas`): rota servidor-side reforçada com filtros
+  `q`, `freguesia`, intervalo de anos e `tipo_registo`, paginação `limit/offset`
+  (1–1000) e `timeout`, com degradação segura. Não usada pelo frontend (que
+  fala direto com o Supabase via RLS) mas pronta para proxy futuro.
+
+### Decisão registada
+- Fase 3 concluída do lado do código/schema; falta apenas aplicar a migração no
+  Supabase remoto (escrita em BD de produção fora do ciclo seguro de 8h). Sem
+  risco: nenhuma escrita remota, sem quota de OCR.
+- `WEB_IMPROVEMENTS_PLAN.md` atualizado: Fase 1 (filtro de tipo) e Fase 3
+  (schema + páginas por tipo) marcados como feitos.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_tipo_registo.sql` no Supabase e correr o OCR
+  BIRT/MARR (`htr_cloud_v2.py` com `PROMPT_BY_TYPE`) para povoar os novos tipos.
+- Cartões específicos por evento (cônjuge em casamentos, pais em batismos)
+  quando houver dados MARR/BIRT.

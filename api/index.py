@@ -189,17 +189,54 @@ def salvar_validacao():
 
 @app.route('/api/pessoas')
 def get_pessoas():
+    # Server-side search used by the web app. Supports the same filters as
+    # the browser (text, freguesia, year range) plus a record-type filter
+    # (tipo_registo) so the schema prepared in Fase 3 (DEAT/MARR/BIRT) is
+    # already usable once the migration is applied. Degrades safely if the
+    # tipo_registo column is not present yet.
     try:
-        query = request.args.get('q', '')
+        query = request.args.get('q', '').strip()
+        freguesia = request.args.get('freguesia', '').strip()
+        from_year = request.args.get('from_year', '').strip()
+        to_year = request.args.get('to_year', '').strip()
+        tipo = request.args.get('tipo', '').strip().upper()
+        try:
+            limit = max(1, min(int(request.args.get('limit', 50)), 1000))
+        except ValueError:
+            limit = 50
+        try:
+            offset = max(0, int(request.args.get('offset', 0)))
+        except ValueError:
+            offset = 0
+
+        # Validate year inputs (avoid injecting arbitrary values into the URL).
+        def _valid_year(v):
+            return v.isdigit() and 1000 <= int(v) <= 2999
+
         url = SUPABASE_URL + '/rest/v1/pessoas?select=*'
-        
+        conditions = []
         if query:
-            # Pesquisa simplificada no nome
-            url += f'&nome=ilike.*{query}*&limit=100'
+            conditions.append(
+                f"or(nome.ilike.*{query}*,sobrenome.ilike.*{query}*,freguesia.ilike.*{query}*)"
+            )
+        if freguesia:
+            conditions.append(f"freguesia.ilike.*{freguesia}*")
+        if _valid_year(from_year):
+            conditions.append(f"data_obito.gte.{from_year}-01-01")
+        if _valid_year(to_year):
+            conditions.append(f"data_obito.lte.{to_year}-12-31")
+        if tipo in ('DEAT', 'MARR', 'BIRT'):
+            conditions.append(f"tipo_registo=eq.{tipo}")
+
+        if conditions:
+            url += '&' + '&'.join(conditions)
+            url += f'&order=criado_em.desc&limit={limit}&offset={offset}'
         else:
-            url += '&order=criado_em.desc&limit=50'
-            
-        resp = requests.get(url, headers=HEADERS)
+            url += f'&order=criado_em.desc&limit={limit}&offset={offset}'
+
+        resp = requests.get(url, headers=HEADERS, timeout=30)
+        if resp.status_code != 200:
+            return jsonify({"error": resp.text[:300]}), resp.status_code
         return jsonify(resp.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500

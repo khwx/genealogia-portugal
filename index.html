@@ -85,6 +85,13 @@
             <button class="parish-tag" onclick="filterByParish('Cortiço')">Cortiço da Serra</button>
         </div>
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+            <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Tipo:</span>
+            <button class="parish-tag active" onclick="filterByType('')">Todos</button>
+            <button class="parish-tag" onclick="filterByType('DEAT')">Óbitos ✝️</button>
+            <button class="parish-tag" onclick="filterByType('MARR')">Casamentos 💍</button>
+            <button class="parish-tag" onclick="filterByType('BIRT')">Nascimentos 👶</button>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
             <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Ano:</span>
             <input type="number" id="fromYear" class="year-input" placeholder="De (ex: 1700)" min="1600" max="2000">
             <span style="color: var(--text2); align-self: center;">→</span>
@@ -135,6 +142,8 @@
         let currentFromYear = '';
         let currentToYear = '';
         let currentQuery = '';
+        let currentTipo = '';
+        let tipoFallback = false;
         let currentOffset = 0;
         const PAGE_SIZE = 100;
         let isLoadingMore = false;
@@ -209,6 +218,9 @@
                 if (currentToYear) {
                     conditions.push(`data_obito.lte.${currentToYear}-12-31`);
                 }
+                if (currentTipo && !tipoFallback) {
+                    conditions.push(`tipo_registo=eq.${currentTipo}`);
+                }
                 if (conditions.length > 0) {
                     url += '&' + conditions.join('&');
                 }
@@ -227,6 +239,14 @@
                 updateCount();
                 if (hasMore) showLoadMore(); else hideLoadMore();
             } catch (err) {
+                // If a type filter was applied and the query failed (e.g. the
+                // tipo_registo column is not migrated yet), retry once without
+                // the type filter so the page still works for existing records.
+                if (reset && currentTipo && !tipoFallback) {
+                    tipoFallback = true;
+                    await fetchBatch(true);
+                    return;
+                }
                 if (reset) {
                     document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
                 }
@@ -245,6 +265,16 @@
             currentParish = parish;
             document.querySelectorAll('.parish-tag').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent.includes(parish || 'Todas'));
+            });
+            performSearch();
+        }
+
+        function filterByType(tipo) {
+            currentTipo = tipo;
+            tipoFallback = false;
+            document.querySelectorAll('button[onclick^="filterByType"]').forEach(btn => {
+                const val = btn.getAttribute('onclick').match(/filterByType\('([^']*)'\)/)[1];
+                btn.classList.toggle('active', val === tipo);
             });
             performSearch();
         }
@@ -270,6 +300,8 @@
             const dataObito = person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Data não especificada';
             const freguesia = person.freguesia || 'Celorico da Beira';
             const concelho = person.concelho || 'Celorico da Beira';
+            const tipoLabels = { 'DEAT': 'Óbito', 'MARR': 'Casamento', 'BIRT': 'Nascimento' };
+            const badgeText = tipoLabels[person.tipo_registo] || 'Óbito';
 
             let relationsHtml = '';
             if (person.pai || person.mae || person.conjuge) {
@@ -295,7 +327,7 @@
                 <div class="result-card" onclick="openDetail(${JSON.stringify(person).replace(/"/g, '&quot;')})" style="cursor: pointer;">
                     <div class="result-header">
                         <div class="result-name">${fullName}</div>
-                        <div class="result-badge">Óbito</div>
+                        <div class="result-badge">${badgeText}</div>
                     </div>
                     <div class="result-meta">
                         <span>📅 ${dataObito}</span>
@@ -357,6 +389,10 @@
             const fullName = `${person.nome || ''} ${person.sobrenome || ''}`.trim() || 'Registo Anónimo';
 
             const ref = getArquivoRef(person);
+
+            const dataNasc = person.data_nascimento ? new Date(person.data_nascimento).toLocaleDateString('pt-PT') : null;
+            const dataCas = person.data_casamento ? new Date(person.data_casamento).toLocaleDateString('pt-PT') : null;
+
             const refHtml = ref ? `
                 <div>
                     <strong>Referência do Arquivo:</strong>
@@ -370,6 +406,8 @@
                 <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text);">${fullName}</h2>
                 <div style="display: grid; gap: 12px; margin-bottom: 20px; color: var(--text2); font-size: 0.95rem;">
                     <div><strong>Data de Óbito:</strong> <span style="color:var(--text);">${person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Não especificada'}</span></div>
+                    ${dataNasc ? `<div><strong>Data de Nascimento:</strong> <span style="color:var(--text);">${dataNasc}</span></div>` : ''}
+                    ${dataCas ? `<div><strong>Data de Casamento:</strong> <span style="color:var(--text);">${dataCas}</span></div>` : ''}
                     <div><strong>Freguesia:</strong> <span style="color:var(--text);">${person.freguesia || 'Celorico da Beira'}</span></div>
                     <div><strong>Concelho / Distrito:</strong> <span style="color:var(--text);">${person.concelho || 'Celorico'} / ${person.distrito || 'Guarda'}</span></div>
                     ${person.pai ? `<div><strong>Pai:</strong> <span style="color:var(--text);">${person.pai}</span></div>` : ''}
