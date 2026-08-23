@@ -60,13 +60,15 @@ def api_mapa():
         
         # Obter contagem por freguesia do Supabase (com paginação para abranger todos os 8700+ registos)
         counts = {}
+        # Distribuição por século por freguesia (para os popups do mapa)
+        parish_centuries = {}
         offset = 0
         page = 1000
         while True:
             resp = requests.get(
                 f"{SUPABASE_URL}/rest/v1/pessoas",
                 headers=HEADERS,
-                params={"select": "freguesia", "limit": page, "offset": offset},
+                params={"select": "freguesia,data_obito", "limit": page, "offset": offset},
                 timeout=30
             )
             if resp.status_code != 200:
@@ -77,17 +79,34 @@ def api_mapa():
             for item in batch:
                 f = item.get('freguesia') or 'Outras'
                 counts[f] = counts.get(f, 0) + 1
+                d = item.get('data_obito')
+                if d:
+                    try:
+                        if 'T' in d:
+                            year = int(d[:4])
+                        else:
+                            year = int(str(d).split('-')[0])
+                        if year >= 1000:
+                            seculo = (year - 1) // 100 + 1
+                            pc = parish_centuries.setdefault(f, {})
+                            pc[seculo] = pc.get(seculo, 0) + 1
+                    except (ValueError, TypeError):
+                        pass
             if len(batch) < page:
                 break
             offset += page
         
-        # Combinar coordenadas com contagens
+        # Combinar coordenadas com contagens e períodos cronológicos
         map_data = []
         for f, coord in coords.items():
+            periodos = parish_centuries.get(f, {})
+            # Ordenar séculos por ordem cronológica e manter só com registos
+            periodos_ordenados = {s: periodos[s] for s in sorted(periodos.keys()) if periodos[s] > 0}
             map_data.append({
                 'freguesia': f,
                 'coords': coord,
-                'count': counts.get(f, 0)
+                'count': counts.get(f, 0),
+                'periodos': periodos_ordenados
             })
         return jsonify(map_data)
     except Exception as e:

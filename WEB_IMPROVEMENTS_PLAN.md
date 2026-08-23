@@ -24,13 +24,13 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 ## 2. Lista Priorizada de Melhorias (Roadmap)
 
 ### Fase 1: Enriquecimento da Pesquisa e Cartões de Dados
-- [ ] **Filtros de Tipo de Registo:** Adicionar seletor rápido (Todos, Óbitos ✝️, Casamentos 💍, Nascimentos 👶).
-- [ ] **Filtros Temporais:** Seletor de intervalo de anos (ex: 1700–1800, 1800–1900).
+- [ ] **Filtros de Tipo de Registo:** Adicionar seletor rápido (Todos, Óbitos ✝️, Casamentos 💍, Nascimentos 👶) — adiado (falta de batismos/casamentos na base).
+- [x] **Filtros Temporais:** Seletor de intervalo de anos (ex: 1700–1800, 1800–1900).
 - [x] **Referência do Livro Paroquial:** Cruzar o `file_id` com o inventário (`celorico_completo.json`) para exibir o código do livro do Arquivo Distrital (ex: `PT/TT/PRQ/...`) e link para o fundo documental.
 - [x] **Paginação / Scroll Infinito:** Substituir o limite estático de 50/100 resultados por paginação fluida ou scroll infinito para explorar os 8.700+ registos.
 
 ### Fase 2: Vista de Detalhe do Registo (Modal / Página Dedicada)
-- [ ] **Modal de Detalhe:** Ao clicar num cartão, abrir um modal com:
+- [x] **Modal de Detalhe:** Ao clicar num cartão, abrir um modal com:
   - Nome completo e datas normalizadas.
   - Árvore de familiares (Pai, Mãe, Cônjuge).
   - Transcrição original integral (`raw_text` do HTR).
@@ -41,7 +41,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 - [ ] **Páginas Específicas por Tipo:** Adaptar os cartões para destacar a informação relevante de cada tipo de evento (ex: cônjuges em casamentos, pais em batismos).
 
 ### Fase 4: Evolução do Mapa e Estatísticas
-- [ ] **Mapa Dinâmico (`/mapa`):** Mostrar popups interativos em cada freguesia com contagem detalhada por tipo de ato e períodos cronológicos.
+- [x] **Mapa Dinâmico (`/mapa`):** Mostrar popups interativos em cada freguesia com contagem detalhada por tipo de ato e períodos cronológicos.
 - [x] **Gráficos de Natalidade/Mortalidade:** Adicionar gráficos simples de distribuição por século.
 
 ---

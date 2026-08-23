@@ -100,6 +100,20 @@
 
                     if (item.coords && item.count > 0) {
                         const radius = Math.max(8, Math.sqrt(item.count) * 2.5);
+                        // Períodos cronológicos (séculos) com registos para esta freguesia
+                        const roman = {16:'XVI',17:'XVII',18:'XVIII',19:'XIX',20:'XX',21:'XXI'};
+                        const periodos = item.periodos || {};
+                        const periodosKeys = Object.keys(periodos).map(Number).sort((a,b)=>a-b);
+                        let periodosHtml = '';
+                        if (periodosKeys.length) {
+                            periodosHtml = '<div style="margin-top: 6px; font-size: 0.85rem; line-height: 1.5;">' +
+                                periodosKeys.slice(0, 4).map(s => {
+                                    const label = roman[s] || (s + 'º');
+                                    return `<span style="display:inline-block; margin-right:8px; color:#374151;"><strong>${label}</strong>: ${periodos[s].toLocaleString('pt-PT')}</span>`;
+                                }).join('') +
+                                (periodosKeys.length > 4 ? `<span style="color:#374151;">+${periodosKeys.length - 4} séc.</span>` : '') +
+                                '</div>';
+                        }
                         L.circleMarker([item.coords[0], item.coords[1]], {
                             radius: radius,
                             fillColor: '#6c63ff',
@@ -109,10 +123,11 @@
                             fillOpacity: 0.65
                         })
                         .bindPopup(`
-                            <div style="color: #111; font-family: Inter, sans-serif; padding: 4px;">
+                            <div style="color: #111; font-family: Inter, sans-serif; padding: 4px; min-width: 220px;">
                                 <strong style="font-size: 1.1rem; color: #4f46e5;">${item.freguesia}</strong><br>
-                                <span style="font-size: 0.95rem;"><strong>${item.count}</strong> registos indexados</span><br>
-                                <a href="/?q=${encodeURIComponent(item.freguesia)}" style="color: #2563eb; font-size: 0.85rem; text-decoration: underline; margin-top: 4px; display: inline-block;">Ver registos desta freguesia ➔</a>
+                                <span style="font-size: 0.95rem;"><strong>${item.count.toLocaleString('pt-PT')}</strong> registos indexados</span>
+                                ${periodosHtml}
+                                <a href="/?q=${encodeURIComponent(item.freguesia)}" style="color: #2563eb; font-size: 0.85rem; text-decoration: underline; margin-top: 6px; display: inline-block;">Ver registos desta freguesia ➔</a>
                             </div>
                         `)
                         .addTo(map);

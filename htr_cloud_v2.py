@@ -447,7 +447,7 @@ class HTRProcessor:
                 "contents": [{
                     "parts": [
                         {"inline_data": {"mime_type": "image/jpeg", "data": img_b64}},
-                        {"text": PROMPT},
+                        {"text": prompt},
                     ]
                 }],
                 "generationConfig": {"temperature": 0.1, "maxOutputTokens": 2000},

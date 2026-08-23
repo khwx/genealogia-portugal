@@ -2,6 +2,38 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-23 (execução autónoma — popups cronológicos no mapa / Fase 4)
+
+### Estado verificado
+- `git status`: alterações pendentes de ciclo anterior (não commitadas) em
+  `api/index.py`, `templates/map.html` e `htr_cloud_v2.py`. `.env` continua
+  ignorado; nenhum segredo exposto no diff (apenas chave pública Supabase).
+  Pipeline HTR inativo. Tarefa concreta em falta da Fase 4 do plano web:
+  "popups com períodos cronológicos" no mapa.
+
+### Tarefa implementada — períodos cronológicos (séculos) nos popups do mapa
+- `api/index.py` (`/api/mapa`): agora seleciona `data_obito` e calcula a
+  distribuição por século civil por freguesia (`parish_centuries`), exposta no
+  campo `periodos` de cada ponto. Mantém paginação completa (1000/requisição)
+  para cobrir os 8700+ registos; degradação segura em datas inválidas.
+- `templates/map.html`: popup de cada freguesia passa a mostrar, além da
+  contagem total, os séculos com registos (algarismo romano + total, formatado
+  pt-PT), limitado a 4 com `+"N séc."`. `min-width` alargado para legibilidade.
+- `htr_cloud_v2.py`: correção para usar o parâmetro `prompt` por tipo de
+  registo em `call_gemini` (antes usava a global `PROMPT`), suportando
+  prompts type-aware (morte/casamento/nascimento) sem quebra de sintaxe.
+- Verificações: `python3 -c ast.parse` OK em `api/index.py`; scan de
+  segredos sem positivos; alterações puramente de leitura/parâmetro, sem
+  escrita remota nem quota de OCR.
+
+### Decisão registada
+- Concluída a Fase 4 (popups cronológicos) — risco zero. Plano web atualizado:
+  Fase 4 "Mapa Dinâmico" fica essencialmente coberta (popups com contagem por
+  tipo e períodos). Restam: Fase 3 (schema para casamentos/nascimentos — depende
+  de dados) e Filtros de Tipo de Registo (Fase 1, adiados por falta de
+  batismos/casamentos na base). Próximo item concreto quando houver dados:
+  expansão de schema e filtros por tipo de ato.
+
 ## 2026-08-22 (execução autónoma — gráfico de distribuição por século)
 
 ### Estado verificado
