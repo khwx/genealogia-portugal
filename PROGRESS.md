@@ -876,6 +876,41 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   para backfill de `pai`/`mae`/`conjuge`.
 - `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
 
+## 2026-08-24 (execução autónoma — fix teste type-aware HTR)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado.
+- Scanner de segredos: **0 segredos** em 147 ficheiros rastreados. Segurança intacta.
+- Testes existentes falhavam: `test_htr_type_aware.py` tinha 1 falha em
+  `test_build_type_map_real_data_all_deat` — o teste assumia que só existiam
+  listings de óbitos (DEAT), mas após `fetch_page_listings.py` (2026-08-21) os
+  listings de BIRT (38.5k) e MARR (18.4k) também estão presentes no
+  `doc_file_listings.json`.
+
+### Tarefa implementada — atualizar teste para refletir estado real
+- `test_htr_type_aware.py`: renomeado `test_build_type_map_real_data_all_deat`
+  para `test_build_type_map_real_data_has_all_types`; agora verifica que os
+  três tipos (DEAT, BIRT, MARR) estão presentes com contagens > 1000 cada,
+  em vez de esperar só DEAT. Mantém degradação segura (retorna se mapa vazio).
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED** (10/10 no
+  `test_htr_type_aware.py` + todos os outros gates). `py_compile` OK.
+- Alteração puramente local/teste, sem rede, sem BD remota, sem quota de OCR,
+  sem exposição de segredos.
+
+### Decisão registada
+- Melhoria segura e mensurável do pilar "melhorar autonomamente": o portão de
+  testes passa a validar corretamente o estado atual do mapeamento de tipos,
+  permitindo que futuras regressões (listings em falta, inversão de tipos) sejam
+  detetadas automaticamente no CI. Não se relançou o HTR nem se tocou na BD
+  remota.
+
+### Próximos passos sugeridos
+- Correr `htr_cloud_v2.py` para OCR de nascimentos/casamentos (prompts já prontos
+  via `PROMPT_BY_TYPE` — BIRT e MARR schemas definidos).
+- Aplicar `migrations/add_pessoa_relation_columns.sql` + `SYNC_RELATIONS=1`
+  para backfill de `pai`/`mae`/`conjuge`.
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+
 ## 2026-08-20 (execução autónoma — cobertura por tipo de registo)
 
 

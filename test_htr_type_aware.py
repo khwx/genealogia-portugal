@@ -40,15 +40,23 @@ def test_prompt_selection_for_all_types():
         assert prompt and "JSON object" in prompt
 
 
-def test_build_type_map_real_data_all_deat():
-    # On the current checkout only óbitos listings have been fetched, so every
-    # resolvable file_id maps to DEAT. Guards against an accidental type
-    # inversion that would regress the death pipeline. If the source files are
-    # absent (e.g. fresh checkout), the map is simply empty and we skip.
+def test_build_type_map_real_data_has_all_types():
+    # After 2026-08-21 fetch_page_listings.py run, BIRT and MARR listings are
+    # now present alongside DEAT. Verify all three types exist with non-zero
+    # counts. Guards against missing listings or regressions in type mapping.
     tm = H.build_type_map()
     if not tm:
         return
-    assert all(v == "DEAT" for v in tm.values())
+    types = set(tm.values())
+    assert "DEAT" in types, "DEAT (óbitos) should be present"
+    assert "BIRT" in types, "BIRT (nascimentos/batismos) should be present"
+    assert "MARR" in types, "MARR (casamentos) should be present"
+    # Sanity check: each type should have a substantial number of file_ids
+    from collections import Counter
+    counts = Counter(tm.values())
+    assert counts["DEAT"] > 1000
+    assert counts["BIRT"] > 1000
+    assert counts["MARR"] > 1000
 
 
 def test_build_type_map_joints_listing_with_inventory():
@@ -152,7 +160,7 @@ if __name__ == "__main__":
         test_prompt_schemas_present,
         test_default_record_type_is_death,
         test_prompt_selection_for_all_types,
-        test_build_type_map_real_data_all_deat,
+        test_build_type_map_real_data_has_all_types,
         test_build_type_map_joints_listing_with_inventory,
         test_build_type_map_inventory_takes_precedence,
         test_build_type_map_missing_files_returns_empty,
