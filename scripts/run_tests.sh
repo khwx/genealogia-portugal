@@ -20,10 +20,12 @@ run() {
 
 # Security gate (must always run)
 run scripts/scan_secrets.py
+run scripts/precommit_secrets.py
 
 # Pure unit tests (no network / no credentials)
 run scripts/test_coverage_report.py
 run scripts/test_scan_secrets.py
+run scripts/test_precommit_secrets.py
 run test_sync_pagination.py
 run test_sync_relations.py
 run test_htr_type_aware.py

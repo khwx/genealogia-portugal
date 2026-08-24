@@ -2,6 +2,42 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-24 (execução autónoma — pre-commit secret guard / pilar de segurança)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado e
+  untracked. Scanner `scan_secrets.py`: **0 segredos** em 147 ficheiros
+  rastreados. `bash scripts/run_tests.sh` → **ALL TESTS PASSED**.
+- Lacuna identificada: `scan_secrets.py` só inspeciona ficheiros *rastreados*.
+  Um segredo num ficheiro novo, não rastreado e não ignorado pelo git passaria
+  pelo portão e iria para o GitHub no `git add .`.
+
+### Tarefa implementada — guarda de segurança pré-commit
+- `scripts/precommit_secrets.py` (novo): reutiliza os mesmos padrões/heurísticas
+  do `scan_secrets.py` mas analisa o conjunto exato que `git add .` iria
+  stagear — ficheiros rastreados + ficheiros não rastreados e não ignorados —
+  e ainda valida que `.env` continua git-ignored e não rastreado. Exit 1 se
+  encontrar um segredo ou se `.env` estiver exposto.
+- `scripts/test_precommit_secrets.py` (novo): 5 testes (deteção de segredo
+  real, skip de placeholder, `.env` protegido, conjunto de candidatos,
+  skip de extensão binária). **PASS**.
+- `scripts/run_tests.sh`: adicionado `precommit_secrets.py` e o seu teste ao
+  portão (passa a correr em cada ciclo de 8h e em CI).
+- Verificações: `bash scripts/run_tests.sh` OK; `py_compile` OK. Alteração
+  puramente local, sem rede, sem BD remota, sem quota de OCR, sem segredos
+  expostos.
+
+### Decisão registada
+- Reforço direto do pilar "garantir segurança sem expor segredos": a partir de
+  agora nenhum segredo num ficheiro não rastreado pode chegar ao GitHub, e
+  qualquer regressão em `.env` (deixar de ser ignorado) é detetada antes do
+  commit. Sem risco: nenhuma escrita remota.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_tipo_registo.sql` no Supabase e correr o OCR
+  BIRT/MARR (`htr_cloud_v2.py` com `PROMPT_BY_TYPE`) para povoar os novos tipos.
+- `sync_htr_supabase.py --backfill-url` para preencher `imagem_url`.
+
 ## 2026-08-23 (execução autónoma — popups cronológicos no mapa / Fase 4)
 
 ### Estado verificado
