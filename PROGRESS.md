@@ -2,6 +2,42 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-24 (execução autónoma — verificação de estado a cada 8h)
+
+### Estado verificado
+- Repo limpo e alinhado com `origin/main`; `.env` continua ignorado e
+  untracked. Scanner `scan_secrets.py`: **0 segredos** em 149 ficheiros
+  rastreados. `bash scripts/run_tests.sh` → **ALL TESTS PASSED**.
+- O objetivo do projeto exige "verificar estado a cada 8h"; o CI só corria
+  no push/PR, pelo que uma regressão de segurança ou de teste entre pushes
+  passaria despercebida até ao próximo commit.
+
+### Tarefa implementada — verificação autónoma de estado (a cada 8h)
+- `scripts/status_check.py` (novo): verificação read-only e sem rede que
+  agrega os portões existentes — `scan_secrets.py`, `precommit_secrets.py`,
+  `run_tests.sh` (suite de testes) e a segurança de `.env` (não rastreado) —
+  e imprime um resumo JSON com `status: OK|PROBLEM` (exit 1 em falha).
+  Determinístico e seguro: não toca no pacing, na BD remota nem em segredos.
+- `.github/workflows/security-scan.yml`: adicionado trigger `schedule`
+  `0 */8 * * *` (cada 8h) e job `status-check` que corre `status_check.py`,
+  cumprindo o pilar "verificar estado a cada 8h" também no GitHub (não só
+  localmente). Mantém push/PR/dispatch.
+- Verificações: `python3 scripts/status_check.py` → `status: OK`;
+  `py_compile` OK. Alteração puramente local, sem rede, sem BD remota, sem
+  quota de OCR, sem segredos expostos.
+
+### Decisão registada
+- Reforço direto do pilar "verificar estado a cada 8h": a partir de agora o
+  GitHub corre a bateria de segurança+testes de forma autónoma a cada 8h e
+  sinaliza qualquer regressão. Sem risco: nenhuma escrita remota.
+
+### Próximos passos sugeridos
+- Correr `htr_cloud_v2.py` para OCR de nascimentos/casamentos (prompts já
+  prontos via `PROMPT_BY_TYPE` — BIRT e MARR). Requer download das imagens
+  TIFF de BIRT/MARR (ainda por fazer) e quota Gemini.
+- Aplicar `migrations/add_tipo_registo.sql` + `SYNC_RELATIONS=1` para
+  backfill de `pai`/`mae`/`conjuge`.
+
 ## 2026-08-24 (execução autónoma — pre-commit secret guard / pilar de segurança)
 
 ### Estado verificado
