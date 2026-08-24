@@ -29,6 +29,7 @@ run scripts/test_precommit_secrets.py
 run test_sync_pagination.py
 run test_sync_relations.py
 run test_htr_type_aware.py
+run test_migrations.py
 
 if [ "$fail" -ne 0 ]; then
     echo "RESULT: FAILED"

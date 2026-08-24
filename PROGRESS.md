@@ -2,6 +2,41 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-24 (execução autónoma — teste de segurança de migrações SQL)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 150 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — portão de segurança para migrações SQL
+- `test_migrations.py` (novo): teste local e sem rede que valida todos os
+  ficheiros `migrations/*.sql` quanto a:
+  - ausência de instruções destrutivas (`DROP TABLE/COLUMN`, `DELETE FROM`,
+    `TRUNCATE`);
+  - idempotência obrigatória (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`,
+    `CREATE INDEX IF NOT EXISTS`);
+  - escopo restrito a `public.pessoas` (nenhuma outra tabela é alterada);
+  - ausência de padrões de segredos (password/api_key/secret/token).
+- `scripts/run_tests.sh`: adicionado `run test_migrations.py` ao gate, pelo
+  que o CI (incluindo o schedule de 8h) bloqueia regressões em migrações.
+- Reforço direto do pilar "garantir segurança sem expor segredos": como as
+  migrações são aplicadas à mão no Supabase SQL Editor, este gate garante que
+  nada destrutivo ou com credenciais entra no repo entre as verificações.
+- Verificações: `python3 test_migrations.py` → ALL MIGRATIONS SAFE;
+  `bash scripts/run_tests.sh` → **ALL TESTS PASSED**; `py_compile`/`status_check`
+  OK. Alteração puramente local, sem rede, sem BD remota, sem segredos expostos.
+
+### Decisão registada
+- Melhoria segura e mensurável do pilar "melhorar autonomamente" + "garantir
+  segurança": o gate de migrações fecha a lacuna entre a redação das migrações
+  e a sua aplicação em produção. Não se aplicou nenhuma migração remota.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_tipo_registo.sql` e `add_pessoa_relation_columns.sql`
+  no Supabase, depois correr o OCR BIRT/MARR (`htr_cloud_v2.py`) e o backfill
+  de `imagem_url` (`sync_htr_supabase.py --backfill-url`).
+
 ## 2026-08-24 (execução autónoma — verificação de estado a cada 8h)
 
 ### Estado verificado
