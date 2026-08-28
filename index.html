@@ -100,8 +100,12 @@
         </div>
     </div>
 
-    <div style="max-width: 1000px; margin: 0 auto 10px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="max-width: 1000px; margin: 0 auto 10px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <span id="resultsCount" style="color: var(--text2); font-size: 0.9rem;">A carregar...</span>
+        <div style="display: flex; gap: 8px;">
+            <button onclick="exportCSV()" class="parish-tag" style="background: var(--bg2); color: var(--text);">📥 Exportar CSV</button>
+            <button onclick="exportGEDCOM()" class="parish-tag" style="background: var(--bg2); color: var(--text);">🌲 Exportar GEDCOM</button>
+        </div>
     </div>
 
     <div class="results-container" id="resultsContainer">
@@ -342,7 +346,10 @@
             `;
         }
 
+        let currentLoadedRecords = [];
+
         function renderResults(data) {
+            currentLoadedRecords = data || [];
             const container = document.getElementById('resultsContainer');
 
             if (!data || data.length === 0) {
@@ -354,9 +361,67 @@
         }
 
         function appendResults(data) {
-            const container = document.getElementById('resultsContainer');
             if (!data || data.length === 0) return;
+            currentLoadedRecords = currentLoadedRecords.concat(data);
+            const container = document.getElementById('resultsContainer');
             container.insertAdjacentHTML('beforeend', data.map(cardTemplate).join(''));
+        }
+
+        function exportCSV() {
+            if (!currentLoadedRecords || currentLoadedRecords.length === 0) {
+                alert('Não há registos carregados para exportar.');
+                return;
+            }
+            let csv = 'Nome,Sobrenome,Data Óbito,Freguesia,Pai,Mãe,Cônjuge,URL\n';
+            currentLoadedRecords.forEach(r => {
+                const row = [
+                    `"${(r.nome || '').replace(/"/g, '""')}"`,
+                    `"${(r.sobrenome || '').replace(/"/g, '""')}"`,
+                    `"${r.data_obito || ''}"`,
+                    `"${(r.freguesia || '').replace(/"/g, '""')}"`,
+                    `"${(r.pai || '').replace(/"/g, '""')}"`,
+                    `"${(r.mae || '').replace(/"/g, '""')}"`,
+                    `"${(r.conjuge || '').replace(/"/g, '""')}"`,
+                    `"${r.imagem_url || ''}"`
+                ].join(',');
+                csv += row + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'genealogia_portugal_obitos.csv';
+            a.click();
+        }
+
+        function exportGEDCOM() {
+            if (!currentLoadedRecords || currentLoadedRecords.length === 0) {
+                alert('Não há registos carregados para exportar.');
+                return;
+            }
+            let ged = "0 HEAD\n1 SOUR Genealogia Portugal\n1 GEDC\n2 VERS 5.5.1\n2 FORM LINEAGE-LINKED\n1 CHAR UTF-8\n";
+            currentLoadedRecords.forEach((r, idx) => {
+                const id = `@I${idx + 1}@`;
+                const name = `${r.nome || ''} /${r.sobrenome || ''}/`.trim();
+                ged += `0 ${id} INDI\n`;
+                ged += `1 NAME ${name}\n`;
+                if (r.data_obito) {
+                    ged += `1 DEAT\n2 DATE ${r.data_obito}\n`;
+                }
+                if (r.freguesia) {
+                    ged += `1 RESI\n2 PLAC ${r.freguesia}, Celorico da Beira\n`;
+                }
+                if (r.pai) ged += `1 NOTE Pai: ${r.pai}\n`;
+                if (r.mae) ged += `1 NOTE Mãe: ${r.mae}\n`;
+                if (r.conjuge) ged += `1 NOTE Cônjuge: ${r.conjuge}\n`;
+            });
+            ged += "0 TRLR\n";
+            const blob = new Blob([ged], { type: 'text/plain;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'genealogia_portugal.ged';
+            a.click();
         }
 
         function updateCount() {
@@ -393,6 +458,23 @@
             const dataNasc = person.data_nascimento ? new Date(person.data_nascimento).toLocaleDateString('pt-PT') : null;
             const dataCas = person.data_casamento ? new Date(person.data_casamento).toLocaleDateString('pt-PT') : null;
 
+            let familyTreeHtml = '';
+            if (person.pai || person.mae || person.conjuge) {
+                familyTreeHtml = `
+                    <div style="background: var(--bg3); border-radius: 8px; padding: 14px; margin-bottom: 16px; border: 1px solid var(--border);">
+                        <h4 style="margin-bottom: 10px; color: var(--accent2); font-size: 0.9rem;">Árvore Genealógica (Relações Familiares):</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+                            ${person.pai ? `<div>👨 Pai: <strong style="color: var(--text);">${person.pai}</strong></div>` : ''}
+                            ${person.mae ? `<div>👩 Mãe: <strong style="color: var(--text);">${person.mae}</strong></div>` : ''}
+                            <div style="padding-left: 12px; border-left: 2px solid var(--accent); margin: 4px 0;">
+                                👤 <strong>${fullName}</strong> (Registo Principal)
+                            </div>
+                            ${person.conjuge ? `<div>💍 Cônjuge: <strong style="color: var(--text);">${person.conjuge}</strong></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
             const refHtml = ref ? `
                 <div>
                     <strong>Referência do Arquivo:</strong>
@@ -404,15 +486,13 @@
 
             content.innerHTML = `
                 <h2 style="font-size: 1.5rem; margin-bottom: 16px; color: var(--text);">${fullName}</h2>
+                ${familyTreeHtml}
                 <div style="display: grid; gap: 12px; margin-bottom: 20px; color: var(--text2); font-size: 0.95rem;">
                     <div><strong>Data de Óbito:</strong> <span style="color:var(--text);">${person.data_obito ? new Date(person.data_obito).toLocaleDateString('pt-PT') : 'Não especificada'}</span></div>
                     ${dataNasc ? `<div><strong>Data de Nascimento:</strong> <span style="color:var(--text);">${dataNasc}</span></div>` : ''}
                     ${dataCas ? `<div><strong>Data de Casamento:</strong> <span style="color:var(--text);">${dataCas}</span></div>` : ''}
                     <div><strong>Freguesia:</strong> <span style="color:var(--text);">${person.freguesia || 'Celorico da Beira'}</span></div>
                     <div><strong>Concelho / Distrito:</strong> <span style="color:var(--text);">${person.concelho || 'Celorico'} / ${person.distrito || 'Guarda'}</span></div>
-                    ${person.pai ? `<div><strong>Pai:</strong> <span style="color:var(--text);">${person.pai}</span></div>` : ''}
-                    ${person.mae ? `<div><strong>Mãe:</strong> <span style="color:var(--text);">${person.mae}</span></div>` : ''}
-                    ${person.conjuge ? `<div><strong>Cônjuge:</strong> <span style="color:var(--text);">${person.conjuge}</span></div>` : ''}
                     ${refHtml}
                 </div>
                 ${person.imagem_url ? `
