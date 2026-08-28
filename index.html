@@ -248,37 +248,16 @@
             if (reset === false && !hasMore) return;
             isLoadingMore = true;
             showLoadingMore();
-            // timeout de 8s para nao ficar a pensar
-            const controller = new AbortController();
-            const t = setTimeout(() => controller.abort(), 8000);
             try {
-                // Tenta backend /api/pessoas primeiro (mais rapido e com fallback)
-                let data = null;
-                try {
-                    const params = new URLSearchParams({ limit: PAGE_SIZE, offset: currentOffset });
-                    if (currentQuery) params.set('q', currentQuery);
-                    if (currentParish) params.set('freguesia', currentParish);
-                    if (currentFromYear) params.set('from_year', currentFromYear);
-                    if (currentToYear) params.set('to_year', currentToYear);
-                    if (currentTipo && !tipoFallback) params.set('tipo', currentTipo);
-                    const r = await fetch(`/api/pessoas?${params}`, { signal: controller.signal });
-                    if (r.ok) data = await r.json();
-                    else throw new Error('api not ok');
-                } catch(e) {
-                    // fallback direto Supabase
-                    let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
-                    const conditions = [];
-                    if (currentQuery) conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
-                    if (currentParish) conditions.push(`freguesia.ilike.*${currentParish}*`);
-                    if (currentFromYear) conditions.push(`data_obito.gte.${currentFromYear}-01-01`);
-                    if (currentToYear) conditions.push(`data_obito.lte.${currentToYear}-12-31`);
-                    if (currentTipo && !tipoFallback) conditions.push(`tipo_registo=eq.${currentTipo}`);
-                    if (conditions.length > 0) url += '&' + conditions.join('&');
-                    const response = await fetch(url, { headers, signal: controller.signal });
-                    if (!response.ok) throw new Error('Erro na pesquisa');
-                    data = await response.json();
-                }
-                clearTimeout(t);
+                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
+                const conditions = [];
+                if (currentQuery) conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
+                if (currentParish) conditions.push(`freguesia.ilike.*${currentParish}*`);
+                if (currentFromYear) conditions.push(`data_obito.gte.${currentFromYear}-01-01`);
+                if (currentToYear) conditions.push(`data_obito.lte.${currentToYear}-12-31`);
+                if (currentTipo && !tipoFallback) conditions.push(`tipo_registo=eq.${currentTipo}`);
+                if (conditions.length > 0) url += '&' + conditions.join('&');
+                const response = await fetch(url, { headers });
                 if (!response.ok) throw new Error('Erro na pesquisa');
                 const data = await response.json();
                 if (reset) {
@@ -293,24 +272,13 @@
                 updateCount();
                 if (hasMore) showLoadMore(); else hideLoadMore();
             } catch (err) {
-                clearTimeout(t);
-                if (err.name === 'AbortError') {
-                    if (reset) document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Tempo esgotado — tenta novamente ou refina a pesquisa.</div>`;
-                    return;
-                }
-                // If a type filter was applied and the query failed (e.g. the
-                // tipo_registo column is not migrated yet), retry once without
-                // the type filter so the page still works for existing records.
                 if (reset && currentTipo && !tipoFallback) {
                     tipoFallback = true;
                     await fetchBatch(true);
                     return;
                 }
-                if (reset) {
-                    document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
-                }
+                if (reset) document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro na pesquisa: ${err.message}</div>`;
             } finally {
-                clearTimeout(t);
                 hideLoadingMore();
                 isLoadingMore = false;
             }
