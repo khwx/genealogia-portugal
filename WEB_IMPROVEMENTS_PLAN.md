@@ -43,6 +43,15 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 ### Fase 4: Evolução do Mapa e Estatísticas
 - [x] **Mapa Dinâmico (`/mapa`):** Mostrar popups interativos em cada freguesia com contagem detalhada por tipo de ato e períodos cronológicos.
 - [x] **Gráficos de Natalidade/Mortalidade:** Adicionar gráficos simples de distribuição por século.
+- [x] **Cobertura por Freguesia na Web:** Tabela completa em `index.html` com 2.343 livros / 26.813 páginas / 26.878 nomes por freguesia (Galisteu e São Martinho assinalados).
+- [x] **Pesquisa Robusta com Timeout:** `fetchBatch` agora tenta `/api/pessoas` (backend) com fallback para Supabase direto, ambos com `AbortController` de 8s para não ficar a pensar.
+
+### Fase 5: Apresentação e Exportação (2026-08-28)
+- [x] **Árvore Genealógica Visual:** Modal com bloco destacado Pais → Registo → Cônjuge.
+- [x] **Exportação CSV/GEDCOM:** Botões no topo dos resultados para descarregar os registos carregados.
+- [ ] **Pesquisa Fonética (Soundex pt-BR):** Tolerar variações históricas (Joam/João, Theresa/Teresa) — próximo.
+- [ ] **Heatmap por Freguesia no Mapa:** Colorir freguesias por densidade de registos.
+- [ ] **Timeline Interativa por Década:** Gráfico clicável para filtrar por período.
 
 ---
 
