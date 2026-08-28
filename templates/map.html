@@ -31,6 +31,7 @@
     </style>
 </head>
 <body>
+    <div id="topProgress" style="position:fixed; top:0; left:0; height:3px; width:0%; background: linear-gradient(90deg, #6c63ff, #8b83ff); z-index:9999; transition: width 0.3s ease, opacity 0.3s; opacity:1;"></div>
     <div class="topbar">
         <a href="/" class="logo">Genealogia <span>Portugal</span></a>
         <div class="nav-links">
@@ -82,10 +83,14 @@
             maxZoom: 19
         }).addTo(map);
 
+        function setProgress(p) { const el=document.getElementById('topProgress'); if(!el) return; el.style.width=p+'%'; el.style.opacity=p>=100?'0':'1'; if(p>=100) setTimeout(()=>el.style.width='0%', 400); }
         async function loadMapData() {
             try {
+                setProgress(20);
                 const resp = await fetch('/api/mapa');
+                setProgress(60);
                 const data = await resp.json();
+                setProgress(80);
 
                 let total = 0;
                 let maxCount = 0;
@@ -137,16 +142,19 @@
                 document.getElementById('statTotal').textContent = total.toLocaleString('pt-PT');
                 document.getElementById('statFregs').textContent = data.filter(d => d.count > 0).length;
                 document.getElementById('statTop').textContent = topFreguesia;
-
+                setProgress(100);
             } catch (e) {
                 console.error("Erro ao carregar dados do mapa:", e);
+                setProgress(100);
             }
         }
 
         async function loadSeculos() {
             try {
+                setProgress(30);
                 const resp = await fetch('/api/seculos');
                 const json = await resp.json();
+                setProgress(90);
                 const data = json.seculos || [];
                 const container = document.getElementById('seculosChart');
                 if (!data.length) {

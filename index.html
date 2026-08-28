@@ -46,6 +46,7 @@
     </style>
 </head>
 <body>
+    <div id="topProgress" style="position:fixed; top:0; left:0; height:3px; width:0%; background: linear-gradient(90deg, #6c63ff, #8b83ff); z-index:9999; transition: width 0.3s ease, opacity 0.3s; opacity:1;"></div>
     <div class="topbar">
         <a href="/" class="logo">Genealogia <span>Portugal</span></a>
         <div class="nav-links">
@@ -209,6 +210,7 @@
             }
         }
 
+        function setProgress(p) { const el=document.getElementById('topProgress'); if(!el) return; el.style.width=p+'%'; el.style.opacity=p>=100?'0':'1'; if(p>=100) setTimeout(()=>el.style.width='0%', 400); }
         function getArquivoRef(person) {
             if (!arquivoRefs || !person) return null;
             const fid = person.file_id || (person.imagem_url || '').match(/fileId=([^&]+)/)?.[1];
@@ -218,8 +220,10 @@
 
         async function loadInitial() {
             try {
+                setProgress(20);
                 const randomOffset = Math.floor(Math.random() * 5000);
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&limit=50&offset=${randomOffset}`, { headers });
+                setProgress(70);
                 if (!response.ok) throw new Error('Erro ao ligar à base de dados');
                 const data = await response.json();
                 renderResults(data);
@@ -227,7 +231,9 @@
                 hasMore = false;
                 hideLoadMore();
                 updateCount();
+                setProgress(100);
             } catch (err) {
+                setProgress(100);
                 document.getElementById('resultsContainer').innerHTML = `<div class="loading" style="color:#ef4444">Erro ao carregar dados: ${err.message}</div>`;
             }
         }
