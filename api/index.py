@@ -163,22 +163,40 @@ def api_seculos():
 
 @app.route('/validar')
 def validar():
-    # Buscar um registo ainda não validado (com nome) para revisão
-    resp = requests.get(
-        f"{SUPABASE_URL}/rest/v1/pessoas",
-        headers=HEADERS,
-        params={"validado": "eq.false", "nome": "not.is.null", "limit": 1, "order": "criado_em.desc"},
-        timeout=30
-    )
-    registo = resp.json()[0] if resp.status_code == 200 and resp.json() else None
-    return render_template('validate.html', registo=registo)
+    # Buscar um registo ainda não validado, saltando [ilegível]/[não consta] por defeito
+    # Se só houver ilegíveis, mostra o primeiro na mesma para permitir rejeitar
+    for filt in [
+        {"validado": "eq.false", "nome": "not.is.null", "nome_not_ilike": "[ilegível]", "limit": 5},
+        {"validado": "eq.false", "nome": "not.is.null", "limit": 5},
+    ]:
+        params = {"validado": filt["validado"], "nome": filt["nome"], "limit": filt["limit"], "order": "criado_em.desc"}
+        resp = requests.get(f"{SUPABASE_URL}/rest/v1/pessoas", headers=HEADERS, params=params, timeout=30)
+        if resp.status_code == 200 and resp.json():
+            batch = resp.json()
+            # filtrar localmente ilegíveis na primeira volta
+            if "nome_not_ilike" in filt:
+                filtered = [r for r in batch if "[ileg" not in (r.get("nome") or "").lower() and "[não" not in (r.get("nome") or "").lower()]
+                if filtered:
+                    return render_template('validate.html', registo=filtered[0])
+                continue
+            return render_template('validate.html', registo=batch[0])
+    return render_template('validate.html', registo=None)
 
 @app.route('/api/validar', methods=['POST'])
 def salvar_validacao():
     dados = request.json
     id = dados.pop('id')
-    
-    # Atualizar registo como validado
+    acao = dados.pop('acao', 'aprovar')  # aprovar | rejeitar | ilegivel
+    if acao == 'rejeitar' or acao == 'ilegivel':
+        # Marca como validado mas com qualidade 0 e mantém nome original para não poluir pesquisa
+        resp = requests.patch(
+            f"{SUPABASE_URL}/rest/v1/pessoas?id=eq.{id}",
+            headers=HEADERS,
+            json={"validado": True, "qualidade": 0.0},
+            timeout=30
+        )
+        return jsonify({"success": resp.status_code in [200, 204]})
+    # aprovar: atualiza nome corrigido
     resp = requests.patch(
         f"{SUPABASE_URL}/rest/v1/pessoas?id=eq.{id}",
         headers=HEADERS,

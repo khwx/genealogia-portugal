@@ -30,8 +30,11 @@
         .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; background: var(--bg3); padding: 18px; border-radius: 8px; border: 1px solid var(--border); }
         .meta-item { font-size: 0.9rem; color: var(--text2); }
         .meta-item span { display: block; color: var(--text); font-weight: 600; margin-top: 2px; font-size: 1rem; }
-        .btn-primary { background: var(--green); color: white; border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--green); color: white; border: none; border-radius: 8px; padding: 12px 24px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: .2s; flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; font-weight: 600; cursor: pointer; flex: 0.7; }
+        .btn-danger { background: #ef4444; color: white; border: none; border-radius: 8px; padding: 12px 16px; font-weight: 600; cursor: pointer; flex: 0.8; }
+        .btn-row { display: flex; gap: 10px; margin-top: 10px; }
         .doc-link { background: var(--bg3); color: var(--text); text-decoration: none; font-size: 0.9rem; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border); transition: .2s; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin-bottom: 20px; }
         .doc-link:hover { background: var(--accent); border-color: var(--accent); color: white; }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); font-size: 1.1rem; }
@@ -73,52 +76,49 @@
                 <div class="meta-item">Fonte Original: <span>{{ registo.fonte or 'IA HTR Gemini' }}</span></div>
             </div>
 
+            {% if '[ileg' in (registo.nome or '')|lower or '[não' in (registo.nome or '')|lower %}
+            <div style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; color: #fca5a5; font-size: 0.88rem;">⚠️ Este registo está como <strong>[ilegível]</strong> — se não der para ler no documento, usa "Ilegível / Rejeitar".</div>
+            {% endif %}
+            {% if registo.texto_original %}
+            <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 18px; font-family: monospace; font-size: 0.82rem; color: var(--text2); max-height: 140px; overflow-y: auto; white-space: pre-wrap;">{{ registo.texto_original[:800] }}</div>
+            {% endif %}
+
             <form id="form-validacao">
                 <input type="hidden" id="registo-id" value="{{ registo.id }}">
                 
                 <div class="form-group">
                     <label class="form-label" for="nome">Nome Completo Corrigido / Validado:</label>
                     <input type="text" id="nome" value="{{ registo.nome }}" class="form-input" required>
-                    <span style="font-size: 0.8rem; color: var(--text2); margin-top: 6px; display: block;">Pode corrigir erros ortográficos antigos ou completar apelidos se necessário.</span>
+                    <span style="font-size: 0.8rem; color: var(--text2); margin-top: 6px; display: block;">Pode corrigir erros ortográficos antigos ou completar apelidos. Atalhos: Enter=aprovar, Esc=saltar</span>
                 </div>
 
-                <button type="submit" class="btn-primary">
-                    ✓ Validar e Aprovar Registo
-                </button>
+                <div class="btn-row">
+                    <button type="submit" class="btn-primary">✓ Aprovar</button>
+                    <button type="button" class="btn-danger" onclick="rejeitar()">✕ Ilegível / Rejeitar</button>
+                    <button type="button" class="btn-secondary" onclick="saltar()">↷ Saltar</button>
+                </div>
             </form>
         </div>
 
         <script>
+            async function postValidar(payload) {
+                const resp = await fetch('/api/validar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                if (resp.ok) window.location.reload(); else alert('Erro ao guardar.');
+            }
             document.getElementById('form-validacao').onsubmit = async (e) => {
                 e.preventDefault();
-                const btn = e.target.querySelector('button');
-                btn.textContent = 'A gravar...';
-                btn.disabled = true;
-
-                const dados = {
-                    id: document.getElementById('registo-id').value,
-                    nome: document.getElementById('nome').value
-                };
-
-                try {
-                    const resp = await fetch('/api/validar', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(dados)
-                    });
-                    if (resp.ok) {
-                        window.location.reload();
-                    } else {
-                        alert('Erro ao guardar validação.');
-                        btn.textContent = '✓ Validar e Aprovar Registo';
-                        btn.disabled = false;
-                    }
-                } catch (err) {
-                    alert('Erro de ligação: ' + err.message);
-                    btn.textContent = '✓ Validar e Aprovar Registo';
-                    btn.disabled = false;
-                }
+                const btn = e.target.querySelector('.btn-primary');
+                btn.textContent = 'A gravar...'; btn.disabled = true;
+                await postValidar({ id: document.getElementById('registo-id').value, nome: document.getElementById('nome').value, acao: 'aprovar' });
+                btn.textContent = '✓ Aprovar'; btn.disabled = false;
             };
+            async function rejeitar() { await postValidar({ id: document.getElementById('registo-id').value, acao: 'rejeitar' }); }
+            function saltar() { window.location.reload(); }
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                if (e.key === 'Escape') saltar();
+                if (e.key === 'r' || e.key === 'R') rejeitar();
+            });
         </script>
         {% else %}
         <div class="validation-card empty-state">
