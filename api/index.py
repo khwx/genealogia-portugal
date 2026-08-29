@@ -258,8 +258,9 @@ def salvar_validacao():
     dados = request.json
     id = dados.pop('id')
     acao = dados.pop('acao', 'aprovar')  # aprovar | rejeitar | ilegivel
-    if acao == 'rejeitar' or acao == 'ilegivel':
-        # Marca como validado mas com qualidade 0 e mantém nome original para não poluir pesquisa
+    if acao in ('rejeitar', 'ilegivel', 'saltar'):
+        # Marca como validado mas com qualidade 0 para não voltar à fila de revisão
+        # e não poluir a pesquisa pública (excluída pelo filtro qualidade.gt.0)
         resp = requests.patch(
             f"{SUPABASE_URL}/rest/v1/pessoas?id=eq.{id}",
             headers=HEADERS,

@@ -113,7 +113,7 @@
                 btn.textContent = '✓ Aprovar'; btn.disabled = false;
             };
             async function rejeitar() { await postValidar({ id: document.getElementById('registo-id').value, acao: 'rejeitar' }); }
-            function saltar() { window.location.reload(); }
+            async function saltar() { await postValidar({ id: document.getElementById('registo-id').value, acao: 'saltar' }); }
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT') return;
                 if (e.key === 'Escape') saltar();

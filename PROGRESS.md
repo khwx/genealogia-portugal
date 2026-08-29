@@ -2,6 +2,34 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — validação: Saltar remove registo da fila)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 160 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — botão "Saltar" consome o registo na validação
+- `api/index.py` (`/api/validar`): ação `saltar` agora marca o registo como
+  `validado=True, qualidade=0.0` (igual a `rejeitar`/`ilegivel`), em vez de apenas
+  recarregar a página. Isto impede que o mesmo registo reapareça repetidamente na
+  fila de revisão, melhorando a eficiência do revisor.
+- `templates/validate.html`: `saltar()` passa a chamar `postValidar({acao:'saltar'})`
+  em vez de `window.location.reload()`.
+- Ação segura: mantém a lógica de qualidade=0 que já é filtrada da pesquisa
+  pública (`qualidade.gt.0`) e da fila (`validado=false`), sem escrita destrutiva.
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED**; `status_check.py`
+  → `status: OK`; `py_compile` OK. Sem rede, sem BD remota, sem segredos.
+
+### Decisão registada
+- Reforço do pilar "melhorar autonomamente": elimina frustração do revisor que via
+  o mesmo registo voltar ao clicar "Saltar". Pequena mudança UX, grande impacto no
+  fluxo, sem risco.
+
+### Próximos passos sugeridos
+- Aplicar/verificar `add_detalhes_obito.sql` e `add_detalhes_completos.sql` no
+  Supabase e o backfill de `imagem_url` (`sync_htr_supabase.py --backfill-url`).
+
 ## 2026-08-29 (execução autónoma — verificação de estado a cada 8h no CI)
 
 ### Estado verificado
