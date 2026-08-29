@@ -322,10 +322,25 @@ def extract_detalhes(transcription):
         return {}
     t = ' '.join(transcription.split())
     out = {}
+    # idade: dígitos OU por extenso (sessenta, setenta, etc.)
     m = re.search(r'com\s+(\d{1,3})\s+ann?os', t, re.I)
     if m:
         try: out['idade'] = int(m.group(1))
         except: pass
+    else:
+        # tenta por extenso: "com sessenta anos", "de oitenta annos", "com setenta e dois annos"
+        mapa = {'um':1,'dois':2,'tres':3,'três':3,'quatro':4,'cinco':5,'seis':6,'sete':7,'oito':8,'nove':9,'dez':10,'onze':11,'doze':12,'treze':13,'catorze':14,'catorze':14,'quinze':15,'dezasseis':16,'dezaseis':16,'dezassete':17,'dezassete':17,'dezoito':18,'dezanove':19,'dezanove':19,'vinte':20,'trinta':30,'quarenta':40,'cinquenta':50,'sessenta':60,'setenta':70,'oitenta':80,'noventa':90,'cem':100,'cento':100}
+        m2 = re.search(r'com\s+([a-zà-ú\s]+?)\s+ann?os', t, re.I)
+        if m2:
+            palavras = re.findall(r'[a-zà-ú]+', m2.group(1).lower())
+            total = 0
+            for p in palavras:
+                if p in mapa:
+                    total += mapa[p]
+                elif p in ('e',):
+                    continue
+            if 1 <= total <= 120:
+                out['idade'] = total
     # Fallback idade escrita por extenso already in deceased.age
     m = re.search(r'(morte\s+repentina|faleceu\s+de\s+[^,\.]{3,50})', t, re.I)
     if m:
