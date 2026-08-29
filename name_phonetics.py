@@ -155,24 +155,24 @@ HISTORICAL_CLUSTERS: List[List[str]] = [
     ["Pinheiro", "Pinheyro"],
     ["Ribeiro", "Ribeyro"],
     ["Saraiva", "Sarayva"],
-    ["Silva", "Sylva", "Da Silva", "Da Sylva"],
-    ["Sousa", "Souza", "De Sousa", "De Souza"],
+    ["Silva", "Sylva"],
+    ["Sousa", "Souza"],
     ["Tavares", "Tabarez", "Tabares"],
     ["Teixeira", "Teyxeyra", "Texeyra"],
 ]
 
-# Mapa normalizado: chave normalizada -> set de variantes
-_VARIANT_LOOKUP: Dict[str, Set[str]] = {}
+# Mapa normalizado: chave normalizada -> lista ordenada de variantes
+_VARIANT_LOOKUP: Dict[str, List[str]] = {}
 
 for cluster in HISTORICAL_CLUSTERS:
-    # Coletar todas as versões normalizadas do cluster
-    cluster_set = set(cluster)
     for variant in cluster:
         norm = normalize_token(variant)
         if norm:
             if norm not in _VARIANT_LOOKUP:
-                _VARIANT_LOOKUP[norm] = set()
-            _VARIANT_LOOKUP[norm].update(cluster_set)
+                _VARIANT_LOOKUP[norm] = []
+            for item in cluster:
+                if item not in _VARIANT_LOOKUP[norm]:
+                    _VARIANT_LOOKUP[norm].append(item)
 
 
 def get_token_variants(token: str) -> List[str]:
@@ -186,14 +186,17 @@ def get_token_variants(token: str) -> List[str]:
     norm = normalize_token(token_str)
     if norm in _VARIANT_LOOKUP:
         variants = list(_VARIANT_LOOKUP[norm])
-        # Garantir que a forma de entrada original está presente
-        if token_str not in variants:
-            variants.append(token_str)
+        # Colocar o token de entrada no início se já existir ou acrescentar
+        if token_str in variants:
+            variants.remove(token_str)
+            variants.insert(0, token_str)
+        else:
+            variants.insert(0, token_str)
         return variants
     return [token_str]
 
 
-def expand_name_variants(query: str, max_combinations: int = 16) -> List[str]:
+def expand_name_variants(query: str, max_combinations: int = 32) -> List[str]:
     """
     Expande uma consulta composta por múltiplos nomes para todas as combinações de variantes.
     Ex: "Joao Silva" -> ["Joao Silva", "João Silva", "Joam Silva", "Joan Silva", ...]
@@ -212,9 +215,7 @@ def expand_name_variants(query: str, max_combinations: int = 16) -> List[str]:
         for c in combinations:
             for v in variants:
                 new_comb.append(c + [v])
-                if len(new_comb) >= max_combinations * 2:
-                    break
-        combinations = new_comb[:max_combinations * 2]
+        combinations = new_comb
 
     results = [" ".join(comb) for comb in combinations]
     # Deduplicar preservando ordem
