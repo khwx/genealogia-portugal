@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cobertura do Arquivo — Genealogia Portugal</title>
+    <meta name="description" content="Cobertura completa: 2.343 livros, 26.813 páginas, 28.132 nomes por freguesia de Celorico da Beira.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0f1117; --bg2: #1a1d27; --bg3: #22263a; --border: #2e3347; --text: #e8eaf6; --text2: #8b93b8; --accent: #6c63ff; --accent2: #8b83ff; --green: #22c55e; --radius: 12px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.1rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo span { color: var(--accent2); }
+        .nav-links { display: flex; gap: 16px; }
+        .nav-link { color: var(--text2); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .nav-link:hover, .nav-link.active { color: var(--text); }
+        .hero { text-align: center; padding: 40px 20px 20px; }
+        .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; }
+        .hero p { color: var(--text2); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        .wrap { max-width: 1100px; margin: 0 auto 60px; padding: 0 20px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 14px; margin: 24px 0; }
+        .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
+        .stat b { display: block; font-size: 1.8rem; color: var(--accent2); }
+        .stat span { color: var(--text2); font-size: 0.85rem; }
+        .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+        .search { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; color: var(--text); margin-bottom: 14px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th { color: var(--text2); text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); font-weight: 600; }
+        td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+        tr:hover td { background: rgba(108,99,255,0.06); }
+        .bar { height: 6px; background: var(--bg3); border-radius: 6px; overflow: hidden; margin-top: 4px; }
+        .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+        .pill { background: rgba(108,99,255,0.15); color: var(--accent2); padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; }
+        @media (max-width: 640px) { .stats { grid-template-columns: 1fr 1fr; } table { font-size: 0.82rem; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Pesquisa</a>
+            <a href="/mapa" class="nav-link">Mapa</a>
+            <a href="/cobertura.html" class="nav-link active">Cobertura</a>
+            <a href="/validar" class="nav-link">Revisão</a>
+        </div>
+    </div>
+    <div class="hero">
+        <h1>📚 Cobertura do Arquivo</h1>
+        <p>Inventário completo de <strong style="color:var(--text);">2.343 livros</strong> paroquiais de Celorico da Beira — 26.813 páginas transcritas por IA, 28.132 nomes extraídos. Cada freguesia com link para filtrar no mapa e na pesquisa.</p>
+    </div>
+    <div class="wrap">
+        <div class="stats">
+            <div class="stat"><b>2.343</b><span>Livros paroquiais</span></div>
+            <div class="stat"><b>26.813</b><span>Páginas processadas</span></div>
+            <div class="stat"><b>28.132</b><span>Nomes extraídos</span></div>
+            <div class="stat"><b>25</b><span>Freguesias</span></div>
+        </div>
+        <div class="card">
+            <input id="filtro" class="search" placeholder="Filtrar freguesia (ex: Rapa, Linhares)..." oninput="filtrar()">
+            <div style="overflow-x:auto;">
+                <table id="tabela">
+                    <thead><tr><th>Freguesia</th><th style="text-align:right;">Livros</th><th style="text-align:right;">Páginas</th><th style="text-align:right;">Nomes</th><th></th></tr></thead>
+                    <tbody>
+                        <tr data-f="mesquitela"><td>Mesquitela</td><td style="text-align:right;">126</td><td style="text-align:right;">4.424</td><td style="text-align:right;">2.077</td><td><a class="pill" href="/?freguesia=Mesquitela">Ver →</a></td></tr>
+                        <tr data-f="celorico (santa maria)"><td>Celorico (Santa Maria)</td><td style="text-align:right;">128</td><td style="text-align:right;">2.037</td><td style="text-align:right;">297</td><td><a class="pill" href="/?freguesia=Santa%20Maria">Ver →</a></td></tr>
+                        <tr data-f="vale de azares"><td>Vale de Azares</td><td style="text-align:right;">126</td><td style="text-align:right;">1.787</td><td style="text-align:right;">3.020</td><td><a class="pill" href="/?freguesia=Vale%20de%20Azares">Ver →</a></td></tr>
+                        <tr data-f="celorico (são pedro)"><td>Celorico (São Pedro)</td><td style="text-align:right;">126</td><td style="text-align:right;">1.782</td><td style="text-align:right;">178</td><td><a class="pill" href="/?freguesia=São%20Pedro">Ver →</a></td></tr>
+                        <tr data-f="lajeosa do mondego"><td>Lajeosa do Mondego</td><td style="text-align:right;">123</td><td style="text-align:right;">1.566</td><td style="text-align:right;">1.984</td><td><a class="pill" href="/?freguesia=Lajeosa">Ver →</a></td></tr>
+                        <tr data-f="linhares"><td>Linhares</td><td style="text-align:right;">80</td><td style="text-align:right;">1.434</td><td style="text-align:right;">2.884</td><td><a class="pill" href="/?freguesia=Linhares">Ver →</a></td></tr>
+                        <tr data-f="forno telheiro"><td>Forno Telheiro</td><td style="text-align:right;">90</td><td style="text-align:right;">1.247</td><td style="text-align:right;">2.081</td><td><a class="pill" href="/?freguesia=Forno">Ver →</a></td></tr>
+                        <tr data-f="jejua"><td>Jejua</td><td style="text-align:right;">123</td><td style="text-align:right;">1.124</td><td style="text-align:right;">1.240</td><td><a class="pill" href="/?freguesia=Jejua">Ver →</a></td></tr>
+                        <tr data-f="cortiçô da serra"><td>Cortiçô da Serra</td><td style="text-align:right;">108</td><td style="text-align:right;">1.101</td><td style="text-align:right;">1.105</td><td><a class="pill" href="/?freguesia=Cortiço">Ver →</a></td></tr>
+                        <tr data-f="maçal do chão"><td>Maçal do Chão</td><td style="text-align:right;">124</td><td style="text-align:right;">1.037</td><td style="text-align:right;">1.347</td><td><a class="pill" href="/?freguesia=Maçal">Ver →</a></td></tr>
+                        <tr data-f="baraçal"><td>Baraçal</td><td style="text-align:right;">100</td><td style="text-align:right;">1.002</td><td style="text-align:right;">1.095</td><td><a class="pill" href="/?freguesia=Baraçal">Ver →</a></td></tr>
+                        <tr data-f="minhocal"><td>Minhocal</td><td style="text-align:right;">120</td><td style="text-align:right;">998</td><td style="text-align:right;">1.027</td><td><a class="pill" href="/?freguesia=Minhocal">Ver →</a></td></tr>
+                        <tr data-f="vide entre vinhas"><td>Vide Entre Vinhas</td><td style="text-align:right;">92</td><td style="text-align:right;">940</td><td style="text-align:right;">1.223</td><td><a class="pill" href="/?freguesia=Vide">Ver →</a></td></tr>
+                        <tr data-f="ratoeira"><td>Ratoeira</td><td style="text-align:right;">121</td><td style="text-align:right;">921</td><td style="text-align:right;">1.462</td><td><a class="pill" href="/?freguesia=Ratoeira">Ver →</a></td></tr>
+                        <tr data-f="salgueirais"><td>Salgueirais</td><td style="text-align:right;">103</td><td style="text-align:right;">810</td><td style="text-align:right;">663</td><td><a class="pill" href="/?freguesia=Salgueirais">Ver →</a></td></tr>
+                        <tr data-f="prados"><td>Prados</td><td style="text-align:right;">112</td><td style="text-align:right;">799</td><td style="text-align:right;">1.444</td><td><a class="pill" href="/?freguesia=Prados">Ver →</a></td></tr>
+                        <tr data-f="carrapichana"><td>Carrapichana</td><td style="text-align:right;">90</td><td style="text-align:right;">790</td><td style="text-align:right;">938</td><td><a class="pill" href="/?freguesia=Carrapichana">Ver →</a></td></tr>
+                        <tr data-f="cadafaz"><td>Cadafaz</td><td style="text-align:right;">113</td><td style="text-align:right;">694</td><td style="text-align:right;">1.017</td><td><a class="pill" href="/?freguesia=Cadafaz">Ver →</a></td></tr>
+                        <tr data-f="açores"><td>Açores</td><td style="text-align:right;">116</td><td style="text-align:right;">659</td><td style="text-align:right;">748</td><td><a class="pill" href="/?freguesia=Açores">Ver →</a></td></tr>
+                        <tr data-f="rapa"><td>Rapa</td><td style="text-align:right;">116</td><td style="text-align:right;">651</td><td style="text-align:right;">902</td><td><a class="pill" href="/?freguesia=Rapa">Ver →</a></td></tr>
+                        <tr data-f="velosa"><td>Velosa</td><td style="text-align:right;">75</td><td style="text-align:right;">634</td><td style="text-align:right;">869</td><td><a class="pill" href="/?freguesia=Velosa">Ver →</a></td></tr>
+                        <tr data-f="são martinho"><td>São Martinho de Celorico *</td><td style="text-align:right;">12</td><td style="text-align:right;">333</td><td style="text-align:right;">73</td><td><a class="pill" href="/mapa">Mapa →</a></td></tr>
+                        <tr data-f="casas do rio"><td>Casas do Rio</td><td style="text-align:right;">10</td><td style="text-align:right;">22</td><td style="text-align:right;">91</td><td><a class="pill" href="/?freguesia=Casas">Ver →</a></td></tr>
+                        <tr data-f="aldeia da serra"><td>Aldeia da Serra</td><td style="text-align:right;">6</td><td style="text-align:right;">21</td><td style="text-align:right;">76</td><td><a class="pill" href="/?freguesia=Aldeia">Ver →</a></td></tr>
+                        <tr data-f="galisteu"><td>Galisteu *</td><td style="text-align:right;">3</td><td style="text-align:right;">0</td><td style="text-align:right;">0</td><td><span style="color:var(--text2); font-size:0.75rem;">só nascimentos</span></td></tr>
+                    </tbody>
+                </table>
+                <p style="color: var(--text2); font-size: 0.78rem; margin-top: 10px;">* Galisteu só tem nascimentos no inventário. * São Martinho com muitas páginas ilegíveis.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function filtrar() {
+            const q = document.getElementById('filtro').value.toLowerCase();
+            document.querySelectorAll('#tabela tbody tr').forEach(tr => {
+                tr.style.display = tr.getAttribute('data-f').includes(q) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
