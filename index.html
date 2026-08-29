@@ -601,6 +601,10 @@
                     ${dataCas ? `<div><strong>Data de Casamento:</strong> <span style="color:var(--text);">${dataCas}</span></div>` : ''}
                     <div><strong>Freguesia:</strong> <span style="color:var(--text);">${person.freguesia || 'Celorico da Beira'}</span></div>
                     <div><strong>Concelho / Distrito:</strong> <span style="color:var(--text);">${person.concelho || 'Celorico'} / ${person.distrito || 'Guarda'}</span></div>
+                    ${person.idade ? `<div><strong>Idade:</strong> <span style="color:var(--text);">${person.idade} anos</span></div>` : ''}
+                    ${person.causa_morte ? `<div><strong>Causa:</strong> <span style="color:var(--text);">${person.causa_morte}</span></div>` : ''}
+                    ${person.naturalidade ? `<div><strong>Naturalidade/Morada:</strong> <span style="color:var(--text);">${person.naturalidade}</span></div>` : ''}
+                    ${person.numero_assento ? `<div><strong>Nº Assento:</strong> <span style="color:var(--text);">${person.numero_assento}</span></div>` : ''}
                     ${refHtml}
                 </div>
                 ${person.imagem_url ? `

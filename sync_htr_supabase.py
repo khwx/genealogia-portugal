@@ -315,6 +315,32 @@ def extract_persons_from_deceased(deceased_list):
         })
     return persons
 
+def extract_detalhes(transcription):
+    """Extract rich details (idade, causa, naturalidade, numero_assento) from transcription.
+    Works on already-saved transcriptions, no Gemini needed."""
+    if not transcription:
+        return {}
+    t = ' '.join(transcription.split())
+    out = {}
+    # idade: "com 60 anos", "de 60 annos"
+    m = re.search(r'com\s+(\d{1,3})\s+ann?os', t, re.I)
+    if m:
+        try: out['idade'] = int(m.group(1))
+        except: pass
+    # causa_morte: "morte repentina", "faleceu de ..."
+    m = re.search(r'(morte\s+repentina|faleceu\s+de\s+[^,\.]{3,40})', t, re.I)
+    if m:
+        out['causa_morte'] = m.group(1).strip()[:120]
+    # naturalidade: "natural (e morador)? (da|de) freguesia da Rapa"
+    m = re.search(r'natural(?:\s+e\s+morador)?\s+(?:da|de|na)\s+([^,\.\n]{3,60})', t, re.I)
+    if m:
+        out['naturalidade'] = m.group(1).strip()[:120]
+    # numero_assento: "assento n.º 26" / "assento nº 26"
+    m = re.search(r'assento\s+n\.?º?\s*(\d+)', t, re.I)
+    if m:
+        out['numero_assento'] = m.group(1).strip()[:20]
+    return out
+
 def extract_persons(raw_text):
     """Extract person names from HTR text - STRICT mode."""
     if not raw_text or len(raw_text.strip()) < 50:
@@ -857,6 +883,8 @@ def main():
 
             freguesia = file_to_freguesia.get(file_id, "Celorico da Beira")
 
+            # Rich details from transcription (idade, causa, naturalidade, assento)
+            detalhes = extract_detalhes(data.get("transcription") or raw_text)
             for person in persons:
                 # Prefer the structured death_date; otherwise regex the text.
                 if used_structured and person.get("death_date"):
@@ -875,6 +903,18 @@ def main():
                     "file_id": file_id,
                     "criado_em": datetime.now().isoformat(),
                 }
+                # Add rich details when available (new columns, safe if not migrated yet)
+                if detalhes.get("idade") is not None:
+                    record["idade"] = detalhes["idade"]
+                if detalhes.get("causa_morte"):
+                    record["causa_morte"] = detalhes["causa_morte"]
+                if detalhes.get("naturalidade"):
+                    record["naturalidade"] = detalhes["naturalidade"]
+                if detalhes.get("numero_assento"):
+                    record["numero_assento"] = detalhes["numero_assento"]
+                # Age from structured deceased has priority
+                if person.get("age") is not None and str(person.get("age")).isdigit():
+                    record["idade"] = int(person["age"])
                 if SYNC_RELATIONS:
                     for rel_col in ("pai", "mae", "conjuge"):
                         val = (person.get(rel_col) or "").strip()
