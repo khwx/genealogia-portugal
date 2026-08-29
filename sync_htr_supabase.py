@@ -381,6 +381,12 @@ def extract_detalhes(transcription):
     m = re.search(r'sepultad[ao]\s+no\s+([^,\.\n]{5,60}cemit[ée]rio[^,\.\n]{0,40})', t, re.I)
     if m:
         out['local_sepultamento'] = m.group(1).strip()[:120]
+    else:
+        m2 = re.search(r'sepultad[ao]\s+([^,\.\n]{5,80})', t, re.I)
+        if m2: out['local_sepultamento'] = m2.group(1).strip()[:120]
+    # assinatura: "O Pároco, João de Andrade Sena"
+    m = re.search(r'(?:O\s+)?(?:P[aá]roco|Vig[aá]rio|Prior|Cura)\s+([^,\n]{3,50})', t, re.I)
+    if m: out['assinatura'] = m.group(1).strip()[:80]
     return out
 
 def extract_persons(raw_text):
@@ -946,7 +952,7 @@ def main():
                     "criado_em": datetime.now().isoformat(),
                 }
                 # Add rich details when available (new columns, safe if not migrated yet)
-                for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento"):
+                for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento","assinatura"):
                     if detalhes.get(k) is not None:
                         record[k] = detalhes[k]
                 # Age from structured deceased has priority
