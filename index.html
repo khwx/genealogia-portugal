@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genealogia Portugal — Pesquisa de Óbitos</title>
+    <title>Genealogia Portugal — Pesquisa de Óbitos (Celorico da Beira, 1650-1911)</title>
+    <meta name="description" content="Pesquisa em 22.003 registos de óbitos de Celorico da Beira (1650-1911) transcritos por IA a partir de livros paroquiais do Arquivo Distrital. Celorico, Mesquitela, Linhares, Rapa e mais 21 freguesias.">
+    <meta property="og:title" content="Genealogia Portugal — 22.003 Óbitos de Celorico da Beira">
+    <meta property="og:description" content="Descobre a tua história em 2.343 livros paroquiais digitalizados por IA.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://genealogia-portugal.vercel.app/">
+    <meta property="og:image" content="https://genealogia-portugal.vercel.app/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -677,6 +685,22 @@
                 if (totalData) document.getElementById('dateCount').textContent = parseInt(totalData).toLocaleString('pt-PT');
             } catch {}
         }
+        // Analytics simples: guarda pesquisas em localStorage para ver o que mais procuram
+        function trackSearch(q) {
+            if (!q || q.length < 2) return;
+            try {
+                const k='gp_searches';
+                const arr=JSON.parse(localStorage.getItem(k)||'[]');
+                arr.unshift({q, t: Date.now()});
+                localStorage.setItem(k, JSON.stringify(arr.slice(0,50)));
+            } catch {}
+        }
+        const _origPerformSearch = performSearch;
+        performSearch = async function() {
+            const q=document.getElementById('searchInput').value.trim();
+            trackSearch(q);
+            return _origPerformSearch();
+        };
         loadArquivoRefs();
         loadStats();
         loadInitial();
