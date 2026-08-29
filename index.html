@@ -51,6 +51,21 @@
         .doc-link { background: var(--bg3); color: var(--text); text-decoration: none; font-size: 0.85rem; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); transition: .2s; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
         .doc-link:hover { background: var(--accent); border-color: var(--accent); color: white; }
         .loading { text-align: center; padding: 60px; color: var(--text2); font-size: 1.05rem; }
+        @media (max-width: 640px) {
+            .topbar { padding: 0 14px; height: 56px; }
+            .hero { padding: 28px 16px 20px; }
+            .hero h1 { font-size: 1.7rem; }
+            .hero p { font-size: 0.95rem; }
+            .search-container { padding: 0 14px; }
+            .search-box { padding: 4px; }
+            .search-input { font-size: 1rem; padding: 10px 14px; }
+            .search-btn { padding: 0 18px; font-size: 0.9rem; }
+            .result-card { padding: 16px; }
+            .result-name { font-size: 1.05rem; }
+            .stats-bar { padding: 10px 14px; gap: 8px; }
+            .stat-chip { font-size: 0.8rem; padding: 5px 10px; }
+            #detailModal > div { padding: 18px !important; margin: 10px; max-height: 92vh; }
+        }
     </style>
 </head>
 <body>
