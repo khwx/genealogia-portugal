@@ -91,6 +91,14 @@
             <p style="color: var(--text2); font-size: 0.9rem; margin-bottom: 18px;">Evolução por década — clique numa década para ver os registos.</p>
             <div id="decadasChart" style="display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
+        <div class="map-card" style="margin-top: 24px;">
+            <h3 style="color: var(--text); margin-bottom: 6px; font-size: 1.15rem;">Top Sobrenomes & Idades</h3>
+            <p style="color: var(--text2); font-size: 0.9rem; margin-bottom: 18px;">Apelidos mais frequentes e distribuição por faixa etária.</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div><div style="font-size: 0.8rem; color: var(--text2); margin-bottom: 8px; font-weight: 600;">TOP SOBRENOMES</div><div id="topNomes" style="display: flex; flex-direction: column; gap: 6px;"></div></div>
+                <div><div style="font-size: 0.8rem; color: var(--text2); margin-bottom: 8px; font-weight: 600;">POR IDADE</div><div id="idadeChart" style="display: flex; flex-direction: column; gap: 6px;"></div></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -212,6 +220,24 @@
                 }).join('');
             } catch {}
         }
+        async function loadExtras() {
+            try {
+                const resp = await fetch('/api/stats-extras');
+                const json = await resp.json();
+                const top = json.top_sobrenomes || [];
+                const idades = json.idade_dist || [];
+                const c1 = document.getElementById('topNomes');
+                if (c1) {
+                    const max = Math.max(...top.map(t=>t.count),1);
+                    c1.innerHTML = top.map(t => `<a href="/?q=${encodeURIComponent(t.nome)}" style="display:flex; justify-content: space-between; background: var(--bg3); border:1px solid var(--border); border-radius:6px; padding:6px 10px; text-decoration:none; color: var(--text); font-size:0.82rem;"><span>${t.nome}</span><span style="color: var(--accent2); font-weight:600;">${t.count}</span></a>`).join('');
+                }
+                const c2 = document.getElementById('idadeChart');
+                if (c2) {
+                    const max2 = Math.max(...idades.map(d=>d.count),1);
+                    c2.innerHTML = idades.map(d => { const pct=(d.count/max2)*100; return `<div style="display:flex; align-items:center; gap:8px; font-size:0.8rem;"><span style="width:50px; color: var(--text2);">${d.faixa}</span><div style="flex:1; background: var(--bg3); border-radius:6px; height:14px; overflow:hidden; border:1px solid var(--border);"><div style="width:${pct}%; height:100%; background: var(--accent);"></div></div><span style="color:var(--text); font-size:0.75rem;">${d.count}</span></div>`}).join('');
+                }
+            } catch {}
+        }
         async function loadSeculos() {
             try {
                 setProgress(30);
@@ -248,6 +274,7 @@
         loadMapData();
         loadSeculos();
         loadDecadas();
+        loadExtras();
     </script>
 </body>
 </html>

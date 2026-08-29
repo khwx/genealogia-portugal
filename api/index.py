@@ -231,6 +231,48 @@ def api_decadas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/stats-extras')
+def api_stats_extras():
+    cached = cache_get('stats_extras')
+    if cached is not None:
+        return jsonify(cached)
+    try:
+        from collections import Counter
+        sobrenomes = Counter()
+        idades = Counter()
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "sobrenome,idade", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for r in batch:
+                s = (r.get('sobrenome') or '').strip()
+                if s and s.lower() not in ('[ilegível]','[ileg]'):
+                    sobrenomes[s] += 1
+                idade = r.get('idade')
+                if isinstance(idade, int) and 0 < idade < 110:
+                    bucket = f"{(idade//10)*10}-{(idade//10)*10+9}"
+                    idades[bucket] += 1
+            if len(batch) < page:
+                break
+            offset += page
+        top = [{"nome": k, "count": v} for k, v in sobrenomes.most_common(10)]
+        idade_dist = [{"faixa": k, "count": v} for k, v in sorted(idades.items())]
+        payload = {"top_sobrenomes": top, "idade_dist": idade_dist}
+        cache_set('stats_extras', payload)
+        return jsonify(payload)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/validar')
 def validar():
