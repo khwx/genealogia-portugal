@@ -3,6 +3,7 @@ import requests
 import os
 import json
 import sys
+import time
 
 # Load .env (same pattern as other scripts, so it works on a fresh clone)
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,6 +36,17 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
+# Cache simples em memória para /api/mapa, /api/seculos, /api/decadas (TTL 10 min)
+_CACHE = {}
+_CACHE_TTL = 600
+def cache_get(key):
+    v = _CACHE.get(key)
+    if v and time.time() - v[0] < _CACHE_TTL:
+        return v[1]
+    return None
+def cache_set(key, data):
+    _CACHE[key] = (time.time(), data)
+
 @app.route('/')
 def home():
     try:
@@ -61,6 +73,9 @@ def mapa():
 
 @app.route('/api/mapa')
 def api_mapa():
+    cached = cache_get('mapa')
+    if cached is not None:
+        return jsonify(cached)
     try:
         # Carregar coordenadas
         with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
@@ -116,12 +131,16 @@ def api_mapa():
                 'count': counts.get(f, 0),
                 'periodos': periodos_ordenados
             })
+        cache_set('mapa', map_data)
         return jsonify(map_data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/seculos')
 def api_seculos():
+    cached = cache_get('seculos')
+    if cached is not None:
+        return jsonify(cached)
     # Distribuição de registos por século (apenas leitura, sem segredos).
     # Usa o mesmo padrão de paginação de /api/mapa para abranger todos os registos.
     try:
@@ -164,12 +183,17 @@ def api_seculos():
             {"seculo": f"{s}", "count": centuries[s]}
             for s in sorted(centuries.keys())
         ]
-        return jsonify({"seculos": result})
+        payload = {"seculos": result}
+        cache_set('seculos', payload)
+        return jsonify(payload)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/decadas')
 def api_decadas():
+    cached = cache_get('decadas')
+    if cached is not None:
+        return jsonify(cached)
     try:
         decadas = {}
         offset = 0
@@ -201,7 +225,9 @@ def api_decadas():
                 break
             offset += page
         result = [{"decada": k, "count": decadas[k]} for k in sorted(decadas.keys())]
-        return jsonify({"decadas": result})
+        payload = {"decadas": result}
+        cache_set('decadas', payload)
+        return jsonify(payload)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

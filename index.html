@@ -69,7 +69,10 @@
 
     <div class="search-container">
         <div class="search-box">
-            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome (ex: Maria Silva), freguesia ou data...">
+            <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome (ex: Maria Silva), freguesia ou data..." list="sugestoes" autocomplete="off">
+            <datalist id="sugestoes">
+                <option value="Mesquitela"><option value="Celorico (Santa Maria)"><option value="Vale de Azares"><option value="Linhares"><option value="Forno Telheiro"><option value="Lajeosa do Mondego"><option value="Ratoeira"><option value="Prados"><option value="Silva"><option value="Santos"><option value="Ferreira"><option value="Almeida"><option value="Maria"><option value="Antonio">
+            </datalist>
             <button id="searchBtn" class="search-btn">Pesquisar</button>
         </div>
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;" id="parishFilters">
@@ -444,6 +447,9 @@
                     <div class="result-meta">
                         <span>📅 ${dataObito}</span>
                         <span>📍 ${freguesia}, ${concelho}</span>
+                        ${person.idade ? `<span>🎂 ${person.idade} anos</span>` : ''}
+                        ${person.causa_morte ? `<span>⚕️ ${person.causa_morte}</span>` : ''}
+                        ${person.numero_assento ? `<span>🔢 Ass. ${person.numero_assento}</span>` : ''}
                     </div>
                     ${relationsHtml}
                     <div class="result-footer">
