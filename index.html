@@ -57,8 +57,8 @@
     </div>
 
     <div class="stats-bar">
-        <div class="stat-chip">Total Registos: <span id="totalCount">8.754</span></div>
-        <div class="stat-chip">Com Data: <span id="dateCount">5.260</span></div>
+        <div class="stat-chip">Total Registos: <span id="totalCount">—</span></div>
+        <div class="stat-chip">Com Data: <span id="dateCount">—</span></div>
         <div class="stat-chip">Concelho: <span>Celorico da Beira</span></div>
     </div>
 
@@ -660,7 +660,19 @@
             }
         });
 
+        async function loadStats() {
+            try {
+                const r = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=id`, { headers: { ...headers, 'Prefer': 'count=exact' }, method: 'HEAD' });
+                const total = r.headers.get('content-range')?.split('/')[1] || r.headers.get('content-range')?.split('/').pop() || null;
+                if (total) document.getElementById('totalCount').textContent = parseInt(total).toLocaleString('pt-PT');
+                // Com Data: count where data_obito not null (fetch via API)
+                const r2 = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=data_obito&data_obito=not.is.null&limit=1`, { headers: { ...headers, 'Prefer': 'count=exact' }, method: 'HEAD' });
+                const totalData = r2.headers.get('content-range')?.split('/')[1];
+                if (totalData) document.getElementById('dateCount').textContent = parseInt(totalData).toLocaleString('pt-PT');
+            } catch {}
+        }
         loadArquivoRefs();
+        loadStats();
         loadInitial();
     </script>
 </body>
