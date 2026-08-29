@@ -198,6 +198,71 @@
         let totalLoaded = 0;
         let arquivoRefs = null;
 
+        // Mapeamento de variantes históricas frequentes (grafias arcaicas em registos paroquiais)
+        const HISTORICAL_NAME_VARIANTS = {
+            'joao': ['João', 'Joao', 'Joam', 'Joan'],
+            'joam': ['João', 'Joao', 'Joam', 'Joan'],
+            'manuel': ['Manuel', 'Manoel'],
+            'manoel': ['Manuel', 'Manoel'],
+            'antonio': ['António', 'Antonio', 'Anttonio'],
+            'jose': ['José', 'Jose', 'Joseph', 'Joze'],
+            'teresa': ['Teresa', 'Theresa', 'Tereza', 'Thereza'],
+            'theresa': ['Teresa', 'Theresa', 'Tereza', 'Thereza'],
+            'ana': ['Ana', 'Anna', 'Hanna'],
+            'francisco': ['Francisco', 'Francysco'],
+            'luis': ['Luís', 'Luis', 'Luiz'],
+            'luiz': ['Luís', 'Luis', 'Luiz'],
+            'tomas': ['Tomás', 'Tomas', 'Thomaz', 'Thomas'],
+            'inacio': ['Inácio', 'Inacio', 'Ignacio'],
+            'isabel': ['Isabel', 'Izabel', 'Ysabel'],
+            'mateus': ['Mateus', 'Matheus'],
+            'brizida': ['Brízida', 'Brizida', 'Brigida', 'Brígida'],
+            'barbara': ['Bárbara', 'Barbara', 'Barbola'],
+            'caetano': ['Caetano', 'Cayetano'],
+            'simao': ['Simão', 'Simao', 'Simam'],
+            'estevao': ['Estêvão', 'Estevao', 'Estevam'],
+            'goncalo': ['Gonçalo', 'Goncalo', 'Goncallo'],
+            'silva': ['Silva', 'Sylva'],
+            'sousa': ['Sousa', 'Souza'],
+            'pires': ['Pires', 'Peres', 'Pirez'],
+            'vaz': ['Vaz', 'Vas', 'Vaas'],
+            'lopes': ['Lopes', 'Lopez'],
+            'rodrigues': ['Rodrigues', 'Rodriguez'],
+            'fernandes': ['Fernandes', 'Fernandez']
+        };
+
+        function normalizeStr(str) {
+            return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function getHistoricalVariants(query) {
+            if (!query) return [];
+            const words = query.trim().split(/\s+/);
+            if (words.length === 1) {
+                const norm = normalizeStr(words[0]);
+                if (HISTORICAL_NAME_VARIANTS[norm]) {
+                    return HISTORICAL_NAME_VARIANTS[norm];
+                }
+                return [words[0]];
+            }
+            const wordVariants = words.map(w => {
+                const norm = normalizeStr(w);
+                return HISTORICAL_NAME_VARIANTS[norm] || [w];
+            });
+            const combinations = [];
+            const firstList = wordVariants[0];
+            const secondList = wordVariants.length > 1 ? wordVariants[1] : [''];
+            for (let f of firstList) {
+                for (let s of secondList) {
+                    const full = s ? `${f} ${s}` : f;
+                    combinations.push(full);
+                    if (combinations.length >= 6) break;
+                }
+                if (combinations.length >= 6) break;
+            }
+            return combinations;
+        }
+
         // Carrega o mapeamento estatico file_id -> referencia de livro paroquial
         // (arquivo_refs.json, gerado a partir de celorico_completo.json). Sem
         // segredos, sem escrita remota. Degradacao segura se falhar.
@@ -257,7 +322,20 @@
             try {
                 let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
                 const conditions = [];
-                if (currentQuery) conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
+                if (currentQuery) {
+                    const vars = getHistoricalVariants(currentQuery);
+                    if (vars && vars.length > 1) {
+                        const orParts = [];
+                        vars.forEach(v => {
+                            orParts.push(`nome.ilike.*${v}*`);
+                            orParts.push(`sobrenome.ilike.*${v}*`);
+                        });
+                        orParts.push(`freguesia.ilike.*${currentQuery}*`);
+                        conditions.push(`or(${orParts.join(',')})`);
+                    } else {
+                        conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
+                    }
+                }
                 if (currentParish) conditions.push(`freguesia.ilike.*${currentParish}*`);
                 if (currentFromYear) conditions.push(`data_obito.gte.${currentFromYear}-01-01`);
                 if (currentToYear) conditions.push(`data_obito.lte.${currentToYear}-12-31`);

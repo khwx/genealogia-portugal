@@ -75,5 +75,8 @@ output/htr_text/
 output/images/
 output/sync_htr_state.json
 
+# Local utility scripts that do network I/O (not for commit)
+download_lajeosa.py
+
 # Ignore all generated output (already-tracked files remain in clones)
 output/

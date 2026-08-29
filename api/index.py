@@ -2,9 +2,17 @@ from flask import Flask, jsonify, request, render_template_string, render_templa
 import requests
 import os
 import json
+import sys
 
 # Load .env (same pattern as other scripts, so it works on a fresh clone)
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _root not in sys.path:
+    sys.path.insert(0, _root)
+
+try:
+    import name_phonetics
+except ImportError:
+    name_phonetics = None
 env_file = os.path.join(_root, '.env')
 if not os.path.exists(env_file):
     env_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
@@ -234,9 +242,18 @@ def get_pessoas():
         url = SUPABASE_URL + '/rest/v1/pessoas?select=*'
         conditions = []
         if query:
-            conditions.append(
-                f"or(nome.ilike.*{query}*,sobrenome.ilike.*{query}*,freguesia.ilike.*{query}*)"
-            )
+            if name_phonetics:
+                phonetic_cond = name_phonetics.build_postgrest_query_condition(query)
+                if phonetic_cond:
+                    conditions.append(phonetic_cond)
+                else:
+                    conditions.append(
+                        f"or(nome.ilike.*{query}*,sobrenome.ilike.*{query}*,freguesia.ilike.*{query}*)"
+                    )
+            else:
+                conditions.append(
+                    f"or(nome.ilike.*{query}*,sobrenome.ilike.*{query}*,freguesia.ilike.*{query}*)"
+                )
         if freguesia:
             conditions.append(f"freguesia.ilike.*{freguesia}*")
         if _valid_year(from_year):
@@ -256,6 +273,22 @@ def get_pessoas():
         if resp.status_code != 200:
             return jsonify({"error": resp.text[:300]}), resp.status_code
         return jsonify(resp.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/variantes')
+def api_variantes():
+    # Consulta de variantes históricas e código fonético para suporte à pesquisa
+    try:
+        q = request.args.get('q', '').strip()
+        if not q or not name_phonetics:
+            return jsonify({"query": q, "variants": [q] if q else [], "soundex": ""})
+        variants = name_phonetics.expand_name_variants(q)
+        return jsonify({
+            "query": q,
+            "variants": variants,
+            "soundex": name_phonetics.soundex_pt(q)
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

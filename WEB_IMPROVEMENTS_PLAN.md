@@ -49,7 +49,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 ### Fase 5: Apresentação e Exportação (2026-08-28)
 - [x] **Árvore Genealógica Visual:** Modal com bloco destacado Pais → Registo → Cônjuge.
 - [x] **Exportação CSV/GEDCOM:** Botões no topo dos resultados para descarregar os registos carregados.
-- [ ] **Pesquisa Fonética (Soundex pt-BR):** Tolerar variações históricas (Joam/João, Theresa/Teresa) — próximo.
+- [x] **Pesquisa Fonética e Variantes Históricas:** Módulo `name_phonetics.py` com Soundex PT e clusters de grafias arcaicas (Joam/João, Manoel/Manuel, Theresa/Teresa, etc.) integrado em `/api/pessoas`, `/api/variantes` e `index.html`.
 - [ ] **Heatmap por Freguesia no Mapa:** Colorir freguesias por densidade de registos.
 - [ ] **Timeline Interativa por Década:** Gráfico clicável para filtrar por período.
 

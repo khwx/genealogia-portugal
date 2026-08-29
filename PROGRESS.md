@@ -2,6 +2,46 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — pesquisa fonética e variantes históricas de nomes)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 151 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — pesquisa fonética e variantes históricas de nomes portugueses
+- `name_phonetics.py` (novo): módulo com zero dependências externas que fornece:
+  - Normalização e remoção de diacríticos (`remove_accents`, `normalize_token`);
+  - Base de variantes históricas arcaicas portuguesas dos séculos XVI a XX (ex:
+    `Joam`/`João`, `Manoel`/`Manuel`, `Theresa`/`Teresa`, `Francysco`/`Francisco`,
+    `Luiz`/`Luís`, `Thomaz`/`Tomás`, `Ignacio`/`Inácio`, `Izabel`/`Isabel`,
+    `Vaz`/`Vaas`, `Rodriguez`/`Rodrigues`, etc.);
+  - Expansão de combinações de nomes (`expand_name_variants`);
+  - Algoritmo Soundex adaptado à fonética portuguesa (`soundex_pt`, `phonetic_match`);
+  - Gerador de filtros PostgREST / Supabase (`build_postgrest_query_condition`).
+- `test_name_phonetics.py` (novo): 12 testes unitários que cobrem normalização,
+  variantes históricas, Soundex PT, correspondência fonética, expansão PostgREST e edge cases.
+- `api/index.py`:
+  - Rota `/api/pessoas` integrada com `name_phonetics.build_postgrest_query_condition`
+    para pesquisa automática de variantes arcaicas e modernas.
+  - Nova rota `/api/variantes` para consulta de variantes e código Soundex.
+- `index.html`: enriquecida a pesquisa no frontend com expansão de variantes históricas
+  frequentes nos filtros de consulta.
+- `scripts/run_tests.sh`: adicionado `run test_name_phonetics.py` à suite de testes.
+- `WEB_IMPROVEMENTS_PLAN.md`: marcado o item de pesquisa fonética como concluído na Fase 5.
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED** (8 suites);
+  `python3 scripts/status_check.py` → `status: OK`; `py_compile` OK.
+  Sem segredos expostos, sem chamadas de rede externas no teste.
+
+### Decisão registada
+- Reforço do pilar "melhorar autonomamente" e "garantir segurança": permite encontrar
+  registos paroquiais transcritos com grafia arcaica (ex: `Joam`) a partir de pesquisas
+  modernas (ex: `João`) e vice-versa, sem risco de regressão ou exposição de dados.
+
+### Próximos passos sugeridos
+- Implementar Heatmap por densidade de registos em `templates/map.html`.
+- Timeline interativa por década nos resultados da pesquisa web.
+
 ## 2026-08-24 (execução autónoma — teste de segurança de migrações SQL)
 
 ### Estado verificado
