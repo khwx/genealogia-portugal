@@ -31,6 +31,7 @@ run test_sync_relations.py
 run test_htr_type_aware.py
 run test_migrations.py
 run test_name_phonetics.py
+run test_api_quality_filter.py
 
 if [ "$fail" -ne 0 ]; then
     echo "RESULT: FAILED"

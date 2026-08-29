@@ -2,6 +2,41 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — exclusão de registos rejeitados da pesquisa pública)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 155 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — filtro de qualidade na pesquisa pública
+- `api/index.py` (rota `/api/pessoas`): adicionada condição sempre presente
+  `or(qualidade.gt.0,qualidade.is.null)` ao URL PostgREST. Isto exclui da pesquisa
+  pública os registos rejeitados/ilegíveis na revisão (`qualidade = 0.0`) sem afetar a
+  fila de revisão (que usa a sua própria query por `validado=false`). Mantém os
+  registos ainda por validar (`qualidade IS NULL`) e os aprovados (`qualidade >= 1`).
+  Corrige a contradição da regra anterior, que marcava como rejeitado mas deixava o
+  nome garrado/ilegível aparecer na pesquisa.
+- `test_api_quality_filter.py` (novo): 4 testes sem rede que monkeypatcham
+  `requests.get` e verificam que o URL construído inclui a condição de qualidade e
+  continua a combinar corretamente filtros de ano e tipo de registo.
+- `scripts/run_tests.sh`: adicionado `run test_api_quality_filter.py` à suite.
+- `WEB_IMPROVEMENTS_PLAN.md`: marcado o item Timeline da Fase 5 como concluído
+  (já implementado em commit anterior) — roadmap da Fase 5 agora 100% fechado.
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED** (9 suites);
+  `python3 scripts/status_check.py` → `status: OK`; `py_compile` OK. Sem rede, sem
+  BD remota, sem segredos expostos.
+
+### Decisão registada
+- Reforço do pilar "melhorar autonomamente" + "garantir segurança": a pesquisa pública
+  deixa de mostrar nomes rejeitados/ilegíveis, melhorando a qualidade dos resultados sem
+  qualquer escrita remota nem exposição de dados. Escolha conservadora (`is.null` em vez
+  de `gte`) para não esconder registos por validar.
+
+### Próximos passos sugeridos
+- Aplicar/verificar `add_detalhes_obito.sql` e `add_detalhes_completos.sql` no Supabase
+  e o backfill de `imagem_url` (`sync_htr_supabase.py --backfill-url`).
+
 ## 2026-08-29 (execução autónoma — heatmap de densidade de registos no mapa)
 
 ### Estado verificado

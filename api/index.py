@@ -304,6 +304,10 @@ def get_pessoas():
 
         url = SUPABASE_URL + '/rest/v1/pessoas?select=*'
         conditions = []
+        # Excluir da pesquisa pública os registos rejeitados/ilegíveis na revisão
+        # (qualidade = 0). Mantém os registos ainda por validar (qualidade NULL) e
+        # os aprovados (>= 1). Não afeta a fila de revisão, que usa outra query.
+        conditions.append('or(qualidade.gt.0,qualidade.is.null)')
         if query:
             if name_phonetics:
                 phonetic_cond = name_phonetics.build_postgrest_query_condition(query)
