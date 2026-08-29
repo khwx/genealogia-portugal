@@ -2,6 +2,37 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — heatmap de densidade de registos no mapa)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 155 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — heatmap por freguesia no mapa
+- `templates/map.html`:
+  - Nova função `densityColor(count)` que interpola uma cor num gradiente de densidade
+    (azul → verde → amarelo → vermelho) proporcional ao número de registos, normalizado
+    pelo mínimo e máximo entre freguesias com dados (`minCount`/`maxCount`);
+  - `circleMarker` passa a usar essa cor no `fillColor` (borda escura `#1f2937`), em vez
+    da cor única anterior, dando leitura imediata das freguesias mais densas;
+  - Legenda de densidade sobreposta ao canto inferior esquerdo do mapa (`#heatLegend`)
+    com um gradiente horizontal linear e valores mínimo/máximo (`legendMin`/`legendMax`).
+- Apenas alterações ao frontend (`templates/map.html`), sem rede, sem BD remota, sem
+  segredos expostos. Validação: extração do `<script>` com `node --check` → **JS SYNTAX OK**;
+  `bash scripts/run_tests.sh` → **ALL TESTS PASSED**; `status_check.py` → `status: OK`.
+- `WEB_IMPROVEMENTS_PLAN.md`: marcado o item Heatmap da Fase 5 como concluído.
+
+### Decisão registada
+- Reforço do pilar "melhorar autonomamente" com uma melhoria de UX puramente estática e
+  sem risco: o mapa passa a comunicar visualmente a concentração de registos por freguesia,
+  sem qualquer escrita remota ou custo adicional.
+
+### Próximos passos sugeridos
+- Timeline interativa por década nos resultados da pesquisa web (item restante da Fase 5).
+- Aplicar/verificar as migrações `add_detalhes_obito.sql` e `add_detalhes_completos.sql`
+  no Supabase e o backfill de `imagem_url`.
+
 ## 2026-08-29 (execução autónoma — pesquisa fonética e variantes históricas de nomes)
 
 ### Estado verificado
