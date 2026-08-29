@@ -67,6 +67,14 @@ def get_livros():
 def family_tree():
     return render_template('family_tree.html')
 
+@app.route('/casamentos')
+def casamentos():
+    return render_template('casamentos.html')
+
+@app.route('/batismos')
+def batismos():
+    return render_template('batismos.html')
+
 @app.route('/mapa')
 def mapa():
     return render_template('map.html')

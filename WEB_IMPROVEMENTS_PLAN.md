@@ -52,6 +52,8 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 - [x] **Pesquisa Fonética e Variantes Históricas:** Módulo `name_phonetics.py` com Soundex PT e clusters de grafias arcaicas (Joam/João, Manoel/Manuel, Theresa/Teresa, etc.) integrado em `/api/pessoas`, `/api/variantes` e `index.html`.
 - [x] **Heatmap por Freguesia no Mapa:** `templates/map.html` agora colore cada `circleMarker` num gradiente de densidade (azul → verde → amarelo → vermelho) proporcional ao número de registos, com legenda de densidade sobreposta ao mapa.
 - [x] **Timeline Interativa por Década:** Gráfico clicável em `templates/map.html` (`/api/decadas`) que filtra a pesquisa por década (link para `/?from_year=&to_year=`).
+- [x] **Páginas Dedicadas Casamentos/Batismos:** `templates/casamentos.html` e `batismos.html` com rotas `/casamentos` e `/batismos` (placeholder pronto, auto-popula quando houver MARR/BIRT).
+- [x] **Árvore Genealógica Interativa:** `templates/family_tree.html` com D3.js navegável (em melhoria contínua via Stitch).
 
 ---
 
