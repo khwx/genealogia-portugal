@@ -316,29 +316,56 @@ def extract_persons_from_deceased(deceased_list):
     return persons
 
 def extract_detalhes(transcription):
-    """Extract rich details (idade, causa, naturalidade, numero_assento) from transcription.
-    Works on already-saved transcriptions, no Gemini needed."""
+    """Extract rich details (idade, causa, naturalidade, numero_assento, etc.) from transcription.
+    Works on already-saved transcriptions, no Gemini needed. Covers NotebookLM example."""
     if not transcription:
         return {}
     t = ' '.join(transcription.split())
     out = {}
-    # idade: "com 60 anos", "de 60 annos"
     m = re.search(r'com\s+(\d{1,3})\s+ann?os', t, re.I)
     if m:
         try: out['idade'] = int(m.group(1))
         except: pass
-    # causa_morte: "morte repentina", "faleceu de ..."
-    m = re.search(r'(morte\s+repentina|faleceu\s+de\s+[^,\.]{3,40})', t, re.I)
+    # Fallback idade escrita por extenso already in deceased.age
+    m = re.search(r'(morte\s+repentina|faleceu\s+de\s+[^,\.]{3,50})', t, re.I)
     if m:
         out['causa_morte'] = m.group(1).strip()[:120]
-    # naturalidade: "natural (e morador)? (da|de) freguesia da Rapa"
     m = re.search(r'natural(?:\s+e\s+morador)?\s+(?:da|de|na)\s+([^,\.\n]{3,60})', t, re.I)
     if m:
         out['naturalidade'] = m.group(1).strip()[:120]
-    # numero_assento: "assento n.º 26" / "assento nº 26"
     m = re.search(r'assento\s+n\.?º?\s*(\d+)', t, re.I)
     if m:
         out['numero_assento'] = m.group(1).strip()[:20]
+    # hora: "pelas 7 horas da noite (19h)", "às 3 horas da tarde"
+    m = re.search(r'pelas?\s+(\d{1,2})\s+horas?\s+da\s+(manhã|tarde|noite)', t, re.I)
+    if m:
+        out['hora_obito'] = f"{m.group(1)}h da {m.group(2)}"[:30]
+    else:
+        m = re.search(r'às?\s+(\d{1,2})\s+horas?', t, re.I)
+        if m:
+            out['hora_obito'] = f"{m.group(1)}h"[:20]
+    # profissao: "moleira", "pedreiro", etc. (palavra após profissão comum)
+    m = re.search(r'\b(moleir[ao]|pedreiro|proprietári[ao]|lavrador|jornaleir[ao]|sapateiro|alfaiate)\b', t, re.I)
+    if m:
+        out['profissao'] = m.group(1).lower()[:50]
+    # estado_civil
+    m = re.search(r'\b(viúv[ao]|casad[ao]|solteir[ao]|menor|inocente)\b', t, re.I)
+    if m:
+        out['estado_civil'] = m.group(1).lower()[:30]
+    # sacramentos
+    if re.search(r'recebeu\s+os\s+sacramentos', t, re.I):
+        out['sacramentos'] = 'recebeu os sacramentos'
+    elif re.search(r'sem\s+receber\s+sacramentos|sem\s+sacramentos', t, re.I):
+        out['sacramentos'] = 'sem sacramentos'
+    # testamento
+    if re.search(r'não\s+fez\s+testamento', t, re.I):
+        out['testamento'] = 'não fez testamento'
+    elif re.search(r'fez\s+testamento', t, re.I):
+        out['testamento'] = 'fez testamento'
+    # sepultamento
+    m = re.search(r'sepultad[ao]\s+no\s+([^,\.\n]{5,60}cemit[ée]rio[^,\.\n]{0,40})', t, re.I)
+    if m:
+        out['local_sepultamento'] = m.group(1).strip()[:120]
     return out
 
 def extract_persons(raw_text):
@@ -904,14 +931,9 @@ def main():
                     "criado_em": datetime.now().isoformat(),
                 }
                 # Add rich details when available (new columns, safe if not migrated yet)
-                if detalhes.get("idade") is not None:
-                    record["idade"] = detalhes["idade"]
-                if detalhes.get("causa_morte"):
-                    record["causa_morte"] = detalhes["causa_morte"]
-                if detalhes.get("naturalidade"):
-                    record["naturalidade"] = detalhes["naturalidade"]
-                if detalhes.get("numero_assento"):
-                    record["numero_assento"] = detalhes["numero_assento"]
+                for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento"):
+                    if detalhes.get(k) is not None:
+                        record[k] = detalhes[k]
                 # Age from structured deceased has priority
                 if person.get("age") is not None and str(person.get("age")).isdigit():
                     record["idade"] = int(person["age"])

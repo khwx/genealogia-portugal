@@ -602,9 +602,15 @@
                     <div><strong>Freguesia:</strong> <span style="color:var(--text);">${person.freguesia || 'Celorico da Beira'}</span></div>
                     <div><strong>Concelho / Distrito:</strong> <span style="color:var(--text);">${person.concelho || 'Celorico'} / ${person.distrito || 'Guarda'}</span></div>
                     ${person.idade ? `<div><strong>Idade:</strong> <span style="color:var(--text);">${person.idade} anos</span></div>` : ''}
+                    ${person.estado_civil ? `<div><strong>Estado civil:</strong> <span style="color:var(--text);">${person.estado_civil}</span></div>` : ''}
+                    ${person.profissao ? `<div><strong>Profissão:</strong> <span style="color:var(--text);">${person.profissao}</span></div>` : ''}
                     ${person.causa_morte ? `<div><strong>Causa:</strong> <span style="color:var(--text);">${person.causa_morte}</span></div>` : ''}
+                    ${person.hora_obito ? `<div><strong>Hora:</strong> <span style="color:var(--text);">${person.hora_obito}</span></div>` : ''}
                     ${person.naturalidade ? `<div><strong>Naturalidade/Morada:</strong> <span style="color:var(--text);">${person.naturalidade}</span></div>` : ''}
                     ${person.numero_assento ? `<div><strong>Nº Assento:</strong> <span style="color:var(--text);">${person.numero_assento}</span></div>` : ''}
+                    ${person.sacramentos ? `<div><strong>Sacramentos:</strong> <span style="color:var(--text);">${person.sacramentos}</span></div>` : ''}
+                    ${person.testamento ? `<div><strong>Testamento:</strong> <span style="color:var(--text);">${person.testamento}</span></div>` : ''}
+                    ${person.local_sepultamento ? `<div><strong>Sepultamento:</strong> <span style="color:var(--text);">${person.local_sepultamento}</span></div>` : ''}
                     ${refHtml}
                 </div>
                 ${person.imagem_url ? `
