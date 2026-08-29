@@ -168,6 +168,43 @@ def api_seculos():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/decadas')
+def api_decadas():
+    try:
+        decadas = {}
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "data_obito", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for item in batch:
+                d = item.get('data_obito')
+                if not d:
+                    continue
+                try:
+                    year = int(str(d)[:4]) if str(d)[:4].isdigit() else None
+                    if year and 1000 <= year <= 2100:
+                        dec = (year // 10) * 10
+                        decadas[dec] = decadas.get(dec, 0) + 1
+                except:
+                    continue
+            if len(batch) < page:
+                break
+            offset += page
+        result = [{"decada": k, "count": decadas[k]} for k in sorted(decadas.keys())]
+        return jsonify({"decadas": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/validar')
 def validar():
@@ -272,7 +309,24 @@ def get_pessoas():
         resp = requests.get(url, headers=HEADERS, timeout=30)
         if resp.status_code != 200:
             return jsonify({"error": resp.text[:300]}), resp.status_code
-        return jsonify(resp.json())
+        data = resp.json()
+        # Pesquisa fonética simples: se 0 resultados e query tem 3+ letras, tenta variantes pt
+        if not data and query and len(query) >= 3:
+            import unicodedata
+            def norm(s):
+                s = unicodedata.normalize('NFD', s).encode('ascii','ignore').decode()
+                s = s.lower().replace('ph','f').replace('y','i').replace('w','v').replace('ck','k').replace('th','t')
+                s = s.replace('joam','joao').replace('theresa','teresa').replace('thereza','teresa')
+                return s
+            phon = norm(query)
+            if phon != query.lower():
+                url2 = SUPABASE_URL + '/rest/v1/pessoas?select=*'
+                cond2 = f"or(nome.ilike.*{phon}*,sobrenome.ilike.*{phon}*,freguesia.ilike.*{phon}*)"
+                url2 += '&' + cond2 + f'&order=criado_em.desc&limit={limit}&offset={offset}'
+                r2 = requests.get(url2, headers=HEADERS, timeout=30)
+                if r2.status_code == 200 and r2.json():
+                    return jsonify(r2.json())
+        return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
