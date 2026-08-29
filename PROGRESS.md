@@ -2,6 +2,38 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — verificação de estado a cada 8h no CI)
+
+### Estado verificado
+- Repo alinhado com `origin/main`; `.env` ignorado e não rastreado. Scanner
+  `scan_secrets.py`: **0 segredos** em 156 ficheiros rastreados. `status_check.py`
+  → `status: OK` (secret_scan/precommit_guard clean, unit_tests PASSED).
+
+### Tarefa implementada — agendamento de verificação de estado a cada 8h (GitHub Actions)
+- `.github/workflows/security-scan.yml`: reforçado para cumprir o pilar "verificar
+  estado a cada 8h":
+  - Acrescentado `schedule: "0 */8 * * *"` (a cada 8h) ao job, além de push/PR/dispatch.
+  - Novo job `status-check` que corre `scripts/status_check.py` (agrega
+    `scan_secrets.py` + `precommit_secrets.py` + `run_tests.sh`) e falha (exit 1) se
+    houver regressão de segurança OU de testes. Isto fecha a lacuna em que o CI só
+    corria o scanner de segredos e não o portão de testes entre pushes.
+  - Passo de install de `requests`/`python-dotenv` (sem rede externa aos dados do
+    projeto) para suportar os testes em ambiente limpo do runner.
+- Apenas alteração ao CI (sem código de produção, sem BD remota, sem segredos
+  expostos). Validação local: `python3 scripts/status_check.py` → `status: OK`;
+  `py_compile` e `bash scripts/run_tests.sh` → **ALL TESTS PASSED**.
+
+### Decisão registada
+- Reforço direto do pilar "verificar estado a cada 8h": a partir de agora o GitHub
+  corre de forma autónoma, a cada 8h, a bateria completa de segurança + testes e
+  sinaliza qualquer regressão, sem qualquer escrita remota nem risco. (Nota: este
+  agendamento tinha sido referido em registos anteriores mas o workflow em disco não
+  o continha — agora está efetivamente ativo.)
+
+### Próximos passos sugeridos
+- Aplicar/verificar `add_detalhes_obito.sql` e `add_detalhes_completos.sql` no
+  Supabase e o backfill de `imagem_url` (`sync_htr_supabase.py --backfill-url`).
+
 ## 2026-08-29 (execução autónoma — exclusão de registos rejeitados da pesquisa pública)
 
 ### Estado verificado

@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Verificação autónoma de estado a cada 8h (pilar "verificar estado a cada 8h")
+    - cron: "0 */8 * * *"
   workflow_dispatch:
 
 jobs:
@@ -19,3 +22,22 @@ jobs:
           python-version: "3.12"
       - name: Run secret scanner
         run: python3 scripts/scan_secrets.py
+
+  status-check:
+    name: Estado completo (8h) — segredos + testes + .env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar dependências de teste (sem rede externa)
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install requests python-dotenv
+      - name: Verificação agregada de estado
+        # status_check.py corre scan_secrets + precommit_guard + run_tests.sh
+        # e falha (exit 1) se houver regressão de segurança ou de testes.
+        run: python3 scripts/status_check.py
