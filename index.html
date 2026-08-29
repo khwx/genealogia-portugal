@@ -130,8 +130,9 @@
     <div style="max-width: 1000px; margin: 0 auto 10px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <span id="resultsCount" style="color: var(--text2); font-size: 0.9rem;">A carregar...</span>
         <div style="display: flex; gap: 8px;">
-            <button onclick="exportCSV()" class="parish-tag" style="background: var(--bg2); color: var(--text);">📥 Exportar CSV</button>
-            <button onclick="exportGEDCOM()" class="parish-tag" style="background: var(--bg2); color: var(--text);">🌲 Exportar GEDCOM</button>
+            <button onclick="shareView()" class="parish-tag" style="background: var(--bg2); color: var(--text);">🔗 Partilhar</button>
+            <button onclick="exportCSV()" class="parish-tag" style="background: var(--bg2); color: var(--text);">📥 CSV</button>
+            <button onclick="exportGEDCOM()" class="parish-tag" style="background: var(--bg2); color: var(--text);">🌲 GEDCOM</button>
         </div>
     </div>
 
@@ -199,6 +200,8 @@
         .parish-tag:hover, .parish-tag.active { background: var(--accent); color: white; border-color: var(--accent); }
         .year-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; width: 110px; }
         .year-input:focus { outline: none; border-color: var(--accent); }
+        .skeleton { background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 
     <script>
@@ -302,6 +305,32 @@
         }
 
         function setProgress(p) { const el=document.getElementById('topProgress'); if(!el) return; el.style.width=p+'%'; el.style.opacity=p>=100?'0':'1'; if(p>=100) setTimeout(()=>el.style.width='0%', 400); }
+        function syncURL() {
+            const params = new URLSearchParams();
+            if (currentQuery) params.set('q', currentQuery);
+            if (currentParish) params.set('freguesia', currentParish);
+            if (currentTipo) params.set('tipo', currentTipo);
+            if (currentFromYear) params.set('from', currentFromYear);
+            if (currentToYear) params.set('to', currentToYear);
+            const qs = params.toString();
+            history.replaceState(null, '', qs ? '/?' + qs : '/');
+        }
+        function loadFromURL() {
+            const p = new URLSearchParams(location.search);
+            if (p.get('q')) { currentQuery = p.get('q'); document.getElementById('searchInput').value = currentQuery; }
+            if (p.get('freguesia')) currentParish = p.get('freguesia');
+            if (p.get('tipo')) currentTipo = p.get('tipo');
+            if (p.get('from')) { currentFromYear = p.get('from'); document.getElementById('fromYear').value = currentFromYear; }
+            if (p.get('to')) { currentToYear = p.get('to'); document.getElementById('toYear').value = currentToYear; }
+        }
+        function shareView() {
+            syncURL();
+            navigator.clipboard.writeText(location.href).then(()=> alert('Link copiado!')).catch(()=> prompt('Copia o link:', location.href));
+        }
+        function showSkeletons(n=6) {
+            const c = document.getElementById('resultsContainer');
+            c.innerHTML = Array(n).fill(0).map(()=> `<div class="result-card"><div class="skeleton" style="height:20px; width:40%; margin-bottom:12px;"></div><div class="skeleton" style="height:14px; width:80%; margin-bottom:8px;"></div><div class="skeleton" style="height:14px; width:60%;"></div></div>`).join('');
+        }
         function getArquivoRef(person) {
             if (!arquivoRefs || !person) return null;
             const fid = person.file_id || (person.imagem_url || '').match(/fileId=([^&]+)/)?.[1];
@@ -311,7 +340,12 @@
 
         async function loadInitial() {
             try {
+                loadFromURL();
+                if (currentQuery || currentParish || currentTipo || currentFromYear || currentToYear) {
+                    return performSearch();
+                }
                 setProgress(20);
+                showSkeletons(6);
                 const randomOffset = Math.floor(Math.random() * 5000);
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*&limit=50&offset=${randomOffset}`, { headers });
                 setProgress(70);
@@ -334,8 +368,9 @@
             currentOffset = 0;
             totalLoaded = 0;
             hasMore = true;
+            syncURL();
             const container = document.getElementById('resultsContainer');
-            container.innerHTML = '<div class="loading">A pesquisar na base de dados...</div>';
+            showSkeletons(6);
             hideLoadMore();
             await fetchBatch(true);
         }
@@ -672,6 +707,11 @@
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performSearch();
         });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.getElementById('searchInput').focus(); }
+            if (e.key === 'Escape') closeModal();
+        });
+        window.addEventListener('DOMContentLoaded', () => document.getElementById('searchInput').focus());
         document.getElementById('fromYear').addEventListener('change', applyYearFilter);
         document.getElementById('fromYear').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') applyYearFilter();
