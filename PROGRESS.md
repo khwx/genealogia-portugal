@@ -2,6 +2,37 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-29 (execução autónoma — endurecimento de .gitignore contra ficheiros locais)
+
+### Estado verificado
+- Working tree tinha alterações locais não comitadas: `.gitignore` (linha `.env`
+  duplicada) e um script local `reprocess_celorico_villas.py` (utilitário de OCR que
+  faz I/O de rede e lê `.env`). Nenhum segredo exposto (`.env` já ignorado; scan
+  limpo). `status_check.py` → `status: OK`.
+
+### Tarefa implementada — garantir que utilitários locais nunca são comitados
+- `.gitignore`: removida a linha `.env` duplicada (já coberta em `*.env`/`/output/`)
+  e adicionado `reprocess_celorico_villas.py` à secção "Local utility scripts that do
+  network I/O (not for commit)", seguindo a convenção existente de `download_lajeosa.py`.
+  Isto garante que o script local (que lê `.env` e faz chamadas à API Gemini) não
+  possa ser acidentalmente comitado num `git add .`, fechando a lacuna de exposição
+  de segredos identificada no portão `precommit_secrets.py`.
+- Verificações: `git check-ignore reprocess_celorico_villas.py` e `.env` → ambos
+  IGNORADOS; `python3 scripts/scan_secrets.py` → 0 segredos; `status_check.py` →
+  `status: OK`; `bash scripts/run_tests.sh` → **ALL TESTS PASSED**. Sem rede, sem
+  BD remota.
+
+### Decisão registada
+- Reforço direto do pilar "garantir segurança sem expor segredos": em vez de comitar
+  o utilitário local (que faria parte do diff de trabalho), optou-se por ignorá-lo
+  definitivamente, mantendo o repo alinhado com a política de nunca versionar scripts
+  de I/O de rede com credenciais. Nenhuma escrita remota foi feita fora do commit de
+  hardening do `.gitignore`.
+
+### Próximos passos sugeridos
+- Aplicar/verificar `add_detalhes_obito.sql` e `add_detalhes_completos.sql` no
+  Supabase e o backfill de `imagem_url` (`sync_htr_supabase.py --backfill-url`).
+
 ## 2026-08-29 (execução autónoma — validação: Saltar remove registo da fila)
 
 ### Estado verificado
