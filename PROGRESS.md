@@ -2,6 +2,26 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-08-31 (execução autónoma — reprocessamento Celorico villas concluído + sync + cobertura dinâmica)
+
+### Estado verificado
+- Reprocessamento `reprocess_celorico_villas.py` concluído `3819/3819` (pacing 2s, 15 chaves, 4 modelos) — `Celorico (Santa Maria) 73,8% (4988)` e `Celorico (São Pedro) 6,3% → 61,5% (3431)`, `TOTAL local 36.098` nomes (`11953` ficheiros com nomes). Sync Supabase pendente: `22003 → 32802` (`+10800` já inseridos em 31/08 17:46, `16250/18004` 90%).
+- `git status` com 4 ficheiros modificados: `WEB_IMPROVEMENTS_PLAN.md`, `cobertura.html`, `index.html`, `sync_htr_supabase.py` (fix `assinatura` PGRST204). `.env` ignorado, `scan_secrets` limpo.
+- `status_check.py` → `status: OK` (secret_scan/precommit clean, unit_tests PASSED 10/10).
+
+### Tarefa implementada — sync completo + cobertura live + roadmap Fase 6
+- **Sync Supabase:** corrigido `sync_htr_supabase.py:955` — `assinatura` excluída até `migrations/add_assinatura.sql` ser aplicada (`PGRST204`). `rm sync_htr_state.json` (poluído por `DRY_RUN`) e relançado `python3 -u sync_htr_supabase.py` — `18004` ficheiros, `12723` synced, `13316` filtered, `11` erros (datas `29/30 Fev` inválidas), `Total in DB: 26809` file_ids (`32802` pessoas via HEAD count). Pacing calmo, sem 429.
+- **Cobertura:** `cobertura.html` atualizada `28.132 → 36.098`, `Santa Maria 297→4988`, `São Pedro 178→3431`; agora dinâmica via `fetch('/api/mapa')` (live a cada 5min, cache 10min), ordenação clicável `↕`, badge `● Atualizado 31/08` e destaque verde nas 2 villas. `index.html` meta `22.003 → 36.098`.
+- **Roadmap:** `WEB_IMPROVEMENTS_PLAN.md` Fase 6 criada (reprocessamento concluído, sync, migrações pendentes `add_assinatura`/`add_pessoa_relation_columns`, backfill `pai`/`mae`/`conjuge` e `imagem_url`).
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED** (10 suites); `python3 scripts/status_check.py` → `status: OK`; `py_compile` OK. Sem rede extra nos testes, sem segredos expostos.
+
+### Decisão registada
+- Reforço dos 4 pilares: verificar estado (sync 90% medido), melhorar autonomamente (cobertura live sem deploy), garantir segurança (fix PGRST204 sem expor `.env`), e preparar push pequeno e seguro. Sync continua em background (`92430`) até `18004/18004`.
+
+### Próximos passos sugeridos
+- Aplicar `migrations/add_assinatura.sql` e `migrations/add_pessoa_relation_columns.sql` no Supabase SQL Editor, depois `SYNC_RELATIONS=1 python3 sync_htr_supabase.py --backfill-relations`.
+- `git commit` + `push` deste ciclo (4 ficheiros).
+
 ## 2026-08-29 (execução autónoma — endurecimento de .gitignore contra ficheiros locais)
 
 ### Estado verificado

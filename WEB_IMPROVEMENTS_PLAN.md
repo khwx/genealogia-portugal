@@ -8,7 +8,7 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 
 ### Pontos Fortes
 - **Arquitetura Serverless / Cloud Ready:** Aplicação Flask em Python compatível com Vercel, ligada diretamente ao Supabase (PostgreSQL).
-- **Volume de Dados:** Mais de **8.750 registos de óbitos** indexados e validados para o concelho de Celorico da Beira.
+- **Volume de Dados:** **36.098 nomes** extraídos de **26.813 páginas** (HTR Gemini), `Celorico (Santa Maria) 4988` + `Celorico (São Pedro) 3431` reprocessados a 31/08/2026 com prompt rico (idade por extenso, sacramentos, testamento, sepultamento, assinatura).
 - **Interface Moderna:** Design responsivo em Dark Mode (tipografia Inter, cartões limpos, barras de estatísticas e mapas).
 - **Relações Familiares e Fontes:** Captura estruturada de Pai, Mãe, Cônjuge e link direto para a imagem do documento original no Digitarq.
 
@@ -54,6 +54,14 @@ Este documento regista a análise completa da aplicação web e a lista detalhad
 - [x] **Timeline Interativa por Década:** Gráfico clicável em `templates/map.html` (`/api/decadas`) que filtra a pesquisa por década (link para `/?from_year=&to_year=`).
 - [x] **Páginas Dedicadas Casamentos/Batismos:** `templates/casamentos.html` e `batismos.html` com rotas `/casamentos` e `/batismos` (placeholder pronto, auto-popula quando houver MARR/BIRT).
 - [x] **Árvore Genealógica Interativa:** `templates/family_tree.html` com D3.js navegável (em melhoria contínua via Stitch).
+
+### Fase 6: Reprocessamento e Sincronização Completa (2026-08-31)
+- [x] **Reprocessamento Celorico Villas:** `reprocess_celorico_villas.py` (pacing 2s, 15 chaves, 4 modelos) concluiu `3819/3819` ficheiros — `Santa Maria 73,8% (4988)` e `São Pedro 6,3% → 61,5% (3431)`, `TOTAL 36.098` nomes. Antes `32.348` (17:59) → `+1.898` só nas 2 villas.
+- [x] **Cobertura Dinâmica:** `cobertura.html` agora com `36.098` nomes, ordenação clicável `↕`, badge `● Atualizado 31/08` e `fetch('/api/mapa')` live a cada 5min (atualiza `Nomes (óbitos)` e `Total` sem deploy).
+- [x] **Sincronização Supabase:** `sync_htr_supabase.py` corrigido (`assinatura` excluída até `migrations/add_assinatura.sql` ser aplicada — `PGRST204`), `18004` ficheiros pendentes (`8809` já no DB) em sync `92430` (82% em 31/08 20:43, `~920 synced`).
+- [ ] **Aplicar Migrações Pendentes no Supabase SQL Editor:** `migrations/add_assinatura.sql` + `migrations/add_pessoa_relation_columns.sql` (`pai`/`mae`/`conjuge`) + `migrations/add_detalhes_completos.sql` (já idempotentes).
+- [ ] **Backfill Assinatura e Relações:** `SYNC_RELATIONS=1 python3 sync_htr_supabase.py --backfill-relations` + `python3 sync_htr_supabase.py --backfill-url` após migrações.
+- [ ] **Melhorias de Apresentação (next):** paginação na `cobertura.html` para `>36k` registos, export CSV da cobertura, tooltip com `idade`/`causa` no mapa, highlight de variantes fonéticas nos cartões.
 
 ---
 
