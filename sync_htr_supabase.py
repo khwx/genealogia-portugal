@@ -232,6 +232,13 @@ def clean_name(parts):
 
 TITLE_WORDS = {'d', 'don', 'dom', 'doña', 'dona', 'sr', 'sra', 's', 'snr', 'snra'}
 
+def _is_valid_calendar_date(y, m, d):
+    """Check if (y, m, d) is a valid calendar date (catches Feb 29 on non-leap years, etc.)."""
+    days_in_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if m == 2 and y % 4 == 0 and (y % 100 != 0 or y % 400 == 0):
+        return d <= 29
+    return 1 <= d <= days_in_month[m]
+
 def normalize_death_date(value):
     """Normalize a death_date from the structured `deceased` field.
 
@@ -248,7 +255,7 @@ def normalize_death_date(value):
     m = re.match(r'^(\d{4})-(\d{1,2})-(\d{1,2})$', v)
     if m:
         y, mo, d = (int(x) for x in m.groups())
-        if 1500 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+        if 1500 <= y <= 2100 and 1 <= mo <= 12 and _is_valid_calendar_date(y, mo, d):
             return f"{y:04d}-{mo:02d}-{d:02d}"
         return None
 
@@ -256,7 +263,7 @@ def normalize_death_date(value):
     m = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', v)
     if m:
         d, mo, y = (int(x) for x in m.groups())
-        if 1500 <= y <= 2100 and 1 <= mo <= 12 and 1 <= d <= 31:
+        if 1500 <= y <= 2100 and 1 <= mo <= 12 and _is_valid_calendar_date(y, mo, d):
             return f"{y:04d}-{mo:02d}-{d:02d}"
         return None
 
@@ -512,7 +519,7 @@ def extract_date(raw_text):
         day = parse_day_word(m.group(1))
         month = MONTH_MAP.get(m.group(2).lower().strip())
         year = parse_year_words(m.group(3))
-        if day and month and year:
+        if day and month and year and _is_valid_calendar_date(year, int(month), day):
             return f"{year}-{month}-{day:02d}"
 
     # Pattern A2: "Aos/Em XX de MONTH de YEAR"
@@ -528,7 +535,7 @@ def extract_date(raw_text):
         day = parse_day_word(m.group(1))
         month = MONTH_MAP.get(m.group(2).lower().strip())
         year = parse_year_words(m.group(3))
-        if day and month and year:
+        if day and month and year and _is_valid_calendar_date(year, int(month), day):
             return f"{year}-{month}-{day:02d}"
 
     # Pattern B: "no dia XX de MONTH de YEAR"
@@ -544,7 +551,7 @@ def extract_date(raw_text):
         day = parse_day_word(m.group(1))
         month = MONTH_MAP.get(m.group(2).lower().strip())
         year = parse_year_words(m.group(3))
-        if day and month and year:
+        if day and month and year and _is_valid_calendar_date(year, int(month), day):
             return f"{year}-{month}-{day:02d}"
 
     # Pattern D: "XX de Month de YYYY" (numeric)
@@ -557,11 +564,11 @@ def extract_date(raw_text):
     )
     m = pat_d.search(text)
     if m:
-        day = m.group(1).zfill(2)
+        day = int(m.group(1))
         month = MONTH_MAP.get(m.group(2).lower().strip())
-        year = m.group(3)
-        if month:
-            return f"{year}-{month}-{day}"
+        year = int(m.group(3))
+        if month and _is_valid_calendar_date(year, int(month), day):
+            return f"{year:04d}-{month}-{day:02d}"
 
     return None
 
