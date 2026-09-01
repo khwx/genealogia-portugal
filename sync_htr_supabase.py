@@ -959,8 +959,7 @@ def main():
                     "criado_em": datetime.now().isoformat(),
                 }
                 # Add rich details when available (new columns, safe if not migrated yet)
-                # NOTE: 'assinatura' column not yet migrated in Supabase (PGRST204) - skip until migrations/add_assinatura.sql is applied
-                for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento"):
+                for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento","assinatura"):
                     if detalhes.get(k) is not None:
                         record[k] = detalhes[k]
                 # Age from structured deceased has priority
