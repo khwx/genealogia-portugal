@@ -2,13 +2,124 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batismos — Genealogia Portugal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>:root{--bg:#0f1117;--bg2:#1a1d27;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text)} .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between} .logo{color:var(--text);text-decoration:none;font-weight:700} .nav-link{color:var(--text2);text-decoration:none;margin-left:16px} .nav-link.active{color:var(--text)} .hero{text-align:center;padding:40px 20px} .card{max-width:900px;margin:0 auto 40px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;text-align:center} .pill{background:rgba(108,99,255,0.15);color:#8b83ff;padding:6px 14px;border-radius:20px}</style>
+<title>Batismos — Genealogia Portugal (Celorico da Beira)</title>
+<meta name="description" content="Pesquisa em batismos de Celorico da Beira (1654-1911) — 236 livros paroquiais. Filtra por batizado, pais e padrinhos.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent2)}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:500;margin-left:16px}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.hero{text-align:center;padding:40px 20px 20px}
+.hero h1{font-size:2.2rem;font-weight:700;margin-bottom:8px}
+.hero p{color:var(--text2);max-width:700px;margin:0 auto;line-height:1.6}
+.search-container{max-width:750px;margin:0 auto 20px;padding:0 20px;width:100%}
+.search-box{display:flex;background:var(--bg2);border:2px solid var(--border);border-radius:100px;padding:6px;transition:.3s}
+.search-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(108,99,255,0.15)}
+.search-input{flex:1;background:transparent;border:none;color:var(--text);font-size:1.05rem;padding:12px 20px;outline:none;font-family:inherit}
+.search-btn{background:var(--accent);color:white;border:none;border-radius:100px;padding:0 28px;font-weight:600;cursor:pointer}
+.search-btn:hover{background:var(--accent2)}
+.results-container{max-width:1000px;margin:0 auto 40px;padding:0 20px;width:100%}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;transition:.2s}
+.result-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.result-name{font-size:1.2rem;font-weight:600}
+.result-meta{display:flex;gap:16px;color:var(--text2);font-size:0.9rem;flex-wrap:wrap;margin:8px 0}
+.doc-link{background:var(--bg3);color:var(--text);text-decoration:none;font-size:0.85rem;padding:6px 14px;border-radius:8px;border:1px solid var(--border)}
+.doc-link:hover{background:var(--accent);color:white}
+.loading{text-align:center;padding:40px;color:var(--text2)}
+.parish-tag{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:20px;font-size:0.8rem;cursor:pointer}
+.parish-tag.active{background:var(--accent);color:white;border-color:var(--accent)}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
 </head>
 <body>
-<div class="topbar"><a href="/" class="logo">Genealogia <span>Portugal</span></a><div><a href="/" class="nav-link">Pesquisa</a><a href="/casamentos" class="nav-link">Casamentos</a><a href="/batismos" class="nav-link active">Batismos</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a></div></div>
-<div class="hero"><h1>👶 Batismos (1654-1911)</h1><p style="color:var(--text2);max-width:600px;margin:10px auto;">Schema pronto (`tipo_registo=BIRT`). Quando os livros de batismos forem processados, surgem aqui com filtros por batizado, pais e padrinhos.</p></div>
-<div class="card"><p style="color:var(--text2);">Atualmente <strong style="color:var(--text)">óbitos</strong> completos. Filtra por <span class="pill">Nascimentos 👶</span> na pesquisa — esta página auto-popula quando houver BIRT.</p><div style="margin-top:16px;"><a href="/?tipo=BIRT" style="color:var(--accent);">Ver batismos na pesquisa →</a></div></div>
+<div class="topbar">
+<a href="/" class="logo">Genealogia <span>Portugal</span></a>
+<div><a href="/" class="nav-link">Pesquisa</a><a href="/casamentos" class="nav-link">Casamentos</a><a href="/batismos" class="nav-link active">Batismos</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a><a href="/validar" class="nav-link">Revisão</a></div>
+</div>
+<div class="hero">
+<h1>👶 Batismos (1654–1911)</h1>
+<p>236 livros paroquiais de Celorico da Beira. Pesquisa por batizado, pais, padrinhos e data de nascimento. Schema <code style="background:var(--bg3);padding:2px 6px;border-radius:6px">tipo_registo=BIRT</code> já live — esta página auto-popula quando o OCR BIRT for processado.</p>
+</div>
+<div class="search-container">
+<div class="search-box">
+<input id="q" class="search-input" placeholder="Batizado, pai, mãe, padrinho..." autocomplete="off">
+<button id="btn" class="search-btn">Pesquisar</button>
+</div>
+<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+<span style="color:var(--text2);font-size:0.85rem;align-self:center">Freguesia:</span>
+<button class="parish-tag active" onclick="filtrarFreg('')">Todas</button>
+<button class="parish-tag" onclick="filtrarFreg('Santa Maria')">Santa Maria</button>
+<button class="parish-tag" onclick="filtrarFreg('São Pedro')">São Pedro</button>
+<button class="parish-tag" onclick="filtrarFreg('Mesquitela')">Mesquitela</button>
+</div>
+</div>
+<div style="max-width:1000px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center">
+<span id="cnt" style="color:var(--text2);font-size:0.9rem">A carregar...</span>
+<span id="live" style="color:var(--text2);font-size:0.8rem"></span>
+</div>
+<div class="results-container" id="res"><div class="loading">A carregar batismos...</div></div>
+<div id="more" style="text-align:center;padding:20px;display:none"><button id="moreBtn" class="parish-tag" style="padding:10px 24px">Carregar mais</button></div>
+
+<script>
+const SUPABASE_URL='https://qljopxbxgflozrcdblrl.supabase.co';
+const SUPABASE_KEY='sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
+const H={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+let q='', freg='', offset=0, totalLoaded=0, hasMore=true, loading=false;
+const PAGE=100;
+
+function card(p){
+  const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Batizado';
+  const data=p.data_nascimento ? new Date(p.data_nascimento).toLocaleDateString('pt-PT') : (p.data_obito? new Date(p.data_obito).toLocaleDateString('pt-PT'):'Data não especificada');
+  const freguesia=p.freguesia||'Celorico da Beira';
+  return `<div class="result-card">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="result-name">👶 ${nome}</div><span style="background:rgba(108,99,255,0.15);color:#8b83ff;padding:4px 10px;border-radius:20px;font-size:0.8rem">Batismo</span></div>
+    <div class="result-meta"><span>📅 ${data}</span><span>📍 ${freguesia}</span>${p.pai?`<span>👨 ${p.pai}</span>`:''}${p.mae?`<span>👩 ${p.mae}</span>`:''}</div>
+    ${(p.pai||p.mae)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--text2);margin-top:8px">${p.pai?`Pai: <span style="color:var(--text)">${p.pai}</span> &nbsp;`:''}${p.mae?`Mãe: <span style="color:var(--text)">${p.mae}</span>`:''}</div>`:''}
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">${p.imagem_url?`<a href="${p.imagem_url}" target="_blank" class="doc-link">📄 Ver livro no Digitarq ↗</a>`:''}<span style="color:#8b83ff;font-size:0.85rem">Ver detalhes →</span></div>
+  </div>`;
+}
+
+async function fetchBatch(reset){
+  if(loading) return;
+  loading=true;
+  try{
+    let url=`${SUPABASE_URL}/rest/v1/pessoas?select=*&tipo_registo=eq.BIRT&order=criado_em.desc&limit=${PAGE}&offset=${offset}`;
+    const conds=[];
+    if(q) conds.push(`or(nome.ilike.*${q}*,sobrenome.ilike.*${q}*,pai.ilike.*${q}*,mae.ilike.*${q}*)`);
+    if(freg) conds.push(`freguesia.ilike.*${freg}*`);
+    if(conds.length) url+='&'+conds.join('&');
+    const r=await fetch(url,{headers:H});
+    if(!r.ok) throw new Error(r.status);
+    const data=await r.json();
+    const c=document.getElementById('res');
+    if(reset) c.innerHTML='';
+    if(!data.length && reset) c.innerHTML='<div class="loading">Ainda sem batismos — 236 livros por processar (BIRT). Filtra por <code>Óbitos</code> na pesquisa principal enquanto aguardas.</div>';
+    else c.insertAdjacentHTML('beforeend', data.map(card).join(''));
+    totalLoaded+=data.length; offset+=data.length; hasMore=data.length===PAGE;
+    document.getElementById('cnt').textContent=`A mostrar ${totalLoaded} batismos${hasMore?' — carrega mais':''}`;
+    document.getElementById('more').style.display=hasMore?'block':'none';
+    document.getElementById('live').textContent=`BIRT live • ${new Date().toLocaleTimeString('pt-PT')}`;
+  }catch(e){
+    if(reset) document.getElementById('res').innerHTML=`<div class="loading" style="color:#ef4444">Erro: ${e.message}</div>`;
+  }finally{loading=false}
+}
+
+function filtrarFreg(f){
+  freg=f;
+  document.querySelectorAll('.parish-tag').forEach(b=>b.classList.toggle('active', b.textContent.includes(f||'Todas')));
+  offset=0; hasMore=true; fetchBatch(true);
+}
+document.getElementById('btn').onclick=()=>{q=document.getElementById('q').value.trim(); offset=0; hasMore=true; fetchBatch(true);};
+document.getElementById('q').onkeypress=e=>{if(e.key==='Enter'){q=e.target.value.trim(); offset=0; hasMore=true; fetchBatch(true);}};
+document.getElementById('moreBtn').onclick=()=>fetchBatch(false);
+window.addEventListener('scroll',()=>{ if(loading||!hasMore) return; if(window.innerHeight+window.scrollY>=document.body.offsetHeight-400) fetchBatch(false); });
+fetchBatch(true);
+</script>
 </body>
 </html>
