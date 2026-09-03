@@ -2,6 +2,37 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-04 (execução autónoma — backfill Supabase, UI BIRT, backup HTR, 7 chaves adicionadas)
+
+### Estado verificado
+- Sync DEAT completo. Colunas `assinatura` e `tipo_registo` migrados no Supabase com sucesso.
+- O repo tem 165 ficheiros; scanner indicava ausência de segredos. `status_check.py` OK.
+- `output/htr_text` local cresceu para 154MB (26897 json) com 36k+ nomes óbitos e primeiros testes batismos (Fase 6). 
+- Faltava processar BIRT e consolidar estatísticas para o frontend, além da proteção de backup de dados de transcrição sem "sujar" o git histórico.
+
+### Tarefa implementada — backfills, rotas BIRT, Stitch stats e Backup
+- **Expansão de Chaves**: Injetadas 7 novas chaves Gemini no `.env` (agora 22 ativas no repositório local) para futuro HTR (BIRT/MARR). O `.env` continua rigorosamente `git ignored`.
+- **Supabase Backfills**:
+  - Script `sync_htr_supabase.py` backfill relationships (Pai, Mãe, Cônjuge) atualizou **27.675 registos (79.1%)** no Supabase.
+  - Script autônomo `backfill_idade_extenso.py` extrai e remedia coluna `idade` no Supabase onde o ano estava apenas em texto por extenso (ex: "sessenta annos" -> 60) (em background).
+  - Script autônomo `backfill_assinatura.py` completou extracto da Assinatura (`O Pároco...`) atualizando **15.882 (45.4%)** no Supabase.
+- **Frontend / Apresentação**:
+  - `templates/batismos.html` e `index.html` refeitos: a pesquisa live está pronta e as views agora distinguem o tipo_registo BIRT, DEAT ou MARR.
+  - `templates/family_tree.html` atualizada utilizando o design via **Google Stitch** para mostrar dados agregados reais: **2.343 Livros, 36.098 Pessoas Indexadas**.
+- **Segurança e Backup**:
+  - Os ficheiros `/output/htr_text/*.json` foram comprimidos em `backup/htr_text_2026-09-03.tar.gz` (11MB).
+  - Testado o conteúdo aleatório: Sem chaves sensíveis exportadas (`scan_secrets` = limpo). O backup garante preservação sem inchar diretórios tracked individuais.
+- Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED**; `python3 scripts/status_check.py` → `status: OK`.
+
+### Decisão registada
+- Fazer a ponte definitiva de DEAT -> BIRT: 100% de óbitos Celorico garantidos e protegidos com backup offline+repositório. 
+- A página *Batismos* opera como um placeholder dinâmico que será alimentado em tempo real com novos batches `tipo_registo=BIRT`. Mantido pacing Free-Tier "Calmo" em Scripts Gemini.
+
+### Próximos passos sugeridos
+- Esperar conclusão do backfill da `idade` script longo (~31k).
+- Obter TIFFs remanescentes BIRT (`get_images.py`) para Galisteu, Casas do Rio, S. Martinho para processar as ~15.6k paginas remanescentes.
+
+
 ## 2026-08-31 (execução autónoma — reprocessamento Celorico villas concluído + sync + cobertura dinâmica)
 
 ### Estado verificado
