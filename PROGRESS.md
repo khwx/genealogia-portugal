@@ -24,6 +24,24 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
   - Testado o conteúdo aleatório: Sem chaves sensíveis exportadas (`scan_secrets` = limpo). O backup garante preservação sem inchar diretórios tracked individuais.
 - Verificações: `bash scripts/run_tests.sh` → **ALL TESTS PASSED**; `python3 scripts/status_check.py` → `status: OK`.
 
+## 2026-09-04 (2ª execução — fix freguesia BIRT Galisteu + prompt rico)
+
+### Estado verificado
+- `São Martinho BIRT 820` em curso `762/820 (92%)` `pid 448756`, `BIRT Supabase 1474` (`Aldeia 163` agora correto, `Galisteu 338` estava em `Celorico da Beira` por fallback do `freguesia_file_mapping.json` só DEAT). `status_check.py` → `OK`, `ALL TESTS PASSED`.
+
+### Tarefa implementada — correção de freguesia BIRT e prompt rico
+- **Bug `sync_htr_supabase.py:build_file_to_freguesia()`**: só carregava `freguesia_file_mapping.json` (26813 DEAT). BIRT `38505` fileIds ficavam com `Celorico da Beira` default. Corrigido para enriquecer com `doc_file_listings.json` + `celorico_casamentos_batismos.json` (`80656` total, `Galisteu 25855587→Galisteu` verificado). `405` linhas de mapping validadas.
+- **Backfill freguesia Galisteu**: `337` rows `BIRT` onde `freguesia=Celorico da Beira` e `file_id` em `131` Galisteu corrigidas para `Galisteu` via `PATCH`.
+- **Prompt BIRT rico** em `htr_cloud_v2.py`: `PROMPT_BY_TYPE[BIRT]` ampliado de `6` para `15` campos (`father/mother + naturalidade`, `legitimidade`, `4 avós`, `padrinhos`, `assinatura`) para não ficar nada para trás nas `236` BIRT livros. `São Martinho` continua com prompt antigo (92% já), `Aldeia/Galisteu` serão reprocessados depois com novo schema.
+- Verificações: `python3 sync_htr_supabase.py` dry-run `Galisteu→Galisteu` OK, `bash scripts/run_tests.sh` → **ALL TESTS PASSED**, `status_check.py` → `OK`, `py_compile` OK. Sem segredos.
+
+### Decisão registada
+- Reforço do pilar "melhorar autonomamente" sem reprocessar tudo: fix pontual de mapping evita que `Galisteu` e próximos BIRT fiquem órfãos de freguesia. Mantém pacing calmo free-tier.
+
+### Próximos passos sugeridos
+- Reprocessar `Aldeia 84` + `Galisteu 131` com novo prompt rico para preencher `avós`/`legitimidade`.
+- Continuar `São Martinho 820` até `820/820` e sync `BIRT` para `Supabase`.
+
 ### Decisão registada
 - Fazer a ponte definitiva de DEAT -> BIRT: 100% de óbitos Celorico garantidos e protegidos com backup offline+repositório. 
 - A página *Batismos* opera como um placeholder dinâmico que será alimentado em tempo real com novos batches `tipo_registo=BIRT`. Mantido pacing Free-Tier "Calmo" em Scripts Gemini.

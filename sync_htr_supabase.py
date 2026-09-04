@@ -132,9 +132,9 @@ def is_good_quality(raw_text):
 
 def build_file_to_freguesia():
     """Build mapping from file_id to freguesia. Uses combined mapping if available,
-    falls back to celorico_completo.json for backward compatibility."""
+    falls back to celorico_completo.json, and enriches with BIRT/MARR via doc listings."""
     mapping = {}
-    # 1. Try combined mapping file (includes all freguesias)
+    # 1. Try combined mapping file (includes all freguesias DEAT)
     if FREGUESIA_MAPPING_JSON.exists():
         with open(FREGUESIA_MAPPING_JSON) as f:
             data = json.load(f)
@@ -149,6 +149,32 @@ def build_file_to_freguesia():
                 fid = str(img.get("file_id", ""))
                 if fid:
                     mapping[fid] = freg
+    # 3. Enrich with BIRT/MARR via doc_file_listings + inventory (Celorico)
+    try:
+        listings_path = Path("output/data/doc_file_listings.json")
+        invent_path = Path("output/celorico_casamentos_batismos.json")
+        if listings_path.exists() and invent_path.exists():
+            with open(listings_path) as f:
+                listings = json.load(f)
+            with open(invent_path) as f:
+                invent = json.load(f)
+            doc_to_freg = {}
+            for doc in invent:
+                url = doc.get("url_info", "")
+                if "documentDetails/" in url:
+                    doc_id = url.split("documentDetails/")[1]
+                    doc_to_freg[doc_id] = doc.get("freguesia", "")
+                elif "fileViewer/" in url:
+                    doc_id = url.split("fileViewer/")[1].split("?")[0]
+                    doc_to_freg[doc_id] = doc.get("freguesia", "")
+            for doc_id, freg in doc_to_freg.items():
+                if doc_id in listings:
+                    for entry in listings[doc_id]:
+                        fid = str(entry.get("id", ""))
+                        if fid and fid not in mapping:
+                            mapping[fid] = freg
+    except Exception:
+        pass
     return mapping
 
 def is_valid_death_record(raw_text):
@@ -907,20 +933,40 @@ def main():
             
             raw_text = data.get("raw_text", "")
 
-            # Prefer structured `deceased` (Gemini JSON) when available; it is
-            # far more reliable than regex over raw_text. Fall back to the
-            # regex extractor for older HTR files that only have raw_text.
+            # Prefer structured `deceased`/`baptized` (Gemini JSON) when available
             deceased = data.get("deceased")
-            structured = (
-                isinstance(deceased, list)
-                and bool([d for d in deceased if isinstance(d, dict) and (d.get("name") or d.get("nome"))])
-            )
-
-            if structured:
+            baptized = data.get("baptized")
+            record_type = data.get("record_type") or "DEAT"
+            structured = False
+            persons = []
+            # BIRT: baptized
+            if isinstance(baptized, list) and baptized and any(isinstance(d, dict) and (d.get("name") or d.get("nome")) for d in baptized):
+                # For BIRT, use baptized list (name -> nome/sobrenome, pai/mae from father/mother)
+                for entry in baptized:
+                    if not isinstance(entry, dict): continue
+                    name = (entry.get("name") or entry.get("nome") or "").strip()
+                    if not name: continue
+                    parts = [p for p in name.split() if p.lower().strip('.,;:') not in TITLE_WORDS]
+                    if not parts: continue
+                    pai = (entry.get("father") or entry.get("pai") or "").strip()[:100]
+                    mae = (entry.get("mother") or entry.get("mae") or "").strip()[:100]
+                    if len(parts)==1:
+                        persons.append({"nome": parts[0][:100], "sobrenome": "", "pai": pai, "mae": mae, "conjuge": "", "birth_date": entry.get("birth_date") or entry.get("baptism_date"), "baptism_date": entry.get("baptism_date")})
+                    else:
+                        persons.append({"nome": " ".join(parts[:-1])[:100], "sobrenome": parts[-1][:50], "pai": pai, "mae": mae, "conjuge": "", "birth_date": entry.get("birth_date") or entry.get("baptism_date"), "baptism_date": entry.get("baptism_date")})
+                structured = True
+                used_structured = True
+            elif isinstance(deceased, list) and bool([d for d in deceased if isinstance(d, dict) and (d.get("name") or d.get("nome"))]):
                 persons = extract_persons_from_deceased(deceased)
+                structured = True
                 used_structured = True
             else:
-                # Filter: check if valid death record
+                # Filter: check if valid death record (only for DEAT fallback)
+                if record_type == "BIRT":
+                    # BIRT without structured data: skip (needs HTR)
+                    filtered_count += 1
+                    synced.add(file_id)
+                    continue
                 is_valid, reason = is_valid_death_record(raw_text)
                 if not is_valid:
                     filtered_count += 1
@@ -941,23 +987,44 @@ def main():
             # Rich details from transcription (idade, causa, naturalidade, assento)
             detalhes = extract_detalhes(data.get("transcription") or raw_text)
             for person in persons:
-                # Prefer the structured death_date; otherwise regex the text.
-                if used_structured and person.get("death_date"):
-                    death_date = normalize_death_date(person["death_date"])
+                # Prefer the structured death_date/birth_date; otherwise regex the text.
+                if record_type == "BIRT":
+                    birth_date = normalize_death_date(person.get("birth_date") or person.get("baptism_date") or "")
+                    # fallback to regex if no structured date
+                    if not birth_date:
+                        birth_date = extract_date(raw_text)
+                    record = {
+                        "nome": person["nome"],
+                        "sobrenome": person.get("sobrenome", ""),
+                        "data_nascimento": birth_date,
+                        "data_obito": None,
+                        "tipo_registo": "BIRT",
+                        "freguesia": freguesia,
+                        "concelho": "Celorico da Beira",
+                        "distrito": "Guarda",
+                        "fonte": "HTR Gemini 3 Flash Preview",
+                        "imagem_url": imagem_url_for(file_id),
+                        "file_id": file_id,
+                        "criado_em": datetime.now().isoformat(),
+                    }
                 else:
-                    death_date = extract_date(raw_text)
-                record = {
-                    "nome": person["nome"],
-                    "sobrenome": person.get("sobrenome", ""),
-                    "data_obito": death_date,
-                    "freguesia": freguesia,
-                    "concelho": "Celorico da Beira",
-                    "distrito": "Guarda",
-                    "fonte": "HTR Gemini 3 Flash Preview",
-                    "imagem_url": imagem_url_for(file_id),
-                    "file_id": file_id,
-                    "criado_em": datetime.now().isoformat(),
-                }
+                    if used_structured and person.get("death_date"):
+                        death_date = normalize_death_date(person["death_date"])
+                    else:
+                        death_date = extract_date(raw_text)
+                    record = {
+                        "nome": person["nome"],
+                        "sobrenome": person.get("sobrenome", ""),
+                        "data_obito": death_date,
+                        "tipo_registo": "DEAT",
+                        "freguesia": freguesia,
+                        "concelho": "Celorico da Beira",
+                        "distrito": "Guarda",
+                        "fonte": "HTR Gemini 3 Flash Preview",
+                        "imagem_url": imagem_url_for(file_id),
+                        "file_id": file_id,
+                        "criado_em": datetime.now().isoformat(),
+                    }
                 # Add rich details when available (new columns, safe if not migrated yet)
                 for k in ("idade","causa_morte","naturalidade","numero_assento","hora_obito","profissao","estado_civil","sacramentos","testamento","local_sepultamento","assinatura"):
                     if detalhes.get(k) is not None:
