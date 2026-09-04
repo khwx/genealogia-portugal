@@ -73,8 +73,14 @@
 
             <div class="meta-grid">
                 <div class="meta-item">Freguesia de Origem: <span>{{ registo.freguesia or 'Celorico da Beira' }}</span></div>
-                <div class="meta-item">Data Estimada: <span>{{ registo.data_obito or 'Não especificada' }}</span></div>
+                <div class="meta-item">Data Estimada: <span>{{ registo.data_obito or registo.data_nascimento or 'Não especificada' }}</span></div>
                 <div class="meta-item">Fonte Original: <span>{{ registo.fonte or 'IA HTR Gemini' }}</span></div>
+                <div class="meta-item">Idade: <span>{{ registo.idade or '—' }}</span></div>
+                <div class="meta-item">Pai: <span>{{ registo.pai or '—' }}</span></div>
+                <div class="meta-item">Mãe: <span>{{ registo.mae or '—' }}</span></div>
+                <div class="meta-item">Cônjuge: <span>{{ registo.conjuge or '—' }}</span></div>
+                <div class="meta-item">Causa: <span>{{ registo.causa_morte or '—' }}</span></div>
+                <div class="meta-item">Assinatura: <span>{{ registo.assinatura or '—' }}</span></div>
             </div>
 
             {% if '[ileg' in (registo.nome or '')|lower or '[não' in (registo.nome or '')|lower %}
@@ -91,6 +97,15 @@
                     <label class="form-label" for="nome">Nome Completo Corrigido / Validado:</label>
                     <input type="text" id="nome" value="{{ registo.nome }}" class="form-input" required>
                     <span style="font-size: 0.8rem; color: var(--text2); margin-top: 6px; display: block;">Pode corrigir erros ortográficos antigos ou completar apelidos. Atalhos: Enter=aprovar, Esc=saltar</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+                    <div class="form-group"><label class="form-label" for="pai">Pai:</label><input type="text" id="pai" value="{{ registo.pai or '' }}" class="form-input" placeholder="Pai"></div>
+                    <div class="form-group"><label class="form-label" for="mae">Mãe:</label><input type="text" id="mae" value="{{ registo.mae or '' }}" class="form-input" placeholder="Mãe"></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px">
+                    <div class="form-group"><label class="form-label" for="conjuge">Cônjuge:</label><input type="text" id="conjuge" value="{{ registo.conjuge or '' }}" class="form-input" placeholder="Cônjuge"></div>
+                    <div class="form-group"><label class="form-label" for="idade">Idade:</label><input type="number" id="idade" value="{{ registo.idade or '' }}" class="form-input" placeholder="Idade"></div>
+                    <div class="form-group"><label class="form-label" for="assinatura">Assinatura:</label><input type="text" id="assinatura" value="{{ registo.assinatura or '' }}" class="form-input" placeholder="Assinatura"></div>
                 </div>
 
                 <div class="btn-row">
@@ -110,7 +125,7 @@
                 e.preventDefault();
                 const btn = e.target.querySelector('.btn-primary');
                 btn.textContent = 'A gravar...'; btn.disabled = true;
-                await postValidar({ id: document.getElementById('registo-id').value, nome: document.getElementById('nome').value, acao: 'aprovar' });
+                await postValidar({ id: document.getElementById('registo-id').value, nome: document.getElementById('nome').value, pai: document.getElementById('pai').value, mae: document.getElementById('mae').value, conjuge: document.getElementById('conjuge').value, idade: document.getElementById('idade').value ? parseInt(document.getElementById('idade').value) : null, assinatura: document.getElementById('assinatura').value, acao: 'aprovar' });
                 btn.textContent = '✓ Aprovar'; btn.disabled = false;
             };
             async function rejeitar() { await postValidar({ id: document.getElementById('registo-id').value, acao: 'rejeitar' }); }
