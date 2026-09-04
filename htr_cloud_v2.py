@@ -170,14 +170,33 @@ Output ONLY a JSON object (no other text) with this structure:
   "deceased": [ { "name": "...", "death_date": "YYYY-MM-DD", "age": "...", "father": "...", "mother": "...", "spouse": "..." } ]
 }
 If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
-    "BIRT": """You are a transcription assistant for Portuguese historical documents.
-This image shows a page from a birth/baptism register (livro de nascimentos/batismos) from Celorico da Beira, Portugal.
-Output ONLY a JSON object (no other text) with this structure:
+    "BIRT": """You are a specialized paleography assistant for Portuguese parish records (Livros Paroquiais de Batismos de Celorico da Beira).
+Transcribe the page and extract structured details for each baptized person.
+Output ONLY a valid JSON object (no other text) with this structure:
 {
-  "transcription": "full transcribed text here",
-  "persons": [ { "name": "nome do recém-nascido", "birth_date": "YYYY-MM-DD", "father": "...", "mother": "...", "godfather": "...", "godmother": "..." } ]
+  "transcription": "full verbatim transcription",
+  "baptized": [
+    {
+      "name": "full name of baptized",
+      "birth_date": "YYYY-MM-DD",
+      "baptism_date": "YYYY-MM-DD",
+      "father": "father full name or null",
+      "mother": "mother full name or null",
+      "father_naturalidade": "father birthplace or null",
+      "mother_naturalidade": "mother birthplace or null",
+      "legitimidade": "legitimo/ilegitimo/exposto or null",
+      "avo_paterno": "paternal grandfather or null",
+      "avo_paterna": "paternal grandmother or null",
+      "avo_materno": "maternal grandfather or null",
+      "avo_materna": "maternal grandmother or null",
+      "godfather": "godfather name or null",
+      "godmother": "godmother name or null",
+      "place": "place or null",
+      "assinatura": "priest signature or null"
+    }
+  ]
 }
-If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
+If a field is not present or illegible, use null. Do NOT invent content. Output ONLY the JSON.""",
     "MARR": """You are a transcription assistant for Portuguese historical documents.
 This image shows a page from a marriage register (livro de casamentos) from Celorico da Beira, Portugal.
 Output ONLY a JSON object (no other text) with this structure:
