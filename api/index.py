@@ -89,8 +89,9 @@ def api_mapa():
         with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
             coords = json.load(f)
         
-        # Obter contagem por freguesia do Supabase (com paginação para abranger todos os 8700+ registos)
+         # Obter contagem por freguesia do Supabase (com paginação para abranger todos os registos)
         counts = {}
+        counts_by_tipo = {}  # freguesia -> {DEAT: n, BIRT: n, MARR: n}
         # Distribuição por século por freguesia (para os popups do mapa)
         parish_centuries = {}
         offset = 0
@@ -99,7 +100,7 @@ def api_mapa():
             resp = requests.get(
                 f"{SUPABASE_URL}/rest/v1/pessoas",
                 headers=HEADERS,
-                params={"select": "freguesia,data_obito", "limit": page, "offset": offset},
+                params={"select": "freguesia,tipo_registo,data_obito,data_nascimento", "limit": page, "offset": offset},
                 timeout=30
             )
             if resp.status_code != 200:
@@ -110,7 +111,10 @@ def api_mapa():
             for item in batch:
                 f = item.get('freguesia') or 'Outras'
                 counts[f] = counts.get(f, 0) + 1
-                d = item.get('data_obito')
+                t = (item.get('tipo_registo') or 'DEAT').upper()
+                ct = counts_by_tipo.setdefault(f, {})
+                ct[t] = ct.get(t, 0) + 1
+                d = item.get('data_obito') or item.get('data_nascimento')
                 if d:
                     try:
                         if 'T' in d:
@@ -137,7 +141,8 @@ def api_mapa():
                 'freguesia': f,
                 'coords': coord,
                 'count': counts.get(f, 0),
-                'periodos': periodos_ordenados
+                'periodos': periodos_ordenados,
+                'counts_tipo': counts_by_tipo.get(f, {})
             })
         cache_set('mapa', map_data)
         return jsonify(map_data)

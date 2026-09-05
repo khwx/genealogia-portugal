@@ -51,22 +51,30 @@
     </div>
     <div class="hero">
         <h1>📚 Cobertura do Arquivo</h1>
-        <p>Inventário completo de <strong style="color:var(--text);">2.343 livros</strong> paroquiais de Celorico da Beira — 26.813 páginas transcritas por IA, 36.098 nomes extraídos. Cada freguesia com link para filtrar no mapa e na pesquisa.</p>
+        <p>Inventário de <strong style="color:var(--text);">2.343 livros</strong> de Celorico da Beira — <span id="heroStats" style="color:var(--text2)">✝️ óbitos 26.813 págs + 👶 batismos 4/25 freguesias + 💍 casamentos pendentes</span>. Cada freguesia com links live para <a href="/" style="color:var(--accent2)">Pesquisa</a>, <a href="/batismos" style="color:var(--accent2)">Batismos</a> e <a href="/mapa" style="color:var(--accent2)">Mapa</a>.</p>
     </div>
     <div class="wrap">
         <div class="stats">
             <div class="stat"><b>2.343</b><span>Livros paroquiais</span></div>
-            <div class="stat"><b>26.813</b><span>Páginas processadas</span></div>
-            <div class="stat"><b id="statNomes">36.098</b><span>Nomes extraídos <span id="liveBadge" class="live">● live</span></span></div>
+            <div class="stat"><b>26.813</b><span>Páginas óbitos</span></div>
+            <div class="stat"><b id="statObitos">35.001</b><span>✝️ Óbitos</span></div>
+            <div class="stat" style="border-color:var(--accent)"><b id="statBatismos" style="color:var(--accent2)">3.594</b><span>👶 Batismos <span id="liveBadge" class="live">● live 4/25</span></span></div>
+            <div class="stat"><b id="statNomes">38.595</b><span>Total nomes <span style="color:var(--text2);font-size:0.75rem">↕ live</span></span></div>
             <div class="stat"><b>25</b><span>Freguesias</span></div>
         </div>
         <div class="card">
+            <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                <button class="pill active" id="filtroTodos" onclick="filtrarTipo('todos')" style="cursor:pointer;border:1px solid var(--accent)">Todos</button>
+                <button class="pill" onclick="filtrarTipo('BIRT')" style="cursor:pointer">👶 só Batismos</button>
+                <button class="pill" onclick="filtrarTipo('DEAT')" style="cursor:pointer">✝️ só Óbitos</button>
+                <span style="color:var(--text2);font-size:0.78rem;align-self:center;margin-left:8px">· Dados BIRT ricos: 4 avós, legitimidade, padrinhos, assinatura</span>
+            </div>
             <input id="filtro" class="search" placeholder="Filtrar freguesia (ex: Rapa, Linhares)..." oninput="filtrar()">
             <div style="overflow-x:auto;">
                 <table id="tabela">
-                    <thead><tr><th>Freguesia</th><th style="text-align:right;">Livros (T/D/M/B)</th><th style="text-align:right;">Páginas</th><th class="sortable" style="text-align:right;" onclick="ordenarPorNomes()" title="Clique para ordenar">Nomes (óbitos) ↕</th><th></th></tr></thead>
+                    <thead><tr><th>Freguesia</th><th style="text-align:right;">Livros (T/D/M/B)</th><th style="text-align:right;">Páginas</th><th class="sortable" style="text-align:right;" onclick="ordenarPorNomes()" title="Clique para ordenar">✝️ Óbitos ↕</th><th style="text-align:right;background:rgba(108,99,255,0.08)">👶 Batismos</th><th style="text-align:right;">💍 Casamentos</th><th></th></tr></thead>
                     <tbody>
-                        <tr data-f="mesquitela"><td>Mesquitela</td><td style="text-align:right;">126 (59/56/11)</td><td style="text-align:right;">4424</td><td style="text-align:right;">2368</td><td><a class="pill" href="/?freguesia=Mesquitela">Ver →</a></td></tr>
+                        <tr data-f="mesquitela"><td>Mesquitela</td><td style="text-align:right;">126 (59/56/11)</td><td style="text-align:right;">4424</td><td style="text-align:right;">2368</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td><a class="pill" href="/?freguesia=Mesquitela">Ver →</a> <a class="pill" href="/batismos" style="font-size:0.7rem">👶</a></td></tr>
                         <tr data-f="celorico (santa maria)"><td>Celorico (Santa Maria)</td><td style="text-align:right;">128 (58/55/15)</td><td style="text-align:right;">2037</td><td style="text-align:right;">4988</td><td><a class="pill" href="/?freguesia=Celorico">Ver →</a></td></tr>
                         <tr data-f="vale de azares"><td>Vale de Azares</td><td style="text-align:right;">126 (58/55/13)</td><td style="text-align:right;">1787</td><td style="text-align:right;">3023</td><td><a class="pill" href="/?freguesia=Vale">Ver →</a></td></tr>
                         <tr data-f="celorico (são pedro)"><td>Celorico (São Pedro)</td><td style="text-align:right;">126 (57/55/14)</td><td style="text-align:right;">1782</td><td style="text-align:right;">3431</td><td><a class="pill" href="/?freguesia=Celorico">Ver →</a></td></tr>
@@ -116,32 +124,63 @@
             sortDesc = !sortDesc;
             rows.forEach(r => tbody.appendChild(r));
         }
-        // Live: atualiza Nomes (óbitos) a partir do Supabase via /api/mapa
+        function filtrarTipo(tipo){
+            document.querySelectorAll('#tabela tbody tr').forEach(tr=>{
+                const b=parseInt(tr.dataset.birt||'0'); const d=parseInt(tr.dataset.deat||'0');
+                let show=true;
+                if(tipo==='BIRT') show=b>0;
+                else if(tipo==='DEAT') show=d>0;
+                tr.style.display=show?'':'none';
+            });
+            document.querySelectorAll('[onclick^="filtrarTipo"]').forEach(b=>b.classList.remove('active'));
+            document.getElementById(tipo==='todos'?'filtroTodos':null)?.classList.add('active');
+            if(tipo!=='todos') document.querySelector(`[onclick="filtrarTipo('${tipo}')"]`)?.classList.add('active');
+        }
+        // Live: atualiza contagens por tipo via /api/mapa (counts_tipo)
         async function atualizarLive() {
             try {
                 const r = await fetch('/api/mapa');
                 if (!r.ok) return;
                 const data = await r.json();
-                const map = {};
-                let total = 0;
-                data.forEach(d => { map[d.freguesia] = d.count; total += d.count; });
-                // atualiza stat
+                const map = {}; const mapTipo = {};
+                let total=0, totalObitos=0, totalBatismos=0, totalCasamentos=0;
+                data.forEach(d => {
+                    map[d.freguesia] = d.count;
+                    const ct=d.counts_tipo||{};
+                    mapTipo[d.freguesia]=ct;
+                    total+=d.count;
+                    totalObitos+=(ct.DEAT||0);
+                    totalBatismos+=(ct.BIRT||0);
+                    totalCasamentos+=(ct.MARR||0);
+                });
                 document.getElementById('statNomes').textContent = total.toLocaleString('pt-PT');
-                // atualiza cada linha
+                document.getElementById('statObitos').textContent = totalObitos.toLocaleString('pt-PT');
+                document.getElementById('statBatismos').textContent = totalBatismos.toLocaleString('pt-PT');
+                document.getElementById('heroStats').innerHTML=`✝️ óbitos ${totalObitos.toLocaleString('pt-PT')} + 👶 batismos ${totalBatismos.toLocaleString('pt-PT')} (${Object.values(mapTipo).filter(c=>c.BIRT>0).length}/25 freguesias) + 💍 casamentos ${totalCasamentos.toLocaleString('pt-PT')}`;
+                // garante colunas extra em linhas antigas (7 cols)
+                document.querySelectorAll('#tabela tbody tr').forEach(tr=>{
+                    while(tr.cells.length<7){
+                        const td=document.createElement('td'); td.style.textAlign='right'; td.textContent='—';
+                        tr.insertBefore(td, tr.cells[tr.cells.length-1]);
+                    }
+                });
                 document.querySelectorAll('#tabela tbody tr').forEach(tr => {
                     const nome = tr.cells[0].textContent.trim();
-                    // match exato ou parcial (Celorico villas)
-                    let v = map[nome];
+                    let v = map[nome]; let ct=null;
                     if (v === undefined) {
-                        // tenta match parcial
-                        for (const k in map) if (k.includes(nome) || nome.includes(k)) { v = map[k]; break; }
-                    }
+                        for (const k in map) if (k.includes(nome) || nome.includes(k)) { v = map[k]; ct=mapTipo[k]; break; }
+                    } else ct=mapTipo[nome];
                     if (v !== undefined) {
                         const old = tr.cells[3].textContent;
-                        tr.cells[3].textContent = v.toLocaleString('pt-PT');
-                        if (old !== v.toLocaleString('pt-PT')) tr.cells[3].style.color = 'var(--green)';
+                        tr.cells[3].textContent = (ct?.DEAT||0).toLocaleString('pt-PT');
+                        tr.cells[4].textContent = ct?.BIRT ? ct.BIRT.toLocaleString('pt-PT') : '—';
+                        tr.cells[5].textContent = ct?.MARR ? ct.MARR.toLocaleString('pt-PT') : '—';
+                        tr.dataset.deat=ct?.DEAT||0; tr.dataset.birt=ct?.BIRT||0;
+                        if (ct?.BIRT) { tr.cells[4].style.color='var(--accent2)'; tr.cells[4].style.fontWeight='600'; }
+                        if (old !== (ct?.DEAT||0).toLocaleString('pt-PT')) tr.cells[3].style.color='var(--green)';
+                        // links live
+                        if(ct?.BIRT && !tr.innerHTML.includes('/batismos')) tr.cells[6].innerHTML+=` <a class="pill" href="/batismos?freguesia=${encodeURIComponent(nome)}" style="font-size:0.7rem;background:rgba(108,99,255,0.12)">👶 ${ct.BIRT}</a>`;
                     }
-                    // badge Atualizado para as 2 villas reprocessadas
                     if (nome.includes('Santa Maria') || nome.includes('São Pedro')) {
                         if (!tr.querySelector('.live')) {
                             const b = document.createElement('span');
@@ -149,14 +188,15 @@
                             b.style.color = 'var(--green)'; b.style.fontSize = '0.65rem';
                             tr.cells[0].appendChild(b);
                         }
-                        tr.style.background = 'rgba(34,197,94,0.06)';
                     }
+                    // destaca 4 freguesias BIRT já feitas
+                    if (ct?.BIRT) tr.style.background='rgba(108,99,255,0.06)';
                 });
-                document.getElementById('liveBadge').textContent = '● live ' + new Date().toLocaleTimeString('pt-PT', {hour:'2-digit', minute:'2-digit'});
-            } catch {}
+                document.getElementById('liveBadge').textContent = `● live ${Object.values(mapTipo).filter(c=>c.BIRT>0).length}/25 batismos · ` + new Date().toLocaleTimeString('pt-PT', {hour:'2-digit', minute:'2-digit'});
+            } catch(e){ console.error(e); }
         }
         atualizarLive();
-        setInterval(atualizarLive, 300000); // refresca a cada 5 min (cache 10 min no backend)
+        setInterval(atualizarLive, 300000);
     </script>
 </body>
 </html>
