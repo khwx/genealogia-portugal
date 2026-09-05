@@ -2,26 +2,28 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
-## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, avós reprocess 44/215, Salgueirais pendente)
+## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, avós sync live, Salgueirais 1139 em curso)
 
 ### Estado verificado
-- **DEAT completo** em `25/25` freguesias `26813` páginas `36098` nomes `100%`. Supabase `35001`.
-- **BIRT 4/25 freguesias completas** → `Supabase 3594` (`+1` novo do reprocess):
+- **DEAT completo** `25/25` freguesias `26813` págs `36098` nomes `100%`. Supabase `35001`.
+- **BIRT 4/25 freguesias completas** → `Supabase 3613`:
   - Aldeia da Serra: `1 livro 84 págs → 163 batismos` ✅
-  - Galisteu: `2 livros 131 págs → 338 batismos` ✅ (freguesia corrigida `Celorico da Beira` → `Galisteu`)
-  - Casas do Rio: `4 livros 436 págs → 973 batismos` ✅
-  - São Martinho: `4 livros 820 págs → 2119 batismos` ✅ (sync concluído)
-- **Reprocessamento BIRT rico** `44/215` páginas (`Aldeia 84 + Galisteu 131`) em curso `pid 557097` — extrai `4 avós + legitimidade + naturalidade + assinatura` com novo prompt `15 campos`. Primeiro `avo_paterno` já extraído.
-- **Supabase migrations**: colunas `avo_paterno`, `avo_paterna`, `avo_materno`, `avo_materna`, `legitimidade`, `naturalidade_pai`, `naturalidade_mae` adicionadas via SQL Editor (verificado com insert test — `id 38603`, deletado OK)
-- **BIRT freguesia mapping**: `build_file_to_freguesia()` corrigido para `80656` entries (`405` validadas) — commit `8cc4fb4`
-- **Commits push OK**: `fce8f02 feat: BIRT 15 campos` + `8cc4fb4 fix: BIRT freguesia mapping` + `d0dafd5 docs: progress`
-- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, 166 tracked files, `.env` ignorado.
+  - Galisteu: `2 livros 131 págs → 338 batismos` ✅ (freguesia corrigida)
+  - Casas do Rio: `4 livros 436 págs → 973 batismos` ✅ (freguesia corrigida +307)
+  - São Martinho: `4 livros 820 págs → 2119 batismos` ✅
+- **Reprocess BIRT rico 215/215 COMPLETO** (Aldeia 84 + Galisteu 131): extrai `4 avós + legitimidade + naturalidade + assinatura`
+- **Sync avós live**: `avo_paterno=11`, `legitimidade=19`, `naturalidade_pai=9` no Supabase ✅
+- **Fix Casas do Rio freguesia**: `307` rows `Celorico da Beira → Casas do Rio` corrigidas em Supabase
+- **Salgueirais BIRT 1139 páginas em curso** `pid 574996`
+- **UI**: filtros freguesias 25 dinâmicos, batismos mostra avós/legitimidade/padrinhos, árvore mostra dados BIRT ricos
+- **Commits push OK**: `fce8f02` `8cc4fb4` `d0dafd5` `29dc25f` `49f9484` `e352c87` `22ece3e` — todos limpos, `.env` ignorado.
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`.
 
-### Próximos passos pendentes
-1. **Completar reprocess BIRT rico** `Aldeia+Galisteu` (171 páginas restantes) → re-sync Supabase com novos campos (avós, legitimidade)
-2. **Salgueirais BIRT** `6 livros 1139 págs` — script pronto `/tmp/birt_salgueirais.py`, próxima freguesia a processar
-3. **20 freguesias BIRT restantes** (Cadafaz 7 livros até Celorico Santa Maria 14 livros)
-4. Depois BIRT completo → MARR `1030 livros` (~20000 páginas)
+### Próximos passos
+1. **Completar Salgueirais** `1139` págs (em curso) → sync BIRT Salgueirais
+2. **Cadafaz 7 livros** → próxima freguesia
+3. Continuar até `25/25` freguesias BIRT
+4. Depois BIRT completo → MARR `1030 livros` (~20000 págs)
 
 ## 2026-09-04 (execução autónoma — backfill Supabase, UI BIRT, backup HTR, 7 chaves adicionadas)
 
