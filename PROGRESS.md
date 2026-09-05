@@ -2,27 +2,25 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
-## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, avós sync live, Salgueirais 1139 em curso)
+## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, Salgueirais 600/991, Cadafaz pronto)
 
 ### Estado verificado
 - **DEAT completo** `25/25` freguesias `26813` págs `36098` nomes `100%`. Supabase `35001`.
 - **BIRT 4/25 freguesias completas** → `Supabase 3613`:
   - Aldeia da Serra: `1 livro 84 págs → 163 batismos` ✅
-  - Galisteu: `2 livros 131 págs → 338 batismos` ✅ (freguesia corrigida)
-  - Casas do Rio: `4 livros 436 págs → 973 batismos` ✅ (freguesia corrigida +307)
+  - Galisteu: `2 livros 131 págs → 338 batismos` ✅
+  - Casas do Rio: `4 livros 436 págs → 973 batismos` ✅ (+307 freguesia fix)
   - São Martinho: `4 livros 820 págs → 2119 batismos` ✅
-- **Reprocess BIRT rico 215/215 COMPLETO** (Aldeia 84 + Galisteu 131): extrai `4 avós + legitimidade + naturalidade + assinatura`
-- **Sync avós live**: `avo_paterno=11`, `legitimidade=19`, `naturalidade_pai=9` no Supabase ✅
-- **Fix Casas do Rio freguesia**: `307` rows `Celorico da Beira → Casas do Rio` corrigidas em Supabase
-- **Salgueirais BIRT 1139 páginas em curso** `pid 574996`
-- **UI**: filtros freguesias 25 dinâmicos, batismos mostra avós/legitimidade/padrinhos, árvore mostra dados BIRT ricos
-- **Commits push OK**: `fce8f02` `8cc4fb4` `d0dafd5` `29dc25f` `49f9484` `e352c87` `22ece3e` — todos limpos, `.env` ignorado.
-- `status_check.py` → `status: OK`, `ALL TESTS PASSED`.
+- **Reprocess BIRT rico 215/215 COMPLETO** — avós sync live: `avo_paterno=11`, `legitimidade=19`, `naturalidade_pai=9`, `assinatura=2510`
+- **Salgueirais BIRT 600/991** (60%) `pid 2559`, `0 errors` — vai acabar em ~10min
+- **Cadafaz BIRT** script pronto `904` págs (8 livros) — próximo freguesia
+- **UI**: filtros 25 freguesias dinâmicos, batismos com avós/legitimidade, árvore com dados BIRT ricos
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, 166 tracked files, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Salgueirais** `1139` págs (em curso) → sync BIRT Salgueirais
-2. **Cadafaz 7 livros** → próxima freguesia
-3. Continuar até `25/25` freguesias BIRT
+1. **Lançar Cadafaz BIRT** `904` págs quando Salgueirais acabar
+2. Continuar `Carrapichana 1145` → `Prados 1278` → ... → `Celorico Santa Maria 3369`
+3. Depois BIRT completo → MARR `1030 livros` (~20000 págs)
 4. Depois BIRT completo → MARR `1030 livros` (~20000 págs)
 
 ## 2026-09-04 (execução autónoma — backfill Supabase, UI BIRT, backup HTR, 7 chaves adicionadas)
