@@ -5,7 +5,8 @@
 <title>Pessoas — Genealogia Portugal</title>
 <meta name="description" content="Índice paginado de 36.098 pessoas de Celorico da Beira — filtra por nome, freguesia, tipo e anos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--green:#22c55e;--red:#ef4444;--radius:12px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -35,8 +36,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .results{max-width:1100px;margin:0 auto 30px;padding:0 20px;width:100%}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;transition:.2s;text-decoration:none;color:inherit}
 .card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
-.card-name{font-size:1.05rem;font-weight:600;color:var(--text)}
-.card-meta{color:var(--text2);font-size:0.86rem;display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.card-name{font-size:1.05rem;font-weight:700;color:var(--text);font-family:'Source Serif 4',serif;letter-spacing:-0.01em}
+.card-meta{color:var(--text2);font-size:0.86rem;display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-family:'Inter',sans-serif}
+.font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.75rem}
+.card[data-tipo="DEAT"]{border-left:4px solid #db761f}
+.card[data-tipo="BIRT"]{border-left:4px solid #6C63FF}
+.card[data-tipo="MARR"]{border-left:4px solid #d4af37}
+.card[data-tipo="FAM"]{border-left:4px solid #6C63FF}
 .card-meta span{display:flex;align-items:center;gap:4px}
 .pill{font-size:0.78rem;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:4px 10px;border-radius:20px}
 .pagination{display:flex;justify-content:center;gap:8px;padding:20px 0;flex-wrap:wrap;align-items:center}
@@ -50,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </head>
 <body>
 <div class="topbar">
-  <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+  <a href="/" class="logo" style="font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
   <div class="nav-links">
     <a href="/" class="nav-link">Pesquisa</a>
     <a href="/pessoas" class="nav-link active">Pessoas</a>
@@ -61,7 +67,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 <div class="hero">
-  <h1>Índice de Pessoas</h1>
+  <h1 style="font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.02em">Índice de Pessoas</h1>
   <p>Explora todas as pessoas indexadas — filtra por nome, freguesia, tipo de registo e intervalo de anos. Cada ficha liga à árvore e ao Digitarq.</p>
 </div>
 <div class="filters">
@@ -140,13 +146,13 @@ function cardTemplate(p){
   const freg = p.freguesia || 'Celorico da Beira';
   const tipo = (p.tipo_registo||'DEAT').toUpperCase();
   const id = p.id;
-  return `<a class="card" href="/pessoa/${id}">
+  return `<a class="card" data-tipo="${tipo}" href="/pessoa/${id}">
     <div style="flex:1">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="card-name">${nome}</span> ${tipoBadge(tipo)}</div>
-      <div class="card-meta"><span>📅 ${dataFmt}</span><span>📍 ${freg}</span>${p.idade?`<span>🎂 ${p.idade}a</span>`:''}${p.pai||p.mae?`<span>👪 ${[p.pai,p.mae].filter(Boolean).join(' & ')}</span>`:''}</div>
+       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="card-name">${nome}</span> ${tipoBadge(tipo)}</div>
+       <div class="card-meta"><span class="font-mono-caps">📅 ${dataFmt}</span><span>📍 ${freg}</span>${p.idade?`<span>🎂 ${p.idade}a</span>`:''}${p.pai||p.mae?`<span>👪 ${[p.pai,p.mae].filter(Boolean).join(' & ')}</span>`:''}</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:140px">
-      <span class="pill">#${id} → ver ficha</span>
+       <span class="pill font-mono-caps">#${id} → ver ficha</span>
       ${p.imagem_url?`<span style="font-size:0.78rem;color:var(--accent2)">📄 Digitarq</span>`:''}
     </div>
   </a>`;

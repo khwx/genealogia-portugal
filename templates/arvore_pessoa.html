@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="title">Árvore — Genealogia Portugal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
 :root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
@@ -25,18 +26,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .legend{position:absolute;bottom:16px;left:16px;background:rgba(26,29,39,0.92);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.75rem;display:flex;gap:12px;align-items:center}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 .node{cursor:pointer}
-.node text{font-family:Inter;font-size:11px;fill:var(--text);pointer-events:none}
-.link{fill:none;stroke:#3a3f55;stroke-width:1.6px}
+ .node text{font-family:'Source Serif 4',serif;font-size:11px;fill:var(--text);pointer-events:none;font-weight:600}
+ .font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.7rem}
+ .link{fill:none;stroke:#3a3f55;stroke-width:1.6px}
+ /* timeline sidebar */
+ .layout{display:flex;flex:1;min-height:0}
+ #treeWrap{flex:1}
+ .timeline-sidebar{width:280px;background:var(--bg2);border-left:1px solid var(--border);padding:16px;overflow-y:auto}
+ .timeline{position:relative;padding-left:22px}
+ .timeline::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--border);border-radius:2px}
+ .tl-item{position:relative;padding:8px 0;display:flex;flex-direction:column;gap:2px}
+ .tl-dot{position:absolute;left:-16px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--border);border:2px solid var(--bg2)}
+ .tl-dot.active-DEAT{background:#db761f;border-color:#db761f}
+ .tl-dot.active-BIRT{background:#6C63FF;border-color:#6C63FF}
+ .tl-dot.active-MARR{background:#d4af37;border-color:#d4af37}
+ .tl-label{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-size:0.68rem;color:var(--text2);font-weight:600}
+ .tl-value{font-size:0.85rem;color:var(--text)}
+ @media(max-width:900px){.layout{flex-direction:column}.timeline-sidebar{width:100%;border-left:none;border-top:1px solid var(--border)}}
 </style>
 </head>
 <body>
 <div class="topbar">
-  <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+  <a href="/" class="logo" style="font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;color:var(--text);text-decoration:none"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
   <div><a href="/" class="nav-link">Pesquisa</a><a href="/pessoas" class="nav-link">Pessoas</a><a href="/family-tree" class="nav-link">Árvore Global</a></div>
 </div>
 <div class="controls">
-  <span id="headerName" style="font-weight:600;color:var(--text)">A carregar...</span>
-  <span style="color:var(--text2);font-size:0.82rem" id="headerMeta"></span>
+  <span id="headerName" style="font-weight:700;color:var(--text);font-family:'Source Serif 4',serif;letter-spacing:-0.01em">A carregar...</span>
+  <span class="font-mono-caps" style="color:var(--text2)" id="headerMeta"></span>
   <div style="margin-left:auto;display:flex;gap:8px">
     <a id="btnFicha" class="btn" href="#">Ficha →</a>
     <button class="btn" onclick="zoomTo(1)">Centrar</button>
@@ -45,7 +61,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="btn btn-primary" onclick="exportSVG()">Exportar SVG</button>
   </div>
 </div>
+<div class="layout">
 <div id="treeWrap"><div id="tooltip" class="tooltip" style="display:none"></div></div>
+<aside class="timeline-sidebar" id="timelineSidebar" style="display:none">
+  <h3 style="font-size:0.9rem;margin-bottom:10px;font-family:'Inter',sans-serif">🕰️ Linha do tempo</h3>
+  <div id="timelineContent"></div>
+  <div id="timelineDocBtn" style="margin-top:14px"></div>
+</aside>
+</div>
 <div class="legend"><span><span class="dot" style="background:#eab308"></span> Avós</span><span><span class="dot" style="background:#22c55e"></span> Pais</span><span><span class="dot" style="background:#6c63ff"></span> Pessoa</span><span><span class="dot" style="background:#38bdf8"></span> Filhos</span><span><span class="dot" style="background:#a78bfa"></span> Cônjuge</span></div>
 
 <script>
@@ -64,6 +87,23 @@ async function load(){
   document.getElementById('headerMeta').textContent=`${p.freguesia||''} • ${p.data_obito||p.data_nascimento||''} • ${p.tipo_registo||'DEAT'}`;
   document.getElementById('btnFicha').href=`/pessoa/${p.id}`;
   renderTree(familiaData);
+  renderTimeline(p);
+}
+function fmtDate(d){ if(!d) return '—'; try{ const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString('pt-PT'); }catch{return d;}}
+function renderTimeline(p){
+  const side=document.getElementById('timelineSidebar');
+  const cont=document.getElementById('timelineContent');
+  const btn=document.getElementById('timelineDocBtn');
+  if(!side||!cont) return;
+  side.style.display='block';
+  const hasNasc=!!p.data_nascimento, hasCas=!!p.data_casamento, hasOb=!!p.data_obito;
+  cont.innerHTML=`<div class="timeline">
+    <div class="tl-item"><span class="tl-dot ${hasNasc?'active-BIRT':''}"></span><span class="tl-label">Nascimento</span><span class="tl-value">${hasNasc?fmtDate(p.data_nascimento):'—'}</span></div>
+    <div class="tl-item"><span class="tl-dot ${hasNasc?'active-BIRT':''}"></span><span class="tl-label">Batismo</span><span class="tl-value">${fmtDate(p.data_nascimento)}</span></div>
+    <div class="tl-item"><span class="tl-dot ${hasCas?'active-MARR':''}"></span><span class="tl-label">Casamento</span><span class="tl-value">${hasCas?fmtDate(p.data_casamento):'—'}</span></div>
+    <div class="tl-item"><span class="tl-dot ${hasOb?'active-DEAT':''}"></span><span class="tl-label">Óbito</span><span class="tl-value">${hasOb?fmtDate(p.data_obito):'—'}</span></div>
+  </div>`;
+  btn.innerHTML = p.imagem_url ? `<a href="${p.imagem_url}" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;display:flex">📄 Ver documento original ↗</a>` : `<div style="color:var(--text2);font-size:0.82rem">Sem imagem disponível</div>`;
 }
 
 function buildFullHierarchy(fam){

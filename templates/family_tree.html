@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Árvore Genealógica - Celorico da Beira</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; }
-        .header { background: linear-gradient(135deg, #1e293b, #334155); padding: 20px; border-bottom: 1px solid #475569; }
-        .header h1 { font-size: 24px; color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: #0F1117; color: #e2e8f0; }
+        .header { background: linear-gradient(135deg, #1a1d27, #2e3347); padding: 20px; border-bottom: 1px solid #334155; display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px }
+        .header h1 { font-size: 24px; color: #f8fafc; font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.02em }
+        .font-names{font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.015em}
+        .font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.68rem}
         .header .subtitle { color: #94a3b8; font-size: 14px; margin-top: 4px; }
         .stats { display: flex; gap: 24px; margin-top: 12px; }
         .stat { text-align: center; }
@@ -24,10 +29,12 @@
         #tree-container svg { width: 100%; height: 100%; }
         .node { cursor: pointer; }
         .node circle { stroke-width: 2px; }
-        .node text { font-size: 11px; fill: #e2e8f0; }
-        .node--obito circle { fill: #ef4444; stroke: #dc2626; }
+        .node text { font-size: 11px; fill: #e2e8f0; font-family:'Source Serif 4',serif;font-weight:600 }
+        .node--obito circle { fill: #db761f; stroke: #a85a18; }
+        .node--birt circle { fill: #6C63FF; stroke: #4f46e5; }
+        .node--marr circle { fill: #d4af37; stroke: #b7952e; }
+        .node--family circle { fill: #6C63FF; stroke: #4f46e5; }
         .node--person circle { fill: #3b82f6; stroke: #2563eb; }
-        .node--family circle { fill: #22c55e; stroke: #16a34a; }
         .link { fill: none; stroke: #475569; stroke-width: 1.5px; stroke-opacity: 0.6; }
         .tooltip { position: absolute; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 12px; font-size: 13px; pointer-events: none; z-index: 100; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .tooltip h3 { color: #38bdf8; margin-bottom: 6px; font-size: 15px; }
@@ -60,8 +67,10 @@
 </head>
 <body>
     <div class="header">
-        <h1>Árvore Genealógica — Celorico da Beira</h1>
-        <div class="subtitle">Registos de Óbitos do Arquivo Distrital da Guarda | Séculos XVII–XX</div>
+        <div>
+        <h1 style="display:flex;align-items:center;gap:10px"><span style="font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700"><span style="color:#6C63FF">Genealogia</span> Portugal</span><span style="font-weight:400;opacity:0.6;font-size:16px;font-family:'Inter',sans-serif">— Celorico da Beira</span></h1>
+        <div class="subtitle font-mono-caps" style="color:#94a3b8;margin-top:4px">Registos de Óbitos do Arquivo Distrital da Guarda | Séculos XVII–XX</div>
+        </div>
         <div class="stats">
             <div class="stat"><div class="stat-value" id="stat-docs">2.343</div><div class="stat-label">Livros Paroquiais</div></div>
             <div class="stat"><div class="stat-value" id="stat-images">26.813</div><div class="stat-label">Páginas Processadas</div></div>
@@ -203,9 +212,11 @@ function buildHierarchy() {
     allPeople.forEach(p => {
         const key = p.freguesia || 'Desconhecida';
         if (!families[key]) families[key] = { name: key, type: 'family', children: [] };
+        const t=(p.tipo_registo||'DEAT').toLowerCase();
+        const nodeType = t==='birt'?'birt':t==='marr'?'marr':'obito';
         families[key].children.push({
             name: p.nome || 'Desconhecido',
-            type: 'obito',
+            type: nodeType,
             data: p
         });
     });
