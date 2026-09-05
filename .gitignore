@@ -81,3 +81,4 @@ reprocess_celorico_villas.py
 
 # Ignore all generated output (already-tracked files remain in clones)
 output/
+inspiration/
