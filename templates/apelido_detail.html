@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apelido — Genealogia Portugal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none}
+.logo span{color:#6C63FF}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.92rem;font-weight:500}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px;width:100%}
+.breadcrumb{color:var(--text2);font-size:0.85rem;margin-bottom:12px}
+.breadcrumb a{color:var(--accent2);text-decoration:none}
+.hero{padding:10px 0 14px}
+.hero h1{font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.02em;font-size:2rem}
+.hero p{color:var(--text2);font-size:0.95rem;margin-top:4px}
+.grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.72rem}
+.badge{font-size:0.75rem;padding:3px 8px;border-radius:20px;font-weight:600}
+.badge-deat{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.badge-birt{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.badge-marr{background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3)}
+.card-pessoa{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;gap:12px;text-decoration:none;color:inherit;transition:.15s}
+.card-pessoa:hover{border-color:var(--accent);transform:translateY(-1px)}
+.card-pessoa[data-tipo="DEAT"]{border-left:4px solid #db761f}
+.card-pessoa[data-tipo="BIRT"]{border-left:4px solid #6C63FF}
+.card-pessoa[data-tipo="MARR"]{border-left:4px solid #d4af37}
+#map{height:340px;border-radius:10px}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
+  <div class="nav-links">
+    <a href="/apelidos" class="nav-link active">Apelidos</a>
+    <a href="/timeline" class="nav-link">Timeline</a>
+    <a href="/pessoas" class="nav-link">Pessoas</a>
+    <a href="/mapa" class="nav-link">Mapa</a>
+  </div>
+</div>
+<div class="wrap">
+  <div class="breadcrumb"><a href="/apelidos">← Apelidos</a> / <span id="bc" style="color:var(--text)">{{ apelido }}</span></div>
+  <div class="hero">
+    <h1 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">{{ apelido }} <span id="totalBadge" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;background:var(--bg3);border:1px solid var(--border);padding:6px 10px;border-radius:20px;color:var(--text2)">a carregar…</span></h1>
+    <p id="subtitle">Freguesias, décadas e pessoas com este apelido.</p>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <a id="verPessoasLink" href="#" class="font-mono-caps" style="color:var(--accent2);text-decoration:none;border:1px solid var(--border);background:var(--bg2);padding:6px 12px;border-radius:20px">Ver todas em /pessoas →</a>
+      <a href="/apelidos" style="color:var(--text2);text-decoration:none;font-size:0.85rem;align-self:center">← voltar à nuvem</a>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="card">
+        <h3 style="font-size:1rem;margin-bottom:4px">📍 Mapa por freguesia (filtrado)</h3>
+        <p style="color:var(--text2);font-size:0.85rem;margin-bottom:10px">Distribuição geográfica só deste apelido.</p>
+        <div id="map"></div>
+        <div id="fregList" style="margin-top:12px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1rem;margin-bottom:4px">🕰️ Timeline — décadas</h3>
+        <p style="color:var(--text2);font-size:0.85rem;margin-bottom:10px">Clique numa barra para ver pessoas da década.</p>
+        <div id="decadasChart" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="font-size:1rem">👥 Pessoas</h3>
+          <span id="pessoasCount" style="color:var(--text2);font-size:0.82rem"></span>
+        </div>
+        <div id="pessoasList"><div class="skeleton" style="height:78px;margin-bottom:8px"></div><div class="skeleton" style="height:78px"></div></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="btnPrev" class="font-mono-caps" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:8px 12px;border-radius:8px;cursor:pointer" onclick="prevP()">← Anterior</button>
+          <span id="pageInfo" style="color:var(--text2);font-size:0.82rem;align-self:center"></span>
+          <button id="btnNext" class="font-mono-caps" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:8px 12px;border-radius:8px;cursor:pointer;margin-left:auto" onclick="nextP()">Seguinte →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const APELIDO = {{ apelido|tojson }};
+document.title = APELIDO + ' — Apelidos | Genealogia Portugal';
+document.getElementById('verPessoasLink').href = '/pessoas?q=' + encodeURIComponent(APELIDO);
+
+let mapa=null;
+let page=0; const PAGE_SIZE=20;
+
+function tipoBadge(t){
+  t=(t||'DEAT').toUpperCase();
+  if(t==='BIRT') return '<span class="badge badge-birt">👶</span>';
+  if(t==='MARR') return '<span class="badge badge-marr">💍</span>';
+  return '<span class="badge badge-deat">✝️</span>';
+}
+
+async function loadHeader(){
+  try{
+    const r=await fetch('/api/apelidos/'+encodeURIComponent(APELIDO));
+    if(!r.ok) throw new Error();
+    const j=await r.json();
+    document.getElementById('totalBadge').textContent = j.total + ' registos';
+    document.getElementById('subtitle').textContent = `${j.total} pessoas com apelido ${APELIDO} • ${j.freguesias.length} freguesias`;
+    renderFregs(j.freguesias);
+    renderDecadas(j.decadas);
+    initMap(j.freguesias);
+  }catch(e){
+    document.getElementById('totalBadge').textContent='—';
+  }
+}
+function renderFregs(list){
+  const c=document.getElementById('fregList');
+  if(!list.length){ c.innerHTML='<div style="color:var(--text2);font-size:0.85rem">Sem dados por freguesia.</div>'; return; }
+  const max=Math.max(...list.map(x=>x.count));
+  c.innerHTML=list.slice(0,12).map(f=>{
+    const pct=(f.count/max)*100;
+    return `<a href="/pessoas?q=${encodeURIComponent(APELIDO)}&freguesia=${encodeURIComponent(f.freguesia)}" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+      <span style="width:130px;text-align:right;color:var(--text);font-size:0.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.freguesia}</span>
+      <span style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;height:18px;overflow:hidden"><span style="display:block;width:${pct}%;height:100%;background:linear-gradient(90deg,#6c63ff,#8b83ff)"></span></span>
+      <span style="color:var(--text2);font-size:0.82rem;width:44px;text-align:right">${f.count}</span></a>`;
+  }).join('');
+}
+function renderDecadas(list){
+  const c=document.getElementById('decadasChart');
+  if(!list || !list.length){ c.innerHTML='<div style="color:var(--text2);font-size:0.85rem">Sem datas suficientes.</div>'; return; }
+  const max=Math.max(...list.map(x=>x.count));
+  c.innerHTML=list.map(d=>{
+    const pct=(d.count/max)*100;
+    return `<a href="/pessoas?from_year=${d.decada}&to_year=${d.decada+9}&q=${encodeURIComponent(APELIDO)}" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+      <span style="width:64px;text-align:right;color:var(--accent2);font-weight:600;font-size:0.85rem">${d.decada}s</span>
+      <span style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;height:20px;overflow:hidden"><span style="display:block;width:${pct}%;height:100%;background:linear-gradient(90deg,#22c55e,#06b6d4)"></span></span>
+      <span style="color:var(--text2);font-size:0.82rem;width:40px;text-align:right">${d.count}</span></a>`;
+  }).join('');
+}
+
+async function initMap(fregs){
+  try{
+    const resp=await fetch('/api/mapa');
+    const mapData=await resp.json();
+    const countsByFreg={}; fregs.forEach(f=> countsByFreg[f.freguesia]=f.count);
+    const total=Math.max(...fregs.map(f=>f.count),1);
+    if(mapa) mapa.remove();
+    mapa=L.map('map').setView([40.633,-7.392],11);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO',maxZoom:19}).addTo(mapa);
+    mapData.forEach(item=>{
+      const cnt=countsByFreg[item.freguesia]||0;
+      if(!item.coords) return;
+      if(cnt===0) return;
+      const r=Math.max(8, Math.sqrt(cnt/total)*22+6);
+      const pct=cnt/total;
+      const color = pct>0.6 ? '#ef4444' : pct>0.3 ? '#eab308' : pct>0.12 ? '#22c55e' : '#3b82f6';
+      L.circleMarker([item.coords[0],item.coords[1]],{radius:r,fillColor:color,color:'#1f2937',weight:1.5,fillOpacity:0.85}).bindPopup(`<div style="color:#111;font-family:Inter"><strong style="color:#4f46e5">${item.freguesia}</strong><br>${cnt} × ${APELIDO}<br><a href="/pessoas?q=${encodeURIComponent(APELIDO)}&freguesia=${encodeURIComponent(item.freguesia)}" style="color:#2563eb">Ver →</a></div>`).addTo(mapa);
+    });
+  }catch(e){ console.error(e); }
+}
+
+async function loadPessoas(){
+  document.getElementById('pessoasList').innerHTML='<div class="skeleton" style="height:78px;margin-bottom:8px"></div><div class="skeleton" style="height:78px"></div>';
+  try{
+    const r=await fetch(`/api/pessoas?sobrenome=ilike.*${encodeURIComponent(APELIDO)}*&limit=${PAGE_SIZE}&offset=${page*PAGE_SIZE}`);
+    if(!r.ok) throw new Error(await r.text());
+    const data=await r.json();
+    const c=document.getElementById('pessoasList');
+    if(!data.length){ c.innerHTML='<div style="color:var(--text2);text-align:center;padding:20px">Nenhuma pessoa encontrada.</div>'; document.getElementById('pessoasCount').textContent='0'; return; }
+    c.innerHTML=data.map(p=>{
+      const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||p.nome||'Registo';
+      const tipo=(p.tipo_registo||'DEAT').toUpperCase();
+      const dataFmt=(p.data_obito||p.data_nascimento||'').slice(0,10)||'data desconhecida';
+      return `<a class="card-pessoa" data-tipo="${tipo}" href="/pessoa/${p.id}">
+        <div style="flex:1"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-family:'Source Serif 4',serif;font-weight:700">${nome}</span> ${tipoBadge(tipo)}</div><div style="color:var(--text2);font-size:0.82rem;margin-top:4px;display:flex;gap:10px;flex-wrap:wrap"><span>📅 ${dataFmt}</span><span>📍 ${p.freguesia||'-'}</span>${p.idade?`<span>🎂 ${p.idade}a</span>`:''}</div></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text2);align-self:center">#${p.id} →</span></a>`;
+    }).join('');
+    document.getElementById('pessoasCount').textContent=`${data.length} nesta página`;
+    document.getElementById('pageInfo').textContent=`Página ${page+1}`;
+    document.getElementById('btnPrev').disabled=page===0;
+    document.getElementById('btnNext').disabled=data.length<PAGE_SIZE;
+  }catch(e){
+    document.getElementById('pessoasList').innerHTML=`<div style="color:#ef4444;padding:12px">${e.message}</div>`;
+  }
+}
+function nextP(){ page++; loadPessoas(); window.scrollTo({top:600,behavior:'smooth'}); }
+function prevP(){ if(page>0){page--; loadPessoas();} }
+
+loadHeader();
+loadPessoas();
+</script>
+</body>
+</html>

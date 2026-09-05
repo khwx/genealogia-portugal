@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apelidos — Genealogia Portugal</title>
+<meta name="description" content="Nuvem de apelidos mais frequentes em Celorico da Beira 1700-1911.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none}
+.logo span{color:#6C63FF}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.92rem;font-weight:500}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.hero{text-align:center;padding:36px 20px 18px}
+.hero h1{font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.02em;font-size:2rem}
+.hero p{color:var(--text2);max-width:700px;margin:8px auto 0;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px 40px;width:100%}
+.cloud-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:28px;min-height:320px}
+#cloud{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;padding:12px}
+.cloud-item{text-decoration:none;font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.01em;transition:transform .15s, color .15s;padding:4px 8px;border-radius:8px;line-height:1}
+.cloud-item:hover{transform:scale(1.08);background:var(--bg3)}
+.font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.7rem}
+.skeleton{height:42px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Pesquisa</a>
+    <a href="/pessoas" class="nav-link">Pessoas</a>
+    <a href="/apelidos" class="nav-link active">Apelidos</a>
+    <a href="/timeline" class="nav-link">Timeline</a>
+    <a href="/mapa" class="nav-link">Mapa</a>
+    <a href="/family-tree" class="nav-link">Árvore</a>
+  </div>
+</div>
+<div class="hero">
+  <h1>Nuvem de Apelidos</h1>
+  <p>Os 100 apelidos mais frequentes nos registos paroquiais de Celorico da Beira. Tamanho proporcional à frequência — clique para explorar freguesias, décadas e pessoas.</p>
+  <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+    <span class="font-mono-caps" style="color:var(--text2)">Top 100 via /api/apelidos</span>
+    <a href="/timeline" style="color:var(--accent2);font-size:0.85rem;text-decoration:none">Ver timeline 1700–1911 →</a>
+  </div>
+</div>
+<div class="wrap">
+  <div class="cloud-card">
+    <div id="cloud"><div class="skeleton" style="width:100%;height:220px"></div></div>
+    <div id="meta" style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.82rem"></div>
+  </div>
+  <div style="margin-top:16px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+    <a href="/pessoas" style="color:var(--text2);font-size:0.85rem;text-decoration:none;border:1px solid var(--border);padding:8px 14px;border-radius:20px;background:var(--bg2)">🔍 Índice de pessoas</a>
+    <a href="/mapa" style="color:var(--text2);font-size:0.85rem;text-decoration:none;border:1px solid var(--border);padding:8px 14px;border-radius:20px;background:var(--bg2)">🗺️ Mapa por freguesia</a>
+  </div>
+</div>
+<script>
+async function load(){
+  try{
+    const r=await fetch('/api/apelidos');
+    if(!r.ok) throw new Error('Erro '+r.status);
+    const j=await r.json();
+    const list=j.apelidos||[];
+    if(!list.length){ document.getElementById('cloud').innerHTML='<div style="color:var(--text2);text-align:center;padding:40px">Sem apelidos disponíveis.</div>'; return; }
+    const max=Math.max(...list.map(x=>x.count));
+    const min=Math.min(...list.map(x=>x.count));
+    const cloud=document.getElementById('cloud');
+    cloud.innerHTML=list.map(item=>{
+      const t=(item.count-min)/Math.max(1,max-min);
+      const size= 0.85 + t*1.6; // 0.85rem .. 2.45rem
+      const opacity= 0.6 + t*0.4;
+      const hue = 240 + t*20; // subtle purple shift
+      const color = t>0.7 ? '#8b83ff' : t>0.4 ? '#a8a6ff' : '#c7c4ff';
+      return `<a class="cloud-item" href="/apelidos/${encodeURIComponent(item.nome)}" style="font-size:${size}rem;opacity:${opacity};color:${color}" title="${item.nome} — ${item.count} registos">${item.nome} <span style="font-family:'JetBrains Mono',monospace;font-size:0.55em;opacity:0.7;font-weight:500">×${item.count}</span></a>`;
+    }).join('');
+    document.getElementById('meta').textContent=`${list.length} apelidos • ${j.total||list.length} apelidos distintos na BD`;
+  }catch(e){
+    document.getElementById('cloud').innerHTML=`<div style="color:#ef4444;text-align:center;padding:20px">${e.message}</div>`;
+  }
+}
+load();
+</script>
+</body>
+</html>

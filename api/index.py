@@ -91,6 +91,18 @@ def pessoa_detail(pid):
 def arvore_pessoa(pid):
     return render_template('arvore_pessoa.html')
 
+@app.route('/apelidos')
+def apelidos_page():
+    return render_template('apelidos.html')
+
+@app.route('/apelidos/<apelido>')
+def apelido_detail_page(apelido):
+    return render_template('apelido_detail.html', apelido=apelido)
+
+@app.route('/timeline')
+def timeline_page():
+    return render_template('timeline.html')
+
 @app.route('/api/mapa')
 def api_mapa():
     cached = cache_get('mapa')
@@ -256,6 +268,101 @@ def api_decadas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/apelidos')
+def api_apelidos():
+    cached = cache_get('apelidos_top100')
+    if cached is not None:
+        return jsonify(cached)
+    try:
+        from collections import Counter
+        sobrenomes = Counter()
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "sobrenome", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for r in batch:
+                s = (r.get('sobrenome') or '').strip()
+                if not s or s.lower() in ('[ilegível]','[ileg]','[não consta]',''):
+                    continue
+                # sobrenomes may be compound "Santos Silva" -> count each token? keep full first
+                sobrenomes[s] += 1
+                # also count last token separately for cloud richness
+                # But keep primary full surname as stored
+            if len(batch) < page:
+                break
+            offset += page
+        top100 = [{"nome": k, "count": v} for k, v in sobrenomes.most_common(100)]
+        payload = {"apelidos": top100, "total": len(sobrenomes)}
+        cache_set('apelidos_top100', payload)
+        return jsonify(payload)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/apelidos/<nome>')
+def api_apelido_detail(nome):
+    try:
+        # Use cache per nome
+        cache_key = f'apelido_{nome.lower()}'
+        cached = cache_get(cache_key)
+        if cached is not None:
+            return jsonify(cached)
+        # Fetch matching pessoas with sobrenome ilike
+        freg_counts = {}
+        decadas = {}
+        total = 0
+        offset = 0
+        page = 1000
+        while True:
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "freguesia,data_obito,data_nascimento,sobrenome", "sobrenome": f"ilike.*{nome}*", "limit": page, "offset": offset},
+                timeout=30
+            )
+            if resp.status_code != 200:
+                break
+            batch = resp.json()
+            if not batch:
+                break
+            for r in batch:
+                total += 1
+                f = (r.get('freguesia') or 'Desconhecida')
+                freg_counts[f] = freg_counts.get(f, 0) + 1
+                d = r.get('data_obito') or r.get('data_nascimento')
+                if d:
+                    try:
+                        year = int(str(d)[:4]) if str(d)[:4].isdigit() else None
+                        if year and 1000 <= year <= 2100:
+                            dec = (year // 10) * 10
+                            decadas[dec] = decadas.get(dec, 0) + 1
+                    except:
+                        pass
+            if len(batch) < page:
+                break
+            offset += page
+            if total > 5000:
+                break
+        payload = {
+            "nome": nome,
+            "total": total,
+            "freguesias": sorted([{"freguesia": k, "count": v} for k, v in freg_counts.items()], key=lambda x: -x["count"]),
+            "decadas": sorted([{"decada": k, "count": v} for k, v in decadas.items()], key=lambda x: x["decada"])
+        }
+        cache_set(cache_key, payload)
+        return jsonify(payload)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/stats-extras')
 def api_stats_extras():
     cached = cache_get('stats_extras')
@@ -354,9 +461,13 @@ def get_pessoas():
     try:
         query = request.args.get('q', '').strip()
         freguesia = request.args.get('freguesia', '').strip()
+        sobrenome = request.args.get('sobrenome', '').strip()
         from_year = request.args.get('from_year', '').strip()
         to_year = request.args.get('to_year', '').strip()
         tipo = request.args.get('tipo', '').strip().upper()
+        # support PostgREST-style "sobrenome=ilike.*Val*"
+        if sobrenome.startswith('ilike.'):
+            sobrenome = sobrenome[6:].strip('*%')
         try:
             limit = max(1, min(int(request.args.get('limit', 50)), 1000))
         except ValueError:
@@ -391,6 +502,8 @@ def get_pessoas():
                 )
         if freguesia:
             conditions.append(f"freguesia.ilike.*{freguesia}*")
+        if sobrenome:
+            conditions.append(f"sobrenome.ilike.*{sobrenome}*")
         if _valid_year(from_year):
             conditions.append(f"data_obito.gte.{from_year}-01-01")
         if _valid_year(to_year):

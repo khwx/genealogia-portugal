@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline 1700–1911 — Genealogia Portugal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;font-size:1.1rem;color:var(--text);text-decoration:none}
+.logo span{color:#6C63FF}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.92rem;font-weight:500}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.hero{text-align:center;padding:28px 20px 10px}
+.hero h1{font-family:'Source Serif 4',serif;font-weight:700;letter-spacing:-0.02em;font-size:2rem}
+.hero p{color:var(--text2);max-width:800px;margin:8px auto 0;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 20px 40px;width:100%}
+.controls{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+.btn{border:none;border-radius:10px;padding:8px 14px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.85rem}
+.btn-primary{background:var(--accent);color:white}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.font-mono-caps{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;font-size:0.7rem}
+.timeline-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;overflow:hidden}
+#brushWrap{margin-top:10px}
+#bars{overflow-x:auto;overflow-y:hidden;padding-bottom:8px}
+.bars-row{display:flex;align-items:flex-end;gap:6px;min-width:760px;height:260px;padding:10px 6px 0;border-bottom:1px solid var(--border)}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:28px}
+.bar{width:100%;border-radius:8px 8px 0 0;cursor:pointer;transition:opacity .15s, transform .15s;min-height:4px}
+.bar:hover{opacity:0.85;transform:translateY(-2px)}
+.bar-label{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text2);transform:rotate(-30deg);transform-origin:left;white-space:nowrap;margin-top:4px}
+input[type=range]{accent-color:var(--accent);width:100%}
+.skeleton{height:180px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Pesquisa</a>
+    <a href="/pessoas" class="nav-link">Pessoas</a>
+    <a href="/apelidos" class="nav-link">Apelidos</a>
+    <a href="/timeline" class="nav-link active">Timeline</a>
+    <a href="/mapa" class="nav-link">Mapa</a>
+  </div>
+</div>
+<div class="hero">
+  <h1>Timeline 1700 — 1911</h1>
+  <p>Timeline horizontal fullscreen — explore a evolução dos registos por década. Filtre por tipo (Óbito, Nascimento, Casamento), faça brush no intervalo 1700–1911 e clique numa barra para ver pessoas da década.</p>
+</div>
+<div class="wrap">
+  <div class="controls">
+    <div class="filter-group">
+      <span class="font-mono-caps" style="color:var(--text2)">Tipo:</span>
+      <button class="btn active" data-tipo="" onclick="setTipo('')">Todos</button>
+      <button class="btn btn-ghost" data-tipo="DEAT" onclick="setTipo('DEAT')">✝️ Óbitos</button>
+      <button class="btn btn-ghost" data-tipo="BIRT" onclick="setTipo('BIRT')">👶 Nascimentos</button>
+      <button class="btn btn-ghost" data-tipo="MARR" onclick="setTipo('MARR')">💍 Casamentos</button>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <span class="font-mono-caps" style="color:var(--text2)">Intervalo:</span>
+      <span id="rangeLabel" class="font-mono-caps" style="color:var(--accent2)">1700 – 1911</span>
+      <a href="/apelidos" style="color:var(--text2);font-size:0.85rem;text-decoration:none;border:1px solid var(--border);padding:6px 12px;border-radius:20px;background:var(--bg2)">Nuvem de apelidos →</a>
+    </div>
+  </div>
+
+  <div class="timeline-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h3 style="font-size:1rem">Barras por década (clique para filtrar)</h3>
+      <div style="display:flex;gap:12px;align-items:center;font-size:0.75rem;color:var(--text2)">
+        <span><span class="legend-dot" style="background:#db761f"></span> DEAT</span>
+        <span><span class="legend-dot" style="background:#6C63FF"></span> BIRT</span>
+        <span><span class="legend-dot" style="background:#d4af37"></span> MARR</span>
+        <span id="totalLabel" class="font-mono-caps" style="color:var(--text2)"></span>
+      </div>
+    </div>
+
+    <div id="bars"><div class="skeleton"></div></div>
+
+    <div id="brushWrap">
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="font-mono-caps" style="color:var(--text2);white-space:nowrap">Brush 1700–1911</span>
+        <input type="range" id="brushFrom" min="1700" max="1911" value="1700" step="10" oninput="onBrush()">
+        <input type="range" id="brushTo" min="1700" max="1911" value="1911" step="10" oninput="onBrush()">
+      </div>
+      <div style="display:flex;justify-content:space-between;color:var(--text2);font-size:0.72rem;margin-top:4px;font-family:'JetBrains Mono',monospace"><span>1700</span><span>1800</span><span>1911</span></div>
+    </div>
+  </div>
+
+  <div class="timeline-card" style="margin-top:16px">
+    <h3 style="font-size:1rem;margin-bottom:6px">Séculos (usa /api/seculos)</h3>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:10px">Clique para ver pessoas do século.</p>
+    <div id="seculosChart" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+<script>
+let decadasRaw=[];
+let seculosRaw=[];
+let tipoFiltro='';
+let brushFrom=1700, brushTo=1911;
+
+function setTipo(t){
+  tipoFiltro=t;
+  document.querySelectorAll('[data-tipo]').forEach(b=>{ b.classList.toggle('active', b.dataset.tipo===t); b.classList.toggle('btn-ghost', b.dataset.tipo!==t); });
+  // reload if needed — for now just re-render bars with same data (tipo filter is server side ideally, but decadas endpoint is global; we just inform user)
+  // If tipo selected, bars link with tipo param
+  renderBars();
+}
+
+function onBrush(){
+  const f=parseInt(document.getElementById('brushFrom').value);
+  const tt=parseInt(document.getElementById('brushTo').value);
+  brushFrom=Math.min(f,tt);
+  brushTo=Math.max(f,tt);
+  document.getElementById('rangeLabel').textContent=brushFrom+' – '+brushTo;
+  renderBars();
+}
+
+function barColorForDecada(){
+  if(tipoFiltro==='BIRT') return 'linear-gradient(180deg,#6C63FF,#8b83ff)';
+  if(tipoFiltro==='MARR') return 'linear-gradient(180deg,#d4af37,#f0c75e)';
+  if(tipoFiltro==='DEAT') return 'linear-gradient(180deg,#db761f,#f59e0b)';
+  return 'linear-gradient(180deg,#6c63ff,#22c55e)';
+}
+
+function renderBars(){
+  const container=document.getElementById('bars');
+  if(!decadasRaw.length){ container.innerHTML='<div style="color:var(--text2);padding:20px;text-align:center">Sem dados por década.</div>'; return; }
+  const filtered=decadasRaw.filter(d=> d.decada>=brushFrom && d.decada<=brushTo);
+  if(!filtered.length){ container.innerHTML='<div style="color:var(--text2);padding:20px;text-align:center">Nenhuma década no intervalo.</div>'; return; }
+  const max=Math.max(...filtered.map(d=>d.count),1);
+  let html='<div class="bars-row">';
+  filtered.forEach(d=>{
+    const pct=(d.count/max)*100;
+    const h=Math.max(8, pct*1.8); // height px scaled
+    const tipoParam=tipoFiltro?`&tipo=${tipoFiltro}`:'';
+    html+=`<div class="bar-col">
+      <div style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:0.65rem">${d.count}</div>
+      <a href="/pessoas?from_year=${d.decada}&to_year=${d.decada+9}${tipoParam?`&tipo=${tipoFiltro}`:''}" title="${d.decada}s — ${d.count} registos" class="bar" style="height:${h}px;background:${barColorForDecada()}"></a>
+      <div class="bar-label">${d.decada}</div>
+    </div>`;
+  });
+  html+='</div>';
+  container.innerHTML=html;
+  document.getElementById('totalLabel').textContent=filtered.reduce((a,b)=>a+b.count,0).toLocaleString('pt-PT')+' no intervalo';
+}
+
+async function loadDecadas(){
+  try{
+    const r=await fetch('/api/decadas');
+    const j=await r.json();
+    decadasRaw=j.decadas||[];
+    renderBars();
+  }catch(e){
+    document.getElementById('bars').innerHTML=`<div style="color:#ef4444;padding:12px">${e.message}</div>`;
+  }
+}
+async function loadSeculos(){
+  try{
+    const r=await fetch('/api/seculos');
+    const j=await r.json();
+    seculosRaw=j.seculos||[];
+    const c=document.getElementById('seculosChart');
+    if(!seculosRaw.length){ c.innerHTML='<div style="color:var(--text2)">Sem dados.</div>'; return; }
+    const max=Math.max(...seculosRaw.map(x=>x.count));
+    const roman={17:'XVII',18:'XVIII',19:'XIX',20:'XX'};
+    c.innerHTML=seculosRaw.map(s=>{
+      const pct=(s.count/max)*100;
+      const label=roman[s.seculo]||s.seculo+'º';
+      const from=(parseInt(s.seculo)-1)*100+1, to=parseInt(s.seculo)*100;
+      const tipoParam=tipoFiltro?`&tipo=${tipoFiltro}`:'';
+      return `<a href="/pessoas?from_year=${from}&to_year=${to}${tipoParam}" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <span style="width:48px;text-align:right;color:var(--text);font-weight:700">${label}</span>
+        <span style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;height:24px;overflow:hidden"><span style="display:block;width:${pct}%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))"></span></span>
+        <span style="color:var(--text2);font-size:0.85rem;width:70px;text-align:right">${s.count.toLocaleString('pt-PT')}</span></a>`;
+    }).join('');
+  }catch{}
+}
+loadDecadas();
+loadSeculos();
+</script>
+</body>
+</html>
