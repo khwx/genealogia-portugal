@@ -101,16 +101,8 @@
         </div>
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;" id="parishFilters">
             <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Freguesias:</span>
-            <button class="parish-tag active" onclick="filterByParish('')">Todas</button>
-            <button class="parish-tag" onclick="filterByParish('Santa Maria')">Santa Maria</button>
-            <button class="parish-tag" onclick="filterByParish('São Pedro')">São Pedro</button>
-            <button class="parish-tag" onclick="filterByParish('Mesquitela')">Mesquitela</button>
-            <button class="parish-tag" onclick="filterByParish('Baraçal')">Baraçal</button>
-            <button class="parish-tag" onclick="filterByParish('Cadafaz')">Cadafaz</button>
-            <button class="parish-tag" onclick="filterByParish('Carrapichana')">Carrapichana</button>
-            <button class="parish-tag" onclick="filterByParish('Açores')">Açores</button>
-            <button class="parish-tag" onclick="filterByParish('Lajeosa')">Lajeosa</button>
-            <button class="parish-tag" onclick="filterByParish('Cortiço')">Cortiço da Serra</button>
+            <button class="parish-tag active" data-freg="" onclick="filterByParish('')">Todas</button>
+            <span id="parishFiltersLoader" style="color:var(--text2);font-size:0.8rem;align-self:center">a carregar 25 freguesias...</span>
         </div>
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
             <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Tipo:</span>
@@ -399,10 +391,39 @@
 
         function filterByParish(parish) {
             currentParish = parish;
-            document.querySelectorAll('.parish-tag').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent.includes(parish || 'Todas'));
+            document.querySelectorAll('#parishFilters .parish-tag').forEach(btn => {
+                const f=btn.getAttribute('data-freg')||'';
+                btn.classList.toggle('active', f===parish);
             });
             performSearch();
+        }
+
+        async function loadParishFilters(){
+            try{
+                const r=await fetch('/api/mapa');
+                if(!r.ok) throw new Error();
+                const data=await r.json();
+                const container=document.getElementById('parishFilters');
+                const loader=document.getElementById('parishFiltersLoader');
+                if(loader) loader.remove();
+                // order: most records first, then alphabetical for ties
+                data.sort((a,b)=> (b.count||0)-(a.count||0) );
+                data.forEach(d=>{
+                    const btn=document.createElement('button');
+                    btn.className='parish-tag';
+                    btn.setAttribute('data-freg', d.freguesia);
+                    btn.setAttribute('title', `${d.count} registos`);
+                    btn.textContent=d.freguesia + (d.count?` (${d.count})`:'');
+                    if(d.counts_tipo?.BIRT) btn.textContent+=` 👶${d.counts_tipo.BIRT}`;
+                    btn.onclick=()=>filterByParish(d.freguesia);
+                    container.appendChild(btn);
+                });
+                // update Todas active state
+                document.querySelector('#parishFilters [data-freg=""]')?.classList.add('active');
+            }catch(e){
+                const loader=document.getElementById('parishFiltersLoader');
+                if(loader) loader.textContent='(filtro offline — 25 freguesias em cobertura.html)';
+            }
         }
 
         function filterByType(tipo) {
@@ -722,6 +743,7 @@
         };
         loadArquivoRefs();
         loadStats();
+        loadParishFilters();
         loadInitial();
     </script>
 </body>
