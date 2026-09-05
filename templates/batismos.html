@@ -77,10 +77,16 @@ function card(p){
   const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Batizado';
   const data=p.data_nascimento ? new Date(p.data_nascimento).toLocaleDateString('pt-PT') : (p.data_obito? new Date(p.data_obito).toLocaleDateString('pt-PT'):'Data não especificada');
   const freguesia=p.freguesia||'Celorico da Beira';
+  const avos=[p.avo_paterno,p.avo_paterna,p.avo_materno,p.avo_materna].filter(Boolean);
+  const hasAvos=avos.length>0;
+  const legit=p.legitimidade?`<span style="background:${p.legitimidade==='legitimo'?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};color:${p.legitimidade==='legitimo'?'#22c55e':'#ef4444'};padding:3px 8px;border-radius:20px;font-size:0.75rem">${p.legitimidade}</span>`:'';
   return `<div class="result-card">
-    <div style="display:flex;justify-content:space-between;align-items:center"><div class="result-name">👶 ${nome}</div><span style="background:rgba(108,99,255,0.15);color:#8b83ff;padding:4px 10px;border-radius:20px;font-size:0.8rem">Batismo</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="result-name">👶 ${nome}</div><span style="background:rgba(108,99,255,0.15);color:#8b83ff;padding:4px 10px;border-radius:20px;font-size:0.8rem">Batismo ${legit}</span></div>
     <div class="result-meta"><span>📅 ${data}</span><span>📍 ${freguesia}</span>${p.pai?`<span>👨 ${p.pai}</span>`:''}${p.mae?`<span>👩 ${p.mae}</span>`:''}</div>
-    ${(p.pai||p.mae)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--text2);margin-top:8px">${p.pai?`Pai: <span style="color:var(--text)">${p.pai}</span> &nbsp;`:''}${p.mae?`Mãe: <span style="color:var(--text)">${p.mae}</span>`:''}</div>`:''}
+    ${(p.pai||p.mae)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--text2);margin-top:8px">${p.pai?`Pai: <span style="color:var(--text)">${p.pai}</span>${p.naturalidade_pai?` <span style="color:var(--text2)">(${p.naturalidade_pai})</span>`:''} &nbsp;`:''}${p.mae?`Mãe: <span style="color:var(--text)">${p.mae}</span>${p.naturalidade_mae?` <span style="color:var(--text2)">(${p.naturalidade_mae})</span>`:''}`:''}</div>`:''}
+    ${hasAvos?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.82rem;color:var(--text2);margin-top:8px">🌲 Avós: ${p.avo_paterno?`Paterno: <span style="color:var(--text)">${p.avo_paterno}</span> & `:''}${p.avo_paterna?`<span style="color:var(--text)">${p.avo_paterna}</span> | `:''}${p.avo_materno?`Materno: <span style="color:var(--text)">${p.avo_materno}</span> & `:''}${p.avo_materna?`<span style="color:var(--text)">${p.avo_materna}</span>`:''}</div>`:''}
+    ${(p.godfather||p.godmother)?`<div style="font-size:0.82rem;color:var(--text2);margin-top:6px">👥 Padrinhos: ${p.godfather||''}${p.godfather&&p.godmother?' & ':''}${p.godmother||''}</div>`:''}
+    ${p.assinatura?`<div style="font-size:0.78rem;color:var(--text2);margin-top:4px;font-style:italic">✒️ ${p.assinatura}</div>`:''}
     <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">${p.imagem_url?`<a href="${p.imagem_url}" target="_blank" class="doc-link">📄 Ver livro no Digitarq ↗</a>`:''}<span style="color:#8b83ff;font-size:0.85rem">Ver detalhes →</span></div>
   </div>`;
 }

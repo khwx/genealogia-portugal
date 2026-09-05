@@ -225,8 +225,15 @@ function showTooltip(event, data) {
     
     let html = `<h3>${data.name || 'Desconhecido'}</h3>`;
     if (data.data) {
-        if (data.data.data_obito) html += `<div class="field">Óbito: <span>${data.data.data_obito}</span></div>`;
-        if (data.data.freguesia) html += `<div class="field">Freguesia: <span>${data.data.freguesia}</span></div>`;
+        const p=data.data;
+        if (p.tipo_registo==='BIRT') html += `<div class="field">👶 Batismo: <span>${p.data_nascimento||p.data_obito||'-'}</span></div>`;
+        else if (p.data_obito) html += `<div class="field">Óbito: <span>${p.data_obito}</span></div>`;
+        if (p.freguesia) html += `<div class="field">Freguesia: <span>${p.freguesia}</span></div>`;
+        if (p.pai) html += `<div class="field">Pai: <span>${p.pai}</span></div>`;
+        if (p.mae) html += `<div class="field">Mãe: <span>${p.mae}</span></div>`;
+        const avos=[p.avo_paterno,p.avo_paterna,p.avo_materno,p.avo_materna].filter(Boolean);
+        if (avos.length) html += `<div class="field">🌲 Avós: <span>${avos.join(', ')}</span></div>`;
+        if (p.legitimidade) html += `<div class="field">Legitimidade: <span>${p.legitimidade}</span></div>`;
     }
     tooltip.innerHTML = html;
 }
@@ -261,13 +268,28 @@ function showDetails(data) {
         const p = data.data;
         html += `<div class="detail-section"><h4>Dados Pessoais</h4>`;
         html += `<div class="detail-row"><span class="detail-label">Nome</span><span class="detail-value">${p.nome || '-'}</span></div>`;
-        html += `<div class="detail-row"><span class="detail-label">Óbito</span><span class="detail-value">${p.data_obito || '-'}</span></div>`;
+        if (p.tipo_registo==='BIRT') html += `<div class="detail-row"><span class="detail-label">Tipo</span><span class="detail-value">👶 Batismo</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">Nascimento</span><span class="detail-value">${p.data_nascimento || '-'}</span></div>`;
+        html += `<div class="detail-row"><span class="detail-label">Óbito</span><span class="detail-value">${p.data_obito || '-'}</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">Casamento</span><span class="detail-value">${p.data_casamento || '-'}</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">Freguesia</span><span class="detail-value">${p.freguesia || '-'}</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">Concelho</span><span class="detail-value">${p.concelho || '-'}</span></div>`;
         html += `<div class="detail-row"><span class="detail-label">Fonte</span><span class="detail-value">${p.fonte || '-'}</span></div>`;
         html += `</div>`;
+        if (p.tipo_registo==='BIRT' && (p.pai||p.mae||p.avo_paterno||p.legitimidade)) {
+            html += `<div class="detail-section"><h4>👶 Batismo</h4>`;
+            if (p.pai) html += `<div class="detail-row"><span class="detail-label">Pai</span><span class="detail-value">${p.pai}${p.naturalidade_pai?` (${p.naturalidade_pai})`:''}</span></div>`;
+            if (p.mae) html += `<div class="detail-row"><span class="detail-label">Mãe</span><span class="detail-value">${p.mae}${p.naturalidade_mae?` (${p.naturalidade_mae})`:''}</span></div>`;
+            if (p.legitimidade) html += `<div class="detail-row"><span class="detail-label">Legitimidade</span><span class="detail-value">${p.legitimidade}</span></div>`;
+            if (p.avo_paterno) html += `<div class="detail-row"><span class="detail-label">Avô paterno</span><span class="detail-value">${p.avo_paterno}</span></div>`;
+            if (p.avo_paterna) html += `<div class="detail-row"><span class="detail-label">Avó paterna</span><span class="detail-value">${p.avo_paterna}</span></div>`;
+            if (p.avo_materno) html += `<div class="detail-row"><span class="detail-label">Avô materno</span><span class="detail-value">${p.avo_materno}</span></div>`;
+            if (p.avo_materna) html += `<div class="detail-row"><span class="detail-label">Avó materna</span><span class="detail-value">${p.avo_materna}</span></div>`;
+            if (p.godfather) html += `<div class="detail-row"><span class="detail-label">Padrinho</span><span class="detail-value">${p.godfather}</span></div>`;
+            if (p.godmother) html += `<div class="detail-row"><span class="detail-label">Madrinha</span><span class="detail-value">${p.godmother}</span></div>`;
+            if (p.assinatura) html += `<div class="detail-row"><span class="detail-label">Assinatura</span><span class="detail-value" style="font-style:italic">${p.assinatura}</span></div>`;
+            html += `</div>`;
+        }
         
         if (p.imagem_url) {
             html += `<div class="detail-section"><h4>Imagem Original</h4>`;
