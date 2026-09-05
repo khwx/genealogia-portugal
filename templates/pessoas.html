@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pessoas — Genealogia Portugal</title>
+<meta name="description" content="Índice paginado de 36.098 pessoas de Celorico da Beira — filtra por nome, freguesia, tipo e anos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--green:#22c55e;--red:#ef4444;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent2)}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.92rem;font-weight:500}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.hero{text-align:center;padding:36px 20px 18px}
+.hero h1{font-size:2rem;font-weight:700;letter-spacing:-0.5px}
+.hero p{color:var(--text2);max-width:700px;margin:8px auto 0;line-height:1.5;font-size:1rem}
+.filters{max-width:1100px;margin:0 auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px;width:100%}
+.filters-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.input{flex:1;min-width:220px;background:var(--bg2);border:1.5px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-family:inherit;font-size:0.92rem;outline:none}
+.input:focus{border-color:var(--accent)}
+.select{background:var(--bg2);border:1.5px solid var(--border);color:var(--text);padding:10px 14px;border-radius:10px;font-family:inherit;font-size:0.88rem;min-width:150px}
+.btn{background:var(--accent);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s}
+.btn:hover{background:var(--accent2)}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text2);border-radius:10px;padding:10px 16px;cursor:pointer}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.badge{font-size:0.75rem;padding:3px 8px;border-radius:20px;font-weight:600}
+.badge-deat{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3)}
+.badge-birt{background:rgba(34,197,94,0.15);color:#4ade80;border:1px solid rgba(34,197,94,0.3)}
+.badge-marr{background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3)}
+.results{max-width:1100px;margin:0 auto 30px;padding:0 20px;width:100%}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px;display:flex;justify-content:space-between;gap:16px;transition:.2s;text-decoration:none;color:inherit}
+.card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.card-name{font-size:1.05rem;font-weight:600;color:var(--text)}
+.card-meta{color:var(--text2);font-size:0.86rem;display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.card-meta span{display:flex;align-items:center;gap:4px}
+.pill{font-size:0.78rem;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:4px 10px;border-radius:20px}
+.pagination{display:flex;justify-content:center;gap:8px;padding:20px 0;flex-wrap:wrap;align-items:center}
+.page-btn{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.88rem}
+.page-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.page-btn:disabled{opacity:0.5;cursor:not-allowed}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(max-width:640px){.topbar{padding:0 14px;height:56px}.hero h1{font-size:1.6rem}.filters{padding:14px}.card{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Pesquisa</a>
+    <a href="/pessoas" class="nav-link active">Pessoas</a>
+    <a href="/family-tree" class="nav-link">Árvore</a>
+    <a href="/mapa" class="nav-link">Mapa</a>
+    <a href="/batismos" class="nav-link">Batismos</a>
+    <a href="/cobertura.html" class="nav-link">Cobertura</a>
+  </div>
+</div>
+<div class="hero">
+  <h1>Índice de Pessoas</h1>
+  <p>Explora todas as pessoas indexadas — filtra por nome, freguesia, tipo de registo e intervalo de anos. Cada ficha liga à árvore e ao Digitarq.</p>
+</div>
+<div class="filters">
+  <div class="filters-row">
+    <input id="q" class="input" placeholder="Nome, apelido ou freguesia..." autocomplete="off">
+    <select id="freguesia" class="select"><option value="">Todas as freguesias</option></select>
+    <select id="tipo" class="select">
+      <option value="">Todos os tipos</option>
+      <option value="DEAT">Óbitos ✝️</option>
+      <option value="BIRT">Nascimentos 👶</option>
+      <option value="MARR">Casamentos 💍</option>
+    </select>
+    <input id="fromYear" class="input" style="max-width:130px" placeholder="De (ex: 1700)" type="number" min="1500" max="2100">
+    <input id="toYear" class="input" style="max-width:130px" placeholder="Até (ex: 1900)" type="number" min="1500" max="2100">
+    <button id="btnSearch" class="btn">Filtrar</button>
+    <button id="btnClear" class="btn-ghost">Limpar</button>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <span id="cnt" style="color:var(--text2);font-size:0.88rem">A carregar...</span>
+    <div style="display:flex;gap:8px">
+      <button onclick="prevPage()" class="page-btn" id="prevBtn">← Anterior</button>
+      <span id="pageInfo" style="color:var(--text2);font-size:0.85rem;align-self:center"></span>
+      <button onclick="nextPage()" class="page-btn" id="nextBtn">Seguinte →</button>
+    </div>
+  </div>
+</div>
+<div class="results" id="results"><div class="skeleton" style="height:90px;margin-bottom:12px"></div><div class="skeleton" style="height:90px;margin-bottom:12px"></div><div class="skeleton" style="height:90px"></div></div>
+<div class="pagination" id="pagination"></div>
+
+<script>
+const API_BASE = '';
+let page = 0;
+const PAGE_SIZE = 50;
+let totalEstimate = null;
+let lastQuery = {};
+
+function getFilters(){
+  return {
+    q: document.getElementById('q').value.trim(),
+    freguesia: document.getElementById('freguesia').value.trim(),
+    tipo: document.getElementById('tipo').value.trim(),
+    from_year: document.getElementById('fromYear').value.trim(),
+    to_year: document.getElementById('toYear').value.trim()
+  };
+}
+function syncURL(f){
+  const p=new URLSearchParams();
+  if(f.q) p.set('q',f.q);
+  if(f.freguesia) p.set('freguesia',f.freguesia);
+  if(f.tipo) p.set('tipo',f.tipo);
+  if(f.from_year) p.set('from_year',f.from_year);
+  if(f.to_year) p.set('to_year',f.to_year);
+  if(page>0) p.set('page',page);
+  history.replaceState(null,'',p.toString()? '/pessoas?'+p.toString() : '/pessoas');
+}
+function loadFromURL(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('q')) document.getElementById('q').value=p.get('q');
+  if(p.get('freguesia')) document.getElementById('freguesia').value=p.get('freguesia');
+  if(p.get('tipo')) document.getElementById('tipo').value=p.get('tipo');
+  if(p.get('from_year')) document.getElementById('fromYear').value=p.get('from_year');
+  if(p.get('to_year')) document.getElementById('toYear').value=p.get('to_year');
+  if(p.get('page')) page=parseInt(p.get('page'))||0;
+}
+
+function tipoBadge(t){
+  if(t==='BIRT') return '<span class="badge badge-birt">👶 Nascimento</span>';
+  if(t==='MARR') return '<span class="badge badge-marr">💍 Casamento</span>';
+  return '<span class="badge badge-deat">✝️ Óbito</span>';
+}
+
+function cardTemplate(p){
+  const nome = `${p.nome||''} ${p.sobrenome||''}`.trim() || (p.nome||'Registo');
+  const data = p.data_obito||p.data_nascimento||p.data_casamento||'';
+  const dataFmt = data ? new Date(data).toLocaleDateString('pt-PT') : 'data desconhecida';
+  const freg = p.freguesia || 'Celorico da Beira';
+  const tipo = (p.tipo_registo||'DEAT').toUpperCase();
+  const id = p.id;
+  return `<a class="card" href="/pessoa/${id}">
+    <div style="flex:1">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="card-name">${nome}</span> ${tipoBadge(tipo)}</div>
+      <div class="card-meta"><span>📅 ${dataFmt}</span><span>📍 ${freg}</span>${p.idade?`<span>🎂 ${p.idade}a</span>`:''}${p.pai||p.mae?`<span>👪 ${[p.pai,p.mae].filter(Boolean).join(' & ')}</span>`:''}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:140px">
+      <span class="pill">#${id} → ver ficha</span>
+      ${p.imagem_url?`<span style="font-size:0.78rem;color:var(--accent2)">📄 Digitarq</span>`:''}
+    </div>
+  </a>`;
+}
+
+async function fetchData(){
+  const f=getFilters();
+  lastQuery=f;
+  syncURL(f);
+  const params=new URLSearchParams();
+  if(f.q) params.set('q',f.q);
+  if(f.freguesia) params.set('freguesia',f.freguesia);
+  if(f.tipo) params.set('tipo',f.tipo);
+  if(f.from_year) params.set('from_year',f.from_year);
+  if(f.to_year) params.set('to_year',f.to_year);
+  params.set('limit',PAGE_SIZE);
+  params.set('offset', page*PAGE_SIZE);
+  document.getElementById('results').innerHTML='<div class="skeleton" style="height:90px;margin-bottom:12px"></div><div class="skeleton" style="height:90px"></div>';
+  try{
+    const r=await fetch(`/api/pessoas?${params.toString()}`);
+    if(!r.ok) throw new Error(await r.text());
+    const data=await r.json();
+    const c=document.getElementById('results');
+    if(!data.length){
+      c.innerHTML=`<div style="text-align:center;padding:40px;color:var(--text2)">Nenhum registo encontrado com esses filtros.<br><span style="font-size:0.85rem">Tenta limpar filtros ou procurar só por apelido.</span></div>`;
+      document.getElementById('cnt').textContent='0 resultados';
+      document.getElementById('pageInfo').textContent=`Página ${page+1}`;
+      return;
+    }
+    c.innerHTML=data.map(cardTemplate).join('');
+    const start=page*PAGE_SIZE+1;
+    const end=page*PAGE_SIZE+data.length;
+    document.getElementById('cnt').textContent=`A mostrar ${start}–${end} • página ${page+1}`;
+    document.getElementById('pageInfo').textContent=`Página ${page+1}`;
+    document.getElementById('prevBtn').disabled=page===0;
+    document.getElementById('nextBtn').disabled=data.length<PAGE_SIZE;
+  }catch(e){
+    document.getElementById('results').innerHTML=`<div style="text-align:center;padding:40px;color:#ef4444">Erro: ${e.message}</div>`;
+  }
+}
+function nextPage(){page++; fetchData(); window.scrollTo({top:0,behavior:'smooth'});}
+function prevPage(){if(page>0){page--; fetchData(); window.scrollTo({top:0,behavior:'smooth'});}}
+
+async function loadFregs(){
+  try{
+    const r=await fetch('/api/mapa');
+    if(!r.ok) return;
+    const data=await r.json();
+    const sel=document.getElementById('freguesia');
+    const cur=sel.value;
+    data.sort((a,b)=>b.count-a.count);
+    data.forEach(d=>{
+      const o=document.createElement('option');
+      o.value=d.freguesia; o.textContent=`${d.freguesia} (${d.count})`;
+      sel.appendChild(o);
+    });
+    sel.value=cur;
+    // restore from URL after populating
+    const p=new URLSearchParams(location.search);
+    if(p.get('freguesia')) sel.value=p.get('freguesia');
+  }catch{}
+}
+
+document.getElementById('btnSearch').onclick=()=>{page=0; fetchData();};
+document.getElementById('btnClear').onclick=()=>{
+  document.getElementById('q').value='';
+  document.getElementById('freguesia').value='';
+  document.getElementById('tipo').value='';
+  document.getElementById('fromYear').value='';
+  document.getElementById('toYear').value='';
+  page=0; fetchData();
+};
+document.getElementById('q').addEventListener('keypress',e=>{if(e.key==='Enter'){page=0; fetchData();}});
+
+loadFromURL();
+loadFregs();
+fetchData();
+</script>
+</body>
+</html>

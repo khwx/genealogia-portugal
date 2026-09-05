@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Ficha — Genealogia Portugal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--green:#22c55e;--red:#ef4444;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.05rem;font-weight:700;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent2)}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:500;margin-left:16px}
+.nav-link:hover{color:var(--text)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px;width:100%}
+.breadcrumb{color:var(--text2);font-size:0.85rem;margin-bottom:16px}
+.breadcrumb a{color:var(--accent2);text-decoration:none}
+.grid{display:grid;grid-template-columns:1.3fr 0.9fr;gap:20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.card h2{font-size:1.4rem;font-weight:700;margin-bottom:4px}
+.subtitle{color:var(--text2);font-size:0.9rem;margin-bottom:16px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kv-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.kv-label{color:var(--text2);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.6px;font-weight:600}
+.kv-value{color:var(--text);font-size:0.92rem;margin-top:3px;word-break:break-word}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:600;border:1px solid rgba(108,99,255,0.3);background:rgba(108,99,255,0.15);color:var(--accent2)}
+.btn{border:none;border-radius:10px;padding:10px 16px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-size:0.88rem}
+.btn-primary{background:var(--accent);color:white}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+.mini-tree{height:280px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative}
+.mini-tree svg{width:100%;height:100%}
+.viewer{height:420px;background:#000;border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.viewer-toolbar{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.viewer-frame{flex:1;background:#0a0a0f;display:flex;align-items:center;justify-content:center;position:relative;overflow:auto}
+.viewer-frame img{max-width:100%;max-height:100%;transition:transform .2s;cursor:zoom-in}
+.link{color:var(--accent2);text-decoration:none}
+.link:hover{text-decoration:underline}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.node circle{stroke-width:2px}
+.node text{font-size:10px;fill:var(--text);font-family:Inter}
+.link-d3{fill:none;stroke:#3a3f55;stroke-width:1.4px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+  <div><a href="/" class="nav-link">Pesquisa</a><a href="/pessoas" class="nav-link">Pessoas</a><a href="/family-tree" class="nav-link">Árvore</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a></div>
+</div>
+<div class="wrap">
+  <div class="breadcrumb"><a href="/pessoas">← Pessoas</a> / <span id="bcName">a carregar</span></div>
+  <div id="loading"><div class="skeleton" style="height:280px"></div></div>
+  <div id="content" style="display:none">
+    <div class="grid">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card" id="fichaCard"></div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <h3 style="font-size:1rem">🌲 Mini árvore</h3>
+            <a id="arvoreLink" class="btn btn-ghost" style="padding:6px 12px;font-size:0.82rem">Ver árvore completa →</a>
+          </div>
+          <div class="mini-tree" id="miniTree"></div>
+          <div id="relacoesList" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"></div>
+        </div>
+        <div class="card" id="transcCard" style="display:none"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card">
+          <h3 style="font-size:1rem;margin-bottom:10px">📄 Imagem original — Digitarq</h3>
+          <div class="viewer" id="viewer">
+            <div class="viewer-toolbar">
+              <span id="viewerLabel" style="color:var(--text2);font-size:0.82rem">Sem imagem</span>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost" style="padding:6px 10px" onclick="zoomImg(1.2)">＋</button>
+                <button class="btn btn-ghost" style="padding:6px 10px" onclick="zoomImg(0.83)">－</button>
+                <button class="btn btn-ghost" style="padding:6px 10px" onclick="resetZoom()">⟲</button>
+                <a id="openDigitarq" target="_blank" class="btn btn-primary" style="padding:6px 12px">Abrir no Digitarq ↗</a>
+              </div>
+            </div>
+            <div class="viewer-frame" id="viewerFrame"><span style="color:var(--text2);font-size:0.9rem;padding:24px;text-align:center">Imagem não disponível para este registo.<br><span style="font-size:0.8rem">O livro pode ser consultado via referência arquivo em arquivo_refs.json</span></span></div>
+          </div>
+        </div>
+        <div class="card" id="metaCard"></div>
+      </div>
+    </div>
+  </div>
+  <div id="notFound" style="display:none;text-align:center;padding:60px;color:var(--text2)"></div>
+</div>
+<script>
+const PID = window.location.pathname.split('/').pop();
+let zoom=1;
+function zoomImg(f){zoom*=f; const img=document.getElementById('viewerImg'); if(img) img.style.transform=`scale(${zoom})`;}
+function resetZoom(){zoom=1; const img=document.getElementById('viewerImg'); if(img) img.style.transform='scale(1)';}
+
+function tipoBadge(t){
+  t=(t||'DEAT').toUpperCase();
+  if(t==='BIRT') return '<span class="badge" style="background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#4ade80">👶 Nascimento</span>';
+  if(t==='MARR') return '<span class="badge" style="background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.3);color:#c084fc">💍 Casamento</span>';
+  return '<span class="badge">✝️ Óbito</span>';
+}
+function fmtDate(d){ if(!d) return '—'; try{ const dt=new Date(d); if(isNaN(dt)) return d; return dt.toLocaleDateString('pt-PT'); }catch{return d;}}
+
+async function loadPessoa(){
+  try{
+    const r=await fetch(`/api/pessoa/${PID}`);
+    if(!r.ok) throw new Error(r.status===404?'Pessoa não encontrada':'Erro '+r.status);
+    const p=await r.json();
+    renderPessoa(p);
+    loadFamilia(p);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    const nf=document.getElementById('notFound'); nf.style.display='block'; nf.innerHTML=`<h2 style="color:var(--text)">Não encontrado</h2><p>${e.message}</p><a href="/pessoas" class="link">← voltar ao índice</a>`;
+  }
+}
+function renderPessoa(p){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  document.getElementById('bcName').textContent = `${p.nome||''} ${p.sobrenome||''}`.trim()||`#${p.id}`;
+  document.getElementById('pageTitle').textContent = `${p.nome||'Registo'} — Genealogia Portugal`;
+  document.getElementById('arvoreLink').href = `/arvore/${p.id}`;
+
+  const nome = `${p.nome||''} ${p.sobrenome||''}`.trim()||'Registo';
+  const ficha = document.getElementById('fichaCard');
+  ficha.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>${nome}</h2> ${tipoBadge(p.tipo_registo)}</div>
+    <div class="subtitle">${p.freguesia||'Celorico da Beira'} • ${p.concelho||'Celorico da Beira'}${p.distrito?' / '+p.distrito:''} • ID #${p.id}</div>
+    <div class="kv">
+      <div class="kv-item"><div class="kv-label">Data óbito</div><div class="kv-value">${fmtDate(p.data_obito)}</div></div>
+      <div class="kv-item"><div class="kv-label">Data nascimento</div><div class="kv-value">${fmtDate(p.data_nascimento)}</div></div>
+      <div class="kv-item"><div class="kv-label">Data casamento</div><div class="kv-value">${fmtDate(p.data_casamento)}</div></div>
+      <div class="kv-item"><div class="kv-label">Idade</div><div class="kv-value">${p.idade!=null?p.idade+' anos':'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Freguesia</div><div class="kv-value">${p.freguesia||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Concelho / Distrito</div><div class="kv-value">${p.concelho||'—'} / ${p.distrito||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Estado civil</div><div class="kv-value">${p.estado_civil||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Profissão</div><div class="kv-value">${p.profissao||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Pai</div><div class="kv-value">${p.pai||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Mãe</div><div class="kv-value">${p.mae||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Cônjuge</div><div class="kv-value">${p.conjuge||'—'}</div></div>
+      <div class="kv-item"><div class="kv-label">Nº assento</div><div class="kv-value">${p.numero_assento||'—'}</div></div>
+    </div>
+    ${(p.avo_paterno||p.avo_paterna||p.avo_materno||p.avo_materna)?`<div style="margin-top:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px"><div style="color:var(--accent2);font-weight:600;font-size:0.85rem;margin-bottom:6px">🌲 Avós</div><div style="display:flex;flex-direction:column;gap:4px;font-size:0.88rem;color:var(--text2)">${p.avo_paterno?`<div>Avô paterno: <span style="color:var(--text)">${p.avo_paterno}</span></div>`:''}${p.avo_paterna?`<div>Avó paterna: <span style="color:var(--text)">${p.avo_paterna}</span></div>`:''}${p.avo_materno?`<div>Avô materno: <span style="color:var(--text)">${p.avo_materno}</span></div>`:''}${p.avo_materna?`<div>Avó materna: <span style="color:var(--text)">${p.avo_materna}</span></div>`:''}${p.godfather||p.godmother?`<div style="margin-top:6px">Padrinhos: <span style="color:var(--text)">${[p.godfather,p.godmother].filter(Boolean).join(' & ')}</span></div>`:''}${p.legitimidade?`<div>Legitimidade: <span style="color:var(--text)">${p.legitimidade}</span></div>`:''}</div></div>`:''}
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <a href="/arvore/${p.id}" class="btn btn-primary">🌲 Ver árvore centrada</a>
+      <a href="/pessoas?freguesia=${encodeURIComponent(p.freguesia||'')}" class="btn btn-ghost">📍 Ver freguesia</a>
+      ${p.pai?`<a href="/pessoas?q=${encodeURIComponent(p.pai.split(' ')[0])}" class="btn btn-ghost">Pesquisar pai</a>`:''}
+    </div>
+  `;
+  const meta=document.getElementById('metaCard');
+  meta.innerHTML=`
+    <h3 style="font-size:0.95rem;margin-bottom:10px">ℹ️ Metadados</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:0.85rem;color:var(--text2)">
+      <div><span style="color:var(--text2)">Fonte:</span> <span style="color:var(--text)">${p.fonte||'—'}</span></div>
+      ${p.causa_morte?`<div>Causa: <span style="color:var(--text)">${p.causa_morte}</span></div>`:''}
+      ${p.local_sepultamento?`<div>Sepultamento: <span style="color:var(--text)">${p.local_sepultamento}</span></div>`:''}
+      ${p.testamento?`<div>Testamento: <span style="color:var(--text)">${p.testamento}</span></div>`:''}
+      ${p.sacramentos?`<div>Sacramentos: <span style="color:var(--text)">${p.sacramentos}</span></div>`:''}
+      ${p.assinatura?`<div>Assinatura: <span style="color:var(--text);font-style:italic">${p.assinatura}</span></div>`:''}
+      ${p.file_id?`<div>File ID: <code style="background:var(--bg3);padding:2px 6px;border-radius:6px">${p.file_id}</code></div>`:''}
+      <div style="margin-top:6px;padding-top:8px;border-top:1px solid var(--border)"><a href="/api/pessoa/${p.id}" class="link" target="_blank">Ver JSON da API →</a></div>
+    </div>
+  `;
+  const tc=document.getElementById('transcCard');
+  if(p.texto_original){
+    tc.style.display='block';
+    tc.innerHTML=`<h3 style="font-size:0.95rem;margin-bottom:8px">📝 Transcrição HTR</h3><div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:0.82rem;color:var(--text2);white-space:pre-wrap;max-height:280px;overflow:auto">${p.texto_original}</div>`;
+  }
+  // viewer
+  const frame=document.getElementById('viewerFrame');
+  const label=document.getElementById('viewerLabel');
+  const open=document.getElementById('openDigitarq');
+  if(p.imagem_url){
+    label.textContent='Imagem do livro paroquial';
+    open.href=p.imagem_url;
+    open.style.display='inline-flex';
+    frame.innerHTML=`<img id="viewerImg" src="${p.imagem_url}" alt="Imagem original" onerror="this.parentElement.innerHTML='<span style=color:var(--text2);padding:24px>Imagem indisponível (CORS/Digitarq). <br><a href=${JSON.stringify(p.imagem_url)} target=_blank class=link>Abrir diretamente ↗</a></span>'">`;
+  } else {
+    label.textContent='Sem imagem associada';
+    open.style.display='none';
+  }
+}
+
+async function loadFamilia(p){
+  try{
+    const r=await fetch(`/api/pessoa/${PID}/familia`);
+    if(!r.ok) throw new Error();
+    const fam=await r.json();
+    renderMiniTree(fam);
+    renderRelacoes(fam);
+  }catch{
+    document.getElementById('miniTree').innerHTML='<div style="color:var(--text2);text-align:center;padding:40px;font-size:0.85rem">Sem dados de família suficientes para árvore.<br>Este registo tem apenas nome e data.</div>';
+  }
+}
+function renderRelacoes(fam){
+  const c=document.getElementById('relacoesList');
+  const items=[];
+  if(fam.pais && fam.pais.length) fam.pais.forEach(x=> items.push(`<a href="${x.id?`/pessoa/${x.id}`:`/pessoas?q=${encodeURIComponent(x.nome)}`}" class="link" style="font-size:0.82rem;background:var(--bg3);border:1px solid var(--border);padding:4px 10px;border-radius:20px">👨‍👩‍👧 ${x.nome}</a>`));
+  if(fam.filhos && fam.filhos.length) fam.filhos.slice(0,6).forEach(x=> items.push(`<a href="${x.id?`/pessoa/${x.id}`:`/pessoas?q=${encodeURIComponent(x.nome)}`}" style="font-size:0.82rem;background:rgba(108,99,255,0.12);border:1px solid rgba(108,99,255,0.3);color:var(--accent2);padding:4px 10px;border-radius:20px;text-decoration:none">👶 ${x.nome}</a>`));
+  if(fam.filhos && fam.filhos.length>6) items.push(`<span style="font-size:0.78rem;color:var(--text2)">+${fam.filhos.length-6} filhos</span>`);
+  c.innerHTML=items.join('')||'<span style="color:var(--text2);font-size:0.82rem">Sem ligações familiares indexadas.</span>';
+}
+
+function buildHierarchy(fam){
+  const p=fam.pessoa;
+  const nomeP=`${p.nome||''} ${p.sobrenome||''}`.trim()||p.nome||'Pessoa';
+  const filhos=(fam.filhos||[]).map(f=>({name:f.nome, type:'filho', id:f.id, data:f}));
+  const central={name:nomeP, type:'central', id:p.id, children: filhos.length?filhos:undefined};
+  // parents layer
+  let parents=[];
+  if(p.pai) parents.push({name:p.pai, type:'pai', children:[central]});
+  if(p.mae) parents.push({name:p.mae, type:'mae', children: parents.length?undefined:[central]});
+  // if both parents exist, merge central under a union node
+  let level;
+  if(parents.length===2){
+    // pai + mãe share central via family node
+    const famNode={name:'Pais', type:'family', children: parents.map(pa=>({...pa, children:undefined}))};
+    // attach central as child of family
+    famNode.children = [{name:nomeP, type:'central', id:p.id, children: filhos.length?filhos:undefined}];
+    // keep parents as grandparents generation? simpler: root = avos, then family
+    // Build avos layer
+    const avos=[];
+    if(p.avo_paterno) avos.push({name:p.avo_paterno, type:'avo'});
+    if(p.avo_paterna) avos.push({name:p.avo_paterna, type:'avo'});
+    if(p.avo_materno) avos.push({name:p.avo_materno, type:'avo'});
+    if(p.avo_materna) avos.push({name:p.avo_materna, type:'avo'});
+    if(avos.length){
+      return {name:'Família de '+nomeP, type:'family', children:[{name:'Avós', type:'family', children: avos}, famNode]};
+    }
+    return {name:'Família de '+nomeP, type:'family', children:[famNode]};
+  } else if(parents.length===1){
+    const par=parents[0];
+    par.children=[central];
+    const avos=[];
+    if(p.avo_paterno||p.avo_paterna) avos.push({name: p.avo_paterno||p.avo_paterna, type:'avo', children:[par]});
+    // simplified
+    if(avos.length) return {name: avos[0].name, type:'avo', children:[par]};
+    return par;
+  } else {
+    // no parents
+    const avos=[];
+    if(p.avo_paterno) avos.push({name:p.avo_paterno, type:'avo'});
+    if(p.avo_paterna) avos.push({name:p.avo_paterna, type:'avo'});
+    if(p.avo_materno) avos.push({name:p.avo_materno, type:'avo'});
+    if(p.avo_materna) avos.push({name:p.avo_materna, type:'avo'});
+    if(avos.length) return {name:'Família de '+nomeP, type:'family', children:[{name:'Avós', type:'family', children:avos}, central]};
+    return central;
+  }
+}
+
+function renderMiniTree(fam){
+  const container=document.getElementById('miniTree');
+  container.innerHTML='';
+  const width=container.clientWidth; const height=container.clientHeight;
+  const hierarchy=buildHierarchy(fam);
+  const root=d3.hierarchy(hierarchy);
+  const tree=d3.tree().size([width-40, height-60]);
+  tree(root);
+  const svg=d3.select('#miniTree').append('svg').attr('width',width).attr('height',height);
+  const g=svg.append('g').attr('transform','translate(20,30)');
+  g.selectAll('.link-d3').data(root.links()).join('path').attr('class','link-d3').attr('d', d3.linkVertical().x(d=>d.x).y(d=>d.y));
+  const node=g.selectAll('.node').data(root.descendants()).join('g').attr('class',d=>`node node--${d.data.type}`).attr('transform',d=>`translate(${d.x},${d.y})`).style('cursor',d=>d.data.id?'pointer':'default').on('click',(e,d)=>{ if(d.data.id) location.href=`/pessoa/${d.data.id}`; });
+  node.append('circle').attr('r',d=>d.data.type==='central'?10:d.data.type==='family'?7:6).attr('fill',d=>d.data.type==='central'?'#6c63ff':d.data.type==='pai'||d.data.type==='mae'?'#22c55e':d.data.type==='avo'?'#eab308':'#3b82f6').attr('stroke','#1a1d27');
+  node.append('text').attr('dy',d=>d.children?' -14':'18').attr('text-anchor','middle').text(d=>d.data.name.length>18?d.data.name.slice(0,18)+'…':d.data.name).style('font-size','9px').style('fill','#e8eaf6');
+}
+
+loadPessoa();
+</script>
+</body>
+</html>

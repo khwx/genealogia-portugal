@@ -2,6 +2,15 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-05 (Stitch — 3 páginas árvore: /pessoa/<id>, /arvore/<id>, /pessoas)
+
+### Tarefa implementada — páginas Stitch para árvore genealógica
+- **Templates**: `pessoa_detail.html` (ficha + mini árvore D3 + viewer Digitarq), `arvore_pessoa.html` (D3 centrada avós→pais→pessoa→filhos, zoom/pan/export SVG), `pessoas.html` (índice paginado 50/pág com filtros q/freguesia/tipo/anos, deep-link URL).
+- **Design**: Stitch dark Inter `var(--accent #6c63ff)` consistente com `index.html` e `family_tree.html`, responsive, badges DEAT/BIRT/MARR.
+- **API**: `GET /api/pessoa/<id>` e `GET /api/pessoa/<id>/familia` (busca pais por nome + filhos por pai/mae ilike, avós do registo), reutiliza `/api/pessoas` existente sem quebra; Supabase `pessoas` compatível.
+- **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
+- **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
+
 ## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, Salgueirais 600/991, Cadafaz pronto)
 
 ### Estado verificado

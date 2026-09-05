@@ -79,6 +79,18 @@ def batismos():
 def mapa():
     return render_template('map.html')
 
+@app.route('/pessoas')
+def pessoas_index():
+    return render_template('pessoas.html')
+
+@app.route('/pessoa/<pid>')
+def pessoa_detail(pid):
+    return render_template('pessoa_detail.html')
+
+@app.route('/arvore/<pid>')
+def arvore_pessoa(pid):
+    return render_template('arvore_pessoa.html')
+
 @app.route('/api/mapa')
 def api_mapa():
     cached = cache_get('mapa')
@@ -415,6 +427,115 @@ def get_pessoas():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def _fetch_pessoa(pid):
+    """Fetch single pessoa by id from Supabase. Returns dict or None."""
+    try:
+        # pid may be int or string; Supabase id is usually integer
+        resp = requests.get(
+            f"{SUPABASE_URL}/rest/v1/pessoas",
+            headers=HEADERS,
+            params={"select": "*", "id": f"eq.{pid}", "limit": 1},
+            timeout=15
+        )
+        if resp.status_code == 200:
+            arr = resp.json()
+            if arr:
+                return arr[0]
+        return None
+    except Exception:
+        return None
+
+@app.route('/api/pessoa/<pid>')
+def api_pessoa(pid):
+    p = _fetch_pessoa(pid)
+    if not p:
+        return jsonify({"error": "Pessoa não encontrada"}), 404
+    return jsonify(p)
+
+@app.route('/api/pessoa/<pid>/familia')
+def api_pessoa_familia(pid):
+    p = _fetch_pessoa(pid)
+    if not p:
+        return jsonify({"error": "Pessoa não encontrada"}), 404
+    # Search for parents and children via name matching (PostgREST ilike)
+    pais = []
+    filhos = []
+    try:
+        nome_central = (p.get('nome') or '').strip()
+        # Parents: search by father's/mother's name appearing as a person's name
+        for parent_name in [p.get('pai'), p.get('mae')]:
+            if not parent_name or len(parent_name.strip()) < 3:
+                continue
+            # Use first two tokens for search to avoid too narrow match
+            tokens = parent_name.strip().split()
+            q = tokens[0] if tokens else parent_name
+            if len(q) < 3:
+                q = parent_name
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "id,nome,sobrenome,freguesia,data_obito,data_nascimento,tipo_registo", "nome": f"ilike.*{q}*", "limit": 5},
+                timeout=10
+            )
+            if resp.status_code == 200:
+                for cand in resp.json():
+                    # avoid duplicating central
+                    if str(cand.get('id')) == str(pid):
+                        continue
+                    # score by last name overlap?
+                    cand['relacao'] = 'pai' if parent_name == p.get('pai') else 'mae'
+                    cand['nome_completo'] = f"{cand.get('nome','')} {cand.get('sobrenome','')}".strip()
+                    # use nome_completo as display if available
+                    cand['nome'] = cand['nome_completo'] or cand.get('nome')
+                    pais.append(cand)
+                    break  # only first match per parent
+    except Exception:
+        pass
+    try:
+        # Filhos: where pai or mae ilike central name
+        nome_central = (p.get('nome') or '').strip()
+        if nome_central and len(nome_central) >= 3:
+            # Use first name for broad match
+            first = nome_central.split()[0]
+            # Search for filhos where pai ilike first OR mae ilike first
+            # PostgREST or syntax
+            resp = requests.get(
+                f"{SUPABASE_URL}/rest/v1/pessoas",
+                headers=HEADERS,
+                params={"select": "id,nome,sobrenome,freguesia,data_obito,data_nascimento,tipo_registo,pai,mae", "or": f"(pai.ilike.*{first}*,mae.ilike.*{first}*)", "limit": 20},
+                timeout=10
+            )
+            if resp.status_code == 200:
+                batch = resp.json()
+                for cand in batch:
+                    if str(cand.get('id')) == str(pid):
+                        continue
+                    # Verify closer match: pai/mae contains central full first+last? simple contains
+                    pai = (cand.get('pai') or '').lower()
+                    mae = (cand.get('mae') or '').lower()
+                    central_lower = nome_central.lower()
+                    # keep if central name appears in pai or mae field (at least first name)
+                    if first.lower() in pai or first.lower() in mae or central_lower in pai or central_lower in mae:
+                        cand['nome'] = f"{cand.get('nome','')} {cand.get('sobrenome','')}".strip() or cand.get('nome')
+                        filhos.append(cand)
+            # limit to 30 filhos max
+            filhos = filhos[:30]
+    except Exception:
+        pass
+    # Build response
+    return jsonify({
+        "pessoa": p,
+        "pais": pais,
+        "filhos": filhos,
+        "conjuge": {"nome": p.get('conjuge')} if p.get('conjuge') else None,
+        "avos": {
+            "avo_paterno": p.get('avo_paterno'),
+            "avo_paterna": p.get('avo_paterna'),
+            "avo_materno": p.get('avo_materno'),
+            "avo_materna": p.get('avo_materna'),
+        }
+    })
 
 @app.route('/api/variantes')
 def api_variantes():

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="title">Árvore — Genealogia Portugal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-weight:700;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent2)}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;margin-left:14px}
+.nav-link:hover{color:var(--text)}
+.controls{background:var(--bg2);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:0.82rem}
+.btn:hover{border-color:var(--accent)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:white}
+#treeWrap{flex:1;position:relative;overflow:hidden;background:radial-gradient(ellipse at top, #1a1d27 0%, #0f1117 70%);min-height:60vh}
+#treeWrap svg{width:100%;height:calc(100vh - 140px);display:block}
+.tooltip{position:absolute;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.82rem;pointer-events:none;z-index:20;max-width:300px;box-shadow:0 8px 24px rgba(0,0,0,0.4);line-height:1.4}
+.tooltip h4{color:var(--accent2);font-size:0.9rem;margin-bottom:4px}
+.legend{position:absolute;bottom:16px;left:16px;background:rgba(26,29,39,0.92);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:0.75rem;display:flex;gap:12px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.node{cursor:pointer}
+.node text{font-family:Inter;font-size:11px;fill:var(--text);pointer-events:none}
+.link{fill:none;stroke:#3a3f55;stroke-width:1.6px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+  <div><a href="/" class="nav-link">Pesquisa</a><a href="/pessoas" class="nav-link">Pessoas</a><a href="/family-tree" class="nav-link">Árvore Global</a></div>
+</div>
+<div class="controls">
+  <span id="headerName" style="font-weight:600;color:var(--text)">A carregar...</span>
+  <span style="color:var(--text2);font-size:0.82rem" id="headerMeta"></span>
+  <div style="margin-left:auto;display:flex;gap:8px">
+    <a id="btnFicha" class="btn" href="#">Ficha →</a>
+    <button class="btn" onclick="zoomTo(1)">Centrar</button>
+    <button class="btn" onclick="zoomBy(1.3)">＋</button>
+    <button class="btn" onclick="zoomBy(0.77)">－</button>
+    <button class="btn btn-primary" onclick="exportSVG()">Exportar SVG</button>
+  </div>
+</div>
+<div id="treeWrap"><div id="tooltip" class="tooltip" style="display:none"></div></div>
+<div class="legend"><span><span class="dot" style="background:#eab308"></span> Avós</span><span><span class="dot" style="background:#22c55e"></span> Pais</span><span><span class="dot" style="background:#6c63ff"></span> Pessoa</span><span><span class="dot" style="background:#38bdf8"></span> Filhos</span><span><span class="dot" style="background:#a78bfa"></span> Cônjuge</span></div>
+
+<script>
+const PID = location.pathname.split('/').pop();
+let svg, g, zoomBehavior;
+let familiaData=null;
+
+async function load(){
+  const r=await fetch(`/api/pessoa/${PID}/familia`);
+  if(!r.ok){ document.getElementById('headerName').textContent='Pessoa não encontrada'; return; }
+  familiaData=await r.json();
+  const p=familiaData.pessoa;
+  const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||`#${p.id}`;
+  document.getElementById('title').textContent=`Árvore de ${nome} — Genealogia Portugal`;
+  document.getElementById('headerName').textContent=`🌲 Árvore centrada em ${nome}`;
+  document.getElementById('headerMeta').textContent=`${p.freguesia||''} • ${p.data_obito||p.data_nascimento||''} • ${p.tipo_registo||'DEAT'}`;
+  document.getElementById('btnFicha').href=`/pessoa/${p.id}`;
+  renderTree(familiaData);
+}
+
+function buildFullHierarchy(fam){
+  const p=fam.pessoa;
+  const nomeP=`${p.nome||''} ${p.sobrenome||''}`.trim()||p.nome||'Pessoa';
+  const centralNode={name:nomeP, type:'central', id:p.id, data:p};
+  // filhos
+  const filhosNodes=(fam.filhos||[]).map(f=>({name:f.nome||'Filho', type:'filho', id:f.id, data:f, conjuge:f.conjuge||null}));
+  if(filhosNodes.length) centralNode.children=filhosNodes;
+  // conjuge node as sibling of central (family union)
+  let familyNode;
+  if(p.conjuge){
+    const conj={name:p.conjuge, type:'conjuge', data:{conjuge:p.conjuge}};
+    familyNode={name:'Casal', type:'family', children:[centralNode, conj], isCasal:true};
+  } else {
+    familyNode=centralNode;
+  }
+  // parents
+  const paiNode = p.pai ? {name:p.pai, type:'pai', id: fam.pais?.find(x=>x.nome===p.pai)?.id} : null;
+  const maeNode = p.mae ? {name:p.mae, type:'mae', id: fam.pais?.find(x=>x.nome===p.mae)?.id} : null;
+  let parentsUnion;
+  if(paiNode && maeNode){
+    parentsUnion={name:'Pais', type:'family', children:[paiNode, maeNode]};
+    // avos para cada lado
+    const avosPaternos=[]; if(p.avo_paterno) avosPaternos.push({name:p.avo_paterno, type:'avo'}); if(p.avo_paterna) avosPaternos.push({name:p.avo_paterna, type:'avo'});
+    const avosMaternos=[]; if(p.avo_materno) avosMaternos.push({name:p.avo_materno, type:'avo'}); if(p.avo_materna) avosMaternos.push({name:p.avo_materna, type:'avo'});
+    if(avosPaternos.length) paiNode.children=[{name:'Avós paternos', type:'family', children: avosPaternos}];
+    if(avosMaternos.length) maeNode.children=[{name:'Avós maternos', type:'family', children: avosMaternos}];
+    // top root: avos -> pais -> pessoa -> filhos
+    // We'll make hierarchy top-down: root = family of avos
+    const topChildren=[];
+    if(avosPaternos.length || avosMaternos.length){
+      topChildren.push({name:'Avós', type:'family', children:[...avosPaternos, ...avosMaternos]});
+    }
+    return {name:'Família de '+nomeP, type:'root', children:[...topChildren, {name:'Pais', type:'family', children:[paiNode, maeNode]}, familyNode]};
+  } else if(paiNode || maeNode){
+    const par=paiNode||maeNode;
+    const avos=[]; if(p.avo_paterno) avos.push({name:p.avo_paterno, type:'avo'}); if(p.avo_paterna) avos.push({name:p.avo_paterna, type:'avo'}); if(p.avo_materno) avos.push({name:p.avo_materno, type:'avo'}); if(p.avo_materna) avos.push({name:p.avo_materna, type:'avo'});
+    if(avos.length){
+      return {name:'Família de '+nomeP, type:'root', children:[{name:'Avós', type:'family', children:avos}, par, familyNode]};
+    }
+    return {name:'Família de '+nomeP, type:'root', children:[par, familyNode]};
+  } else {
+    // no parents, just avos + central
+    const avos=[]; if(p.avo_paterno) avos.push({name:p.avo_paterno, type:'avo'}); if(p.avo_paterna) avos.push({name:p.avo_paterna, type:'avo'}); if(p.avo_materno) avos.push({name:p.avo_materno, type:'avo'}); if(p.avo_materna) avos.push({name:p.avo_materna, type:'avo'});
+    if(avos.length){
+      return {name:'Família de '+nomeP, type:'root', children:[{name:'Avós', type:'family', children:avos}, familyNode]};
+    }
+    // fallback: just central + filhos
+    if(filhosNodes.length) return familyNode;
+    return centralNode;
+  }
+}
+
+function renderTree(fam){
+  const wrap=document.getElementById('treeWrap');
+  wrap.innerHTML='<div id="tooltip" class="tooltip" style="display:none"></div>';
+  const width=wrap.clientWidth; const height=Math.max(600, window.innerHeight-140);
+  const hierarchy=buildFullHierarchy(fam);
+  const root=d3.hierarchy(hierarchy);
+  // layout: tree top-down, width = breadth, height = depth
+  const treeLayout=d3.tree().nodeSize([140, 110]).separation((a,b)=> a.parent===b.parent?1.2:1.6);
+  treeLayout(root);
+  // compute bounds
+  let x0=Infinity, x1=-Infinity; root.each(d=>{ if(d.x<x0) x0=d.x; if(d.x>x1) x1=d.x; });
+  const svgWidth=Math.max(width, (x1-x0)+280);
+  svg=d3.select('#treeWrap').append('svg').attr('width','100%').attr('height', height).attr('viewBox',`0 0 ${svgWidth} ${height}`).style('background','transparent');
+  g=svg.append('g');
+  zoomBehavior=d3.zoom().scaleExtent([0.2,3]).on('zoom', e=> g.attr('transform', e.transform));
+  svg.call(zoomBehavior);
+  const yOffset=80;
+  const xOffset= svgWidth/2 - (x0+x1)/2;
+  // links
+  g.selectAll('.link').data(root.links()).join('path').attr('class','link').attr('d', d3.linkVertical().x(d=>d.x + xOffset).y(d=>d.y + yOffset));
+  // nodes
+  const node=g.selectAll('.node').data(root.descendants()).join('g').attr('class',d=>`node node--${d.data.type}`).attr('transform', d=>`translate(${d.x + xOffset},${d.y + yOffset})`).on('click', (e,d)=>{ if(d.data.id) location.href=`/pessoa/${d.data.id}`; else if(d.data.type==='filho'||d.data.type==='pai'||d.data.type==='mae') location.href=`/pessoas?q=${encodeURIComponent(d.data.name.split(' ')[0])}`; }).on('mouseover', (e,d)=> showTip(e,d)).on('mouseout', hideTip);
+  node.append('circle').attr('r', d=> d.data.type==='central'?16 : d.data.type==='root'?6 : d.data.type==='family'?5 : 11).attr('fill', d=>{
+    if(d.data.type==='central') return '#6c63ff';
+    if(d.data.type==='pai'||d.data.type==='mae') return '#22c55e';
+    if(d.data.type==='avo') return '#eab308';
+    if(d.data.type==='filho') return '#38bdf8';
+    if(d.data.type==='conjuge') return '#a78bfa';
+    if(d.data.type==='family'||d.data.type==='root') return '#334155';
+    return '#64748b';
+  }).attr('stroke','var(--border)').attr('stroke-width',2);
+  node.append('text').attr('dy','0.32em').attr('y', d=> d.children? -18 : 22).attr('text-anchor','middle').text(d=> d.data.name.length>22? d.data.name.slice(0,22)+'…' : d.data.name).style('font-size', d=> d.data.type==='central'?'12px':'10px').style('font-weight', d=> d.data.type==='central'?'700':'500');
+  // initial zoom centered
+  const initial = d3.zoomIdentity.translate(0,20).scale(0.95);
+  svg.call(zoomBehavior.transform, initial);
+}
+
+function showTip(e,d){
+  const t=document.getElementById('tooltip');
+  if(d.data.type==='family'||d.data.type==='root'){ t.style.display='none'; return; }
+  t.style.display='block';
+  t.style.left=(e.pageX+12)+'px'; t.style.top=(e.pageY-20)+'px';
+  const dd=d.data.data||{};
+  let html=`<h4>${d.data.name}</h4>`;
+  if(d.data.type==='central') html+=`<div style="color:var(--text2)">Pessoa central • <a href="/pessoa/${d.data.id}" style="color:var(--accent2)">ver ficha →</a></div>`;
+  if(dd.freguesia) html+=`<div style="color:var(--text2)">Freguesia: <span style="color:var(--text)">${dd.freguesia}</span></div>`;
+  if(dd.data_obito||dd.data_nascimento) html+=`<div style="color:var(--text2)">Data: <span style="color:var(--text)">${dd.data_obito||dd.data_nascimento}</span></div>`;
+  if(d.data.type==='avo') html+=`<div style="color:var(--text2)">Avô/avó</div>`;
+  t.innerHTML=html;
+}
+function hideTip(){ document.getElementById('tooltip').style.display='none';}
+function zoomBy(k){ svg.transition().call(zoomBehavior.scaleBy, k); }
+function zoomTo(s){ svg.transition().call(zoomBehavior.transform, d3.zoomIdentity.scale(s)); }
+function exportSVG(){
+  const el=document.querySelector('#treeWrap svg');
+  const data=new XMLSerializer().serializeToString(el);
+  const blob=new Blob([data],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`arvore-${PID}.svg`; a.click();
+}
+window.addEventListener('resize', ()=> { if(familiaData) renderTree(familiaData); });
+load();
+</script>
+</body>
+</html>
