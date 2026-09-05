@@ -352,14 +352,20 @@
                         conditions.push(`or(nome.ilike.*${currentQuery}*,sobrenome.ilike.*${currentQuery}*,freguesia.ilike.*${currentQuery}*)`);
                     }
                 }
-                if (currentParish) conditions.push(`freguesia.ilike.*${currentParish}*`);
-                if (currentFromYear) conditions.push(`data_obito.gte.${currentFromYear}-01-01`);
-                if (currentToYear) conditions.push(`data_obito.lte.${currentToYear}-12-31`);
+                if (currentParish) conditions.push(`freguesia=ilike.*${encodeURIComponent(currentParish)}*`);
+                if (currentFromYear) conditions.push(`data_obito=gte.${currentFromYear}-01-01`);
+                if (currentToYear) conditions.push(`data_obito=lte.${currentToYear}-12-31`);
                 if (currentTipo && !tipoFallback) conditions.push(`tipo_registo=eq.${currentTipo}`);
                 if (conditions.length > 0) url += '&' + conditions.join('&');
                 const response = await fetch(url, { headers });
                 if (!response.ok) throw new Error('Erro na pesquisa');
-                const data = await response.json();
+                let data = await response.json();
+                // fallback client-side freguesia filter se Supabase ignorar (ex: Germenegildo São Martinho)
+                if (currentParish && data.length) {
+                    const norm = currentParish.toLowerCase();
+                    const filtered = data.filter(p => (p.freguesia||'').toLowerCase().includes(norm));
+                    if (filtered.length !== data.length) data = filtered;
+                }
                 if (reset) {
                     totalLoaded = 0;
                     renderResults(data);
