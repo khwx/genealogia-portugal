@@ -939,9 +939,8 @@ def main():
             record_type = data.get("record_type") or "DEAT"
             structured = False
             persons = []
-            # BIRT: baptized
+            # BIRT: baptized (prompt rico 15 campos)
             if isinstance(baptized, list) and baptized and any(isinstance(d, dict) and (d.get("name") or d.get("nome")) for d in baptized):
-                # For BIRT, use baptized list (name -> nome/sobrenome, pai/mae from father/mother)
                 for entry in baptized:
                     if not isinstance(entry, dict): continue
                     name = (entry.get("name") or entry.get("nome") or "").strip()
@@ -950,10 +949,24 @@ def main():
                     if not parts: continue
                     pai = (entry.get("father") or entry.get("pai") or "").strip()[:100]
                     mae = (entry.get("mother") or entry.get("mae") or "").strip()[:100]
+                    # Campos ricos BIRT para árvore 3 gerações
+                    extra = {
+                        "avo_paterno": (entry.get("avo_paterno") or "").strip()[:100],
+                        "avo_paterna": (entry.get("avo_paterna") or "").strip()[:100],
+                        "avo_materno": (entry.get("avo_materno") or "").strip()[:100],
+                        "avo_materna": (entry.get("avo_materna") or "").strip()[:100],
+                        "legitimidade": (entry.get("legitimidade") or "").strip()[:50],
+                        "father_naturalidade": (entry.get("father_naturalidade") or "").strip()[:100],
+                        "mother_naturalidade": (entry.get("mother_naturalidade") or "").strip()[:100],
+                        "assinatura": (entry.get("assinatura") or "").strip()[:80],
+                        "godfather": (entry.get("godfather") or "").strip()[:100],
+                        "godmother": (entry.get("godmother") or "").strip()[:100],
+                    }
+                    base = {"pai": pai, "mae": mae, "conjuge": "", "birth_date": entry.get("birth_date") or entry.get("baptism_date"), "baptism_date": entry.get("baptism_date"), **extra}
                     if len(parts)==1:
-                        persons.append({"nome": parts[0][:100], "sobrenome": "", "pai": pai, "mae": mae, "conjuge": "", "birth_date": entry.get("birth_date") or entry.get("baptism_date"), "baptism_date": entry.get("baptism_date")})
+                        persons.append({"nome": parts[0][:100], "sobrenome": "", **base})
                     else:
-                        persons.append({"nome": " ".join(parts[:-1])[:100], "sobrenome": parts[-1][:50], "pai": pai, "mae": mae, "conjuge": "", "birth_date": entry.get("birth_date") or entry.get("baptism_date"), "baptism_date": entry.get("baptism_date")})
+                        persons.append({"nome": " ".join(parts[:-1])[:100], "sobrenome": parts[-1][:50], **base})
                 structured = True
                 used_structured = True
             elif isinstance(deceased, list) and bool([d for d in deceased if isinstance(d, dict) and (d.get("name") or d.get("nome"))]):
@@ -1037,6 +1050,15 @@ def main():
                         val = (person.get(rel_col) or "").strip()
                         if val:
                             record[rel_col] = val[:100]
+                # BIRT extra: 4 avós + legitimidade + naturalidade pais (para árvore 3 gerações)
+                if record_type == "BIRT":
+                    for col in ("avo_paterno","avo_paterna","avo_materno","avo_materna","legitimidade","naturalidade_pai","naturalidade_mae","assinatura"):
+                        # mapping from prompt keys
+                        key_map = {"avo_paterno":"avo_paterno","avo_paterna":"avo_paterna","avo_materno":"avo_materno","avo_materna":"avo_materna","legitimidade":"legitimidade","naturalidade_pai":"father_naturalidade","naturalidade_mae":"mother_naturalidade","assinatura":"assinatura"}
+                        src = key_map[col]
+                        val = (person.get(src) or person.get(col) or "").strip()
+                        if val:
+                            record[col] = val[:100]
                 
                 if not DRY_RUN:
                     result = supabase_request("POST", "pessoas", record)
