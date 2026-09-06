@@ -11,6 +11,20 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-05 (execução autónoma — Prados 1000/1278, script Rapa 1030 pronto)
+
+### Estado verificado
+- **DEAT completo** `25/25` `35001`. **BIRT 7/25 sync** `Supabase 7765`.
+- **Prados BIRT 1000/1278** (78%) `pid 144981` `0 errors` (~2h restantes)
+- **Script Rapa pronto** `/tmp/birt_rapa.py` (7 livros, 1030 págs) — `py_compile OK`
+- **Supabase Total 42766** (DEAT 35001 + BIRT 7765)
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
+
+### Próximos passos
+1. **Completar Prados 1278** → sync → **Rapa 1030** → Velosa 1413 → ...
+2. Aplicar design Stitch (`c1c30d63`) ao `index.html`
+3. Até `25/25` BIRT (7/25) → MARR `1030 livros`
+
 ## 2026-09-05 (execução autónoma — Carrapichana sync COMPLETO, Supabase BIRT 7765, Prados 200/1278)
 
 ### Estado verificado
