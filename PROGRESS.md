@@ -11,6 +11,21 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-05 (execução autónoma — Carrapichana 1145/1145 COMPLETO, sync em curso, Prados 1278 lançada)
+
+### Estado verificado
+- **DEAT completo** `25/25` `35001`. **BIRT 6/25 sync** `6086` + **Carrapichana pending**.
+- **Carrapichana BIRT 1145/1145 COMPLETO** `0 errors` — `31471` ficheiros HTR
+- **Sync Carrapichana→Supabase** em curso `pid 144943` (a sincronizar novos)
+- **Prados BIRT 1278 págs lançada** `pid 144981` (9 livros)
+- **Supabase Total 41087** (DEAT 35001 + BIRT 6086)
+- `status_check.py` → `status: OK`, `.env` ignorado.
+
+### Próximos passos
+1. **Completar Prados 1278** (~40min) → sync → Rapa 1030 → Velosa 1413 → ...
+2. Aplicar design Stitch (`c1c30d63`) ao `index.html`
+3. Até `25/25` BIRT (7/25) → MARR `1030 livros`
+
 ## 2026-09-05 (execução autónoma — Cadafaz 904+sync COMPLETO, Supabase BIRT 6086, Carrapichana 1145 em curso)
 
 ### Estado verificado
