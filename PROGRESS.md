@@ -11,20 +11,19 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
-## 2026-09-05 (execução autónoma — Cadafaz 904/904 COMPLETO, sync em curso, Carrapichana 1145 lançada)
+## 2026-09-05 (execução autónoma — Cadafaz 904+sync COMPLETO, Supabase BIRT 6086, Carrapichana 1145 em curso)
 
 ### Estado verificado
-- **DEAT completo** `25/25` `35001`. **BIRT 5/25 sync** `4995` + **Cadafaz pending sync**.
-- **Cadafaz BIRT 904/904 COMPLETO** `0 errors` — `30326` ficheiros HTR → `30326` output
-- **Sync Cadafaz→Supabase** em curso `pid 125175` (`Already synced 15579`)
-- **Carrapichana BIRT 1145 págs lançada** `pid 125219` (7 livros)
-- **Stitch MCP**: `Portal Genealógico` `Modern Heritage` + `10 screens` + 3 páginas árvore `/pessoa` `/arvore` `/pessoas`
+- **DEAT completo** `25/25` `35001`. **BIRT 6/25** `Supabase 6086`.
+- **Cadafaz BIRT 904/904 COMPLETO** `0 errors` → sync COMPLETO `1091` no Supabase ✅
+- **Supabase Total 41087** (DEAT 35001 + BIRT 6086)
+- **Carrapichana BIRT 1145 págs em curso** `pid 125219` `0 errors` (~35min)
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Carrapichana 1145** (~35min) → sync → Prados 1278 → Rapa 1030 → ...
+1. **Completar Carrapichana 1145** (~30min) → sync → Prados 1278 → Rapa 1030 → ...
 2. Aplicar design Stitch (`c1c30d63`) ao `index.html`
-3. Até `25/25` BIRT (6/25) → MARR `1030 livros`
+3. Até `25/25` BIRT → MARR `1030 livros`
 
 ## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, Salgueirais 600/991, Cadafaz pronto)
 
