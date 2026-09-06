@@ -11,21 +11,20 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
-## 2026-09-05 (execução autónoma — Salgueirais sync COMPLETO, Supabase BIRT 4995, Cadafaz 700/904)
+## 2026-09-05 (execução autónoma — Cadafaz 904/904 COMPLETO, sync em curso, Carrapichana 1145 lançada)
 
 ### Estado verificado
-- **DEAT completo** `25/25` `35001`. **BIRT 5/25** `Supabase 4995`.
-- **Salgueirais BIRT sync COMPLETO** → `Salgueirais BIRT 1382` no Supabase ✅ (991/991 HTR)
-- **Supabase Total 39996** (DEAT 35001 + BIRT 4995)
-- **Cadafaz BIRT 700/904** (77%) `pid 69189` `0 errors` — acaba em ~30min
-- **Stitch MCP via OAuth OK**: `Portal Genealógico` `12494263615437953207` `Modern Heritage` + `10 screens`
-- **Árvore Stitch**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` + `/api/pessoa/<id>/familia` (D3 avós→pais→pessoa→filhos)
+- **DEAT completo** `25/25` `35001`. **BIRT 5/25 sync** `4995` + **Cadafaz pending sync**.
+- **Cadafaz BIRT 904/904 COMPLETO** `0 errors` — `30326` ficheiros HTR → `30326` output
+- **Sync Cadafaz→Supabase** em curso `pid 125175` (`Already synced 15579`)
+- **Carrapichana BIRT 1145 págs lançada** `pid 125219` (7 livros)
+- **Stitch MCP**: `Portal Genealógico` `Modern Heritage` + `10 screens` + 3 páginas árvore `/pessoa` `/arvore` `/pessoas`
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Cadafaz 904** (~30min) → sync Cadafaz → Carrapichana 1145 → Prados 1278 → ...
+1. **Completar Carrapichana 1145** (~35min) → sync → Prados 1278 → Rapa 1030 → ...
 2. Aplicar design Stitch (`c1c30d63`) ao `index.html`
-3. Até `25/25` BIRT (~5/25) → MARR `1030 livros`
+3. Até `25/25` BIRT (6/25) → MARR `1030 livros`
 
 ## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, Salgueirais 600/991, Cadafaz pronto)
 
