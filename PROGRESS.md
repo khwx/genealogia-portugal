@@ -11,21 +11,21 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
-## 2026-09-05 (execução autónoma — Salgueirais 991/991 COMPLETO, Cadafaz 904 em curso, sync Salgueirais)
+## 2026-09-05 (execução autónoma — Salgueirais sync COMPLETO, Supabase BIRT 4995, Cadafaz 700/904)
 
 ### Estado verificado
-- **DEAT completo** `25/25` `35001`. **BIRT 4/25** `3613`.
-- **Salgueirais BIRT 991/991 COMPLETO** `0 errors` — `1110 batismos` (1139 págs)
-- **Cadafaz BIRT 904 págs em curso** `pid 69189`
-- **Sync Salgueirais→Supabase** em curso `pid 69191`
-- **Stitch MCP via OAuth OK**: `opencode mcp auth stitch` → lista `11 projetos`, `Portal Genealógico` (`12494263615437953207`) com design `Modern Heritage` (`#6c63ff`, `Source Serif 4`, `Inter`, `JetBrains Mono`) e `10 screens`
-- **Árvore Stitch**: templates `pessoa_detail.html`, `arvore_pessoa.html`, `pessoas.html` + rotas `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` + `/api/pessoa/<id>` e `/api/pessoa/<id>/familia`
+- **DEAT completo** `25/25` `35001`. **BIRT 5/25** `Supabase 4995`.
+- **Salgueirais BIRT sync COMPLETO** → `Salgueirais BIRT 1382` no Supabase ✅ (991/991 HTR)
+- **Supabase Total 39996** (DEAT 35001 + BIRT 4995)
+- **Cadafaz BIRT 700/904** (77%) `pid 69189` `0 errors` — acaba em ~30min
+- **Stitch MCP via OAuth OK**: `Portal Genealógico` `12494263615437953207` `Modern Heritage` + `10 screens`
+- **Árvore Stitch**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` + `/api/pessoa/<id>/familia` (D3 avós→pais→pessoa→filhos)
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Cadafaz 904** → sync → Carrapichana 1145 → Prados 1278 → ...
-2. Aplicar design Stitch exportado (`c1c30d63`) ao `index.html` quando Salgueirais sync acabar
-3. Até `25/25` BIRT → MARR `1030 livros`
+1. **Completar Cadafaz 904** (~30min) → sync Cadafaz → Carrapichana 1145 → Prados 1278 → ...
+2. Aplicar design Stitch (`c1c30d63`) ao `index.html`
+3. Até `25/25` BIRT (~5/25) → MARR `1030 livros`
 
 ## 2026-09-05 (execução autónoma — BIRT 4 freguesias completas, reprocess 215/215 OK, Salgueirais 600/991, Cadafaz pronto)
 
