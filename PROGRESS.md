@@ -11,6 +11,19 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-07 (execução autónoma — Rapa sync COMPLETO, Supabase BIRT 11045, Velosa 50/1413)
+
+### Estado verificado
+- **DEAT completo** `25/25` `35001`. **BIRT 10/25** `Supabase 11045`.
+- **Rapa BIRT 1030/1030 COMPLETO** → sync COMPLETO `1364` no Supabase ✅
+- **Supabase Total 46046** (DEAT 35001 + BIRT 11045)
+- **Velosa BIRT 50/1413** (4%) `pid 238655` `0 errors` (~12h estimado)
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
+
+### Próximos passos
+1. **Completar Velosa 1413** → sync → Vide Entre Vinhas 1491 → Açores 1787 → ...
+2. Até `25/25` BIRT (11/25) → MARR `1030 livros`
+
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
 
 ### Estado verificado
