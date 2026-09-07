@@ -52,6 +52,12 @@
             color: var(--text2); font-size: 0.85rem; padding: 6px 12px;
             border-radius: 8px; text-decoration: none; transition: all .2s;
         }
+        .menu-toggle { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg2); flex-direction: column; padding: 12px 24px 16px; gap: 10px; border-bottom: 1px solid var(--border); z-index: 99; }
+            .nav-links.open { display: flex; }
+        }
         .nav-link:hover, .nav-link.active {
             background: var(--bg3); color: var(--text);
         }
@@ -270,6 +276,7 @@
 <nav class="topbar">
     <div class="topbar-left">
         <div class="logo">🌳 Genealogia <span>Portugal</span></div>
+        <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button>
         <div class="nav-links">
             <a href="index_pages.html" class="nav-link">📚 Livros</a>
             <a href="review.html" class="nav-link active">✅ Revisão</a>

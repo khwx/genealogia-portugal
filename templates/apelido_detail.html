@@ -18,6 +18,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .nav-links{display:flex;gap:16px;align-items:center}
 .nav-link{color:var(--text2);text-decoration:none;font-size:0.92rem;font-weight:500}
 .nav-link:hover,.nav-link.active{color:var(--text)}
+.menu-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);font-size:1.2rem;border-radius:8px;padding:4px 12px;cursor:pointer}
+@media(max-width:768px){.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--bg2);flex-direction:column;align-items:stretch;padding:12px 24px 16px;gap:14px;border-bottom:1px solid var(--border);z-index:99}.nav-links.open{display:flex}}
 .wrap{max-width:1100px;margin:0 auto;padding:20px;width:100%}
 .breadcrumb{color:var(--text2);font-size:0.85rem;margin-bottom:12px}
 .breadcrumb a{color:var(--accent2);text-decoration:none}
@@ -45,6 +47,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <body>
 <div class="topbar">
   <a href="/" class="logo"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
+  <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button>
   <div class="nav-links">
     <a href="/apelidos" class="nav-link active">Apelidos</a>
     <a href="/timeline" class="nav-link">Timeline</a>

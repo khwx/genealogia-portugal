@@ -103,6 +103,16 @@ def apelido_detail_page(apelido):
 def timeline_page():
     return render_template('timeline.html')
 
+@app.route('/about')
+def about_page():
+    return render_template('about.html')
+
+@app.route('/stats')
+def stats_page():
+    stats = {'total': 0, 'por_ano': {}, 'por_freguesia': {},
+             'com_familysearch': 0, 'com_transkribus': 0}
+    return render_template('stats.html', stats=stats)
+
 @app.route('/api/mapa')
 def api_mapa():
     cached = cache_get('mapa')

@@ -14,8 +14,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{font-size:1.05rem;font-weight:700;color:var(--text);text-decoration:none}
 .logo span{color:var(--accent2)}
+.nav-links{display:flex;align-items:center}
 .nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:500;margin-left:16px}
 .nav-link:hover{color:var(--text)}
+.menu-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);font-size:1.2rem;border-radius:8px;padding:4px 12px;cursor:pointer}
+@media(max-width:768px){.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--bg2);flex-direction:column;align-items:stretch;padding:12px 24px 16px;gap:14px;border-bottom:1px solid var(--border);z-index:99}.nav-links.open{display:flex}.nav-link{margin-left:0}}
 .wrap{max-width:1100px;margin:0 auto;padding:20px;width:100%}
 .breadcrumb{color:var(--text2);font-size:0.85rem;margin-bottom:16px}
 .breadcrumb a{color:var(--accent2);text-decoration:none}
@@ -67,7 +70,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <body>
 <div class="topbar">
   <a href="/" class="logo" style="font-family:'Source Serif 4',serif;letter-spacing:-0.02em;font-weight:700;font-size:1.05rem;color:var(--text);text-decoration:none"><span style="color:#6C63FF">Genealogia</span> Portugal</a>
-  <div><a href="/" class="nav-link">Pesquisa</a><a href="/pessoas" class="nav-link">Pessoas</a><a href="/family-tree" class="nav-link">Árvore</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a></div>
+  <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button>
+  <div class="nav-links"><a href="/" class="nav-link">Pesquisa</a><a href="/pessoas" class="nav-link">Pessoas</a><a href="/family-tree" class="nav-link">Árvore</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a></div>
 </div>
 <div class="wrap">
   <div class="breadcrumb"><a href="/pessoas">← Pessoas</a> / <span id="bcName">a carregar</span></div>

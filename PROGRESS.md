@@ -11,6 +11,15 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-07 (fix — menu responsivo nas 15 páginas restantes + rotas /about /stats)
+
+### Tarefa implementada — todas as páginas com menu responsivo
+- **Hambúrguer `☰`** adicionado a `validate`, `pessoas`, `pessoa_detail`, `arvore_pessoa`, `apelidos`, `apelido_detail`, `timeline` (padrão `.nav-links` + `@media 768px`).
+- **Bootstrap toggler** em `obito_detail`, `freguesia`, `stats`, `about`, `search_results` (tinham `collapse` sem botão — menu desaparecia no telemóvel; Bootstrap JS já carregado).
+- **Admin legacy** `gedcom.html`, `review.html`, `index_pages.html` com hambúrguer.
+- **Rotas em falta**: `/about` e `/stats` davam 404 (6 templates linkavam) → rotas criadas; `/stats` com defaults (template server-rendered sem fetch).
+- **Verificação**: 12 rotas `200 OK`, `ALL TESTS PASSED`, `py_compile OK`.
+
 ## 2026-09-05 (fix — menu responsivo + link Árvore partido em 6 páginas)
 
 ### Tarefa implementada — menu hambúrguer + fix /family-tree
