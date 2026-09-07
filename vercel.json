@@ -9,6 +9,16 @@
     { "src": "/validar", "dest": "api/index.py" },
     { "src": "/mapa", "dest": "api/index.py" },
     { "src": "/family-tree", "dest": "api/index.py" },
+    { "src": "/batismos", "dest": "api/index.py" },
+    { "src": "/casamentos", "dest": "api/index.py" },
+    { "src": "/pessoas", "dest": "api/index.py" },
+    { "src": "/pessoa/(.*)", "dest": "api/index.py" },
+    { "src": "/arvore/(.*)", "dest": "api/index.py" },
+    { "src": "/apelidos", "dest": "api/index.py" },
+    { "src": "/apelidos/(.*)", "dest": "api/index.py" },
+    { "src": "/timeline", "dest": "api/index.py" },
+    { "src": "/about", "dest": "api/index.py" },
+    { "src": "/stats", "dest": "api/index.py" },
     { "src": "/(.*)", "dest": "/$1" }
   ],
   "env": {

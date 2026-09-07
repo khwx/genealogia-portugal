@@ -11,6 +11,13 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-07 (fix — /batismos 404 no Vercel + árvore des-saturada)
+
+### Tarefa implementada — vercel.json + family_tree leve
+- **Bug `/batismos` 404**: `vercel.json` só encaminhava `/validar`, `/mapa`, `/family-tree` ao Flask; restantes caíam em estáticos → 404. Adicionadas 11 rotas (`/batismos`, `/casamentos`, `/pessoas`, `/pessoa/*`, `/arvore/*`, `/apelidos*`, `/timeline`, `/about`, `/stats`).
+- **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
+- **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
+
 ## 2026-09-07 (execução autónoma — Rapa sync COMPLETO, Supabase BIRT 11045, Velosa 50/1413)
 
 ### Estado verificado

@@ -34,6 +34,9 @@
         .node--birt circle { fill: #6C63FF; stroke: #4f46e5; }
         .node--marr circle { fill: #d4af37; stroke: #b7952e; }
         .node--family circle { fill: #6C63FF; stroke: #4f46e5; }
+        .node--more circle { fill: transparent; stroke: #475569; stroke-dasharray: 3 3; }
+        .node--more text { fill: #64748b; font-style: italic; font-size: 10px; }
+        #tree-notice { background: #1e293b; border-bottom: 1px solid #334155; color: #94a3b8; font-size: 12px; padding: 6px 20px; }
         .node--person circle { fill: #3b82f6; stroke: #2563eb; }
         .link { fill: none; stroke: #475569; stroke-width: 1.5px; stroke-opacity: 0.6; }
         .tooltip { position: absolute; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 12px; font-size: 13px; pointer-events: none; z-index: 100; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
@@ -86,14 +89,11 @@
     </div>
     <div class="controls">
         <label>Freguesia:</label>
-        <select id="freguesia-filter">
+        <select id="freguesia-filter" onchange="buildTree()">
             <option value="">Todas</option>
-            <option value="Celorico (Santa Maria)">Santa Maria</option>
-            <option value="Celorico (São Pedro)">São Pedro</option>
-            <option value="São Martinho de Celorico">S. Martinho</option>
         </select>
         <label>Período:</label>
-        <select id="period-filter">
+        <select id="period-filter" onchange="buildTree()">
             <option value="">Todos</option>
             <option value="1700-1750">1700-1750</option>
             <option value="1750-1800">1750-1800</option>
@@ -106,6 +106,7 @@
         <button onclick="searchPeople()">Pesquisar</button>
         <button onclick="loadFromSupabase()">Recarregar BD</button>
     </div>
+    <div id="tree-notice"></div>
     <div id="tree-container">
         <div class="loading"><div class="spinner"></div><div>A carregar dados...</div></div>
     </div>
@@ -136,17 +137,23 @@ async function loadFromSupabase() {
     try {
         const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
         
+        const COLS = 'id,nome,sobrenome,data_obito,data_nascimento,data_casamento,freguesia,concelho,tipo_registo,pai,mae,conjuge,avo_paterno,avo_paterna,avo_materno,avo_materna,legitimidade,godfather,godmother,assinatura,naturalidade_pai,naturalidade_mae,imagem_url,fonte,idade,criado_em';
         const [pplRes, booksRes] = await Promise.all([
-            fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=*`, { headers }),
+            fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=${COLS}&order=criado_em.desc&limit=1500`, { headers }),
             fetch(`${SUPABASE_URL}/rest/v1/livros?select=*&freguesia=like.*Celorico*`, { headers })
         ]);
         
         allPeople = await pplRes.json();
         allBooks = await booksRes.json();
         
-        document.getElementById('stat-people').textContent = allPeople.length;
         document.getElementById('stat-docs').textContent = allBooks.length;
-        
+        try {
+            const h2 = { ...headers, 'Prefer': 'count=exact' };
+            const cRes = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=id&limit=1`, { headers: h2, method: 'HEAD' });
+            const tot = (cRes.headers.get('content-range') || '').split('/').pop();
+            if (tot) document.getElementById('stat-people').textContent = parseInt(tot).toLocaleString('pt-PT');
+        } catch (e) {}
+        populateFreguesiaFilter();
         buildTree();
         document.querySelector('.loading').style.display = 'none';
     } catch (e) {
@@ -203,7 +210,7 @@ function buildTree() {
         .join('g')
         .attr('class', d => `node node--${d.data.type || 'person'}`)
         .attr('transform', d => `translate(${d.x + 100},${d.y + 100})`)
-        .on('click', (event, d) => showDetails(d.data))
+        .on('click', (event, d) => { if (d.data.data) showDetails(d.data); })
         .on('mouseover', (event, d) => showTooltip(event, d.data))
         .on('mouseout', hideTooltip);
     
@@ -213,20 +220,63 @@ function buildTree() {
         .text(d => d.data.name || 'Desconhecido');
 }
 
+function populateFreguesiaFilter() {
+    const sel = document.getElementById('freguesia-filter');
+    if (!sel) return;
+    const counts = {};
+    allPeople.forEach(p => { const f = p.freguesia || 'Desconhecida'; counts[f] = (counts[f] || 0) + 1; });
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Todas</option>' + Object.keys(counts).sort()
+        .map(f => `<option value="${f}">${f} (${counts[f]})</option>`).join('');
+    if (cur && counts[cur]) sel.value = cur;
+}
+
+const MAX_PER_FREG = 60;
+const MAX_TOTAL_NODES = 500;
+
 function buildHierarchy() {
+    const fregSel = (document.getElementById('freguesia-filter') || {}).value || '';
+    const perSel = (document.getElementById('period-filter') || {}).value || '';
+    const q = ((document.getElementById('search-input') || {}).value || '').trim().toLowerCase();
+    let perFrom = 0, perTo = 9999;
+    if (perSel && perSel.includes('-')) { const a = perSel.split('-'); perFrom = +a[0]; perTo = +a[1]; }
+
     const families = {};
-    allPeople.forEach(p => {
+    let matched = 0, shown = 0, hidden = 0;
+    for (const p of allPeople) {
+        if (fregSel && (p.freguesia || '') !== fregSel) continue;
+        if (q && !(((p.nome || '') + ' ' + (p.sobrenome || '')).toLowerCase().includes(q))) continue;
+        if (perSel) {
+            const d = p.data_obito || p.data_nascimento || p.data_casamento || '';
+            const y = parseInt((d || '').slice(0, 4));
+            if (!y || y < perFrom || y > perTo) continue;
+        }
+        matched++;
+        if (shown >= MAX_TOTAL_NODES) { hidden++; continue; }
         const key = p.freguesia || 'Desconhecida';
-        if (!families[key]) families[key] = { name: key, type: 'family', children: [] };
-        const t=(p.tipo_registo||'DEAT').toLowerCase();
-        const nodeType = t==='birt'?'birt':t==='marr'?'marr':'obito';
+        if (!families[key]) families[key] = { name: key, type: 'family', children: [], _hidden: 0 };
+        if (families[key].children.length >= MAX_PER_FREG) { families[key]._hidden++; hidden++; continue; }
+        const t = (p.tipo_registo || 'DEAT').toLowerCase();
+        const nodeType = t === 'birt' ? 'birt' : t === 'marr' ? 'marr' : 'obito';
         families[key].children.push({
-            name: p.nome || 'Desconhecido',
+            name: (p.nome || 'Desconhecido') + (p.sobrenome ? ' ' + p.sobrenome : ''),
             type: nodeType,
             data: p
         });
+        shown++;
+    }
+    Object.values(families).forEach(f => {
+        if (f._hidden > 0) f.children.push({ name: `… +${f._hidden} (refine a pesquisa)`, type: 'more', data: null });
+        delete f._hidden;
     });
-    
+
+    const notice = document.getElementById('tree-notice');
+    if (notice) {
+        notice.textContent = hidden > 0
+            ? `A mostrar ${shown} de ${matched} registos — use freguesia, período ou pesquisa para refinar.`
+            : (matched > 0 ? `${matched} registo(s) no diagrama.` : 'Sem resultados — ajuste os filtros.');
+    }
+
     return d3.hierarchy({
         name: 'Celorico da Beira',
         type: 'family',
@@ -272,13 +322,16 @@ function showDetails(data) {
         html += `</div>`;
         
         if (data.children) {
-            html += `<div class="detail-section"><h4>Pessoas</h4>`;
-            data.children.forEach(c => {
+            const list = data.children.filter(c => c.type !== 'more');
+            const extra = data.children.length - list.length;
+            html += `<div class="detail-section"><h4>Pessoas (${list.length}${extra ? ` +${extra} ocultas` : ''})</h4>`;
+            list.slice(0, 50).forEach(c => {
                 html += `<div class="search-result" onclick="showDetails(${JSON.stringify(c).replace(/"/g, '&quot;')})">`;
                 html += `<div class="name">${c.name}</div>`;
                 if (c.data && c.data.data_obito) html += `<div class="info">Óbito: ${c.data.data_obito}</div>`;
                 html += `</div>`;
             });
+            if (list.length > 50) html += `<div class="info" style="color:#64748b;font-size:12px;padding:4px 8px;">… +${list.length - 50} — use a pesquisa para refinar.</div>`;
             html += `</div>`;
         }
     } else if (data.data) {
@@ -338,7 +391,7 @@ async function searchPeople() {
     
     try {
         const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?nome=like.*${query}*&select=*`, { headers });
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/pessoas?nome=like.*${encodeURIComponent(query)}*&select=id,nome,sobrenome,data_obito,freguesia&limit=50`, { headers });
         const results = await res.json();
         
         const sidebar = document.getElementById('sidebar');
