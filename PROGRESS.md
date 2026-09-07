@@ -11,6 +11,13 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-07 (fix — "Ver detalhes" no /batismos não abria nada)
+
+### Tarefa implementada — modal de detalhes BIRT
+- **Bug**: card tinha `Ver detalhes →` como texto simples — sem modal, sem click handler (index.html tinha, batismos.html nunca recebeu).
+- **Fix**: modal `#detailModal` + `openDetail(i)` com array `loaded[]` (índices estáveis entre batches), campos BIRT (pais+naturalidade, legitimidade, 4 avós, padrinhos, assinatura, assento, Digitarq, transcrição HTR), fecho em ✕/Escape/clique-fora, `stopPropagation` no link Digitarq.
+- **Verificação**: `JS SYNTAX OK`, `/batismos 200`, `ALL TESTS PASSED`.
+
 ## 2026-09-07 (fix — /batismos 404 no Vercel + árvore des-saturada)
 
 ### Tarefa implementada — vercel.json + family_tree leve

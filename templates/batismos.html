@@ -38,6 +38,14 @@ body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-hei
 .parish-tag.active{background:var(--accent);color:white;border-color:var(--accent)}
 .skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+#detailModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#detailModal.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
+.modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem}
+.drow{display:grid;gap:10px;color:var(--text2);font-size:0.95rem}
+.drow strong{color:var(--text2);font-weight:600}
+.drow span.v{color:var(--text)}
+@media(max-width:640px){.modal-box{padding:18px;max-height:92vh}}
 </style>
 </head>
 <body>
@@ -70,28 +78,31 @@ body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-hei
 <div class="results-container" id="res"><div class="loading">A carregar batismos...</div></div>
 <div id="more" style="text-align:center;padding:20px;display:none"><button id="moreBtn" class="parish-tag" style="padding:10px 24px">Carregar mais</button></div>
 
+<div id="detailModal"><div class="modal-box"><button class="modal-close" onclick="closeModal()">✕</button><div id="modalContent"></div></div></div>
+
 <script>
 const SUPABASE_URL='https://qljopxbxgflozrcdblrl.supabase.co';
 const SUPABASE_KEY='sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
 const H={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
 let q='', freg='', offset=0, totalLoaded=0, hasMore=true, loading=false;
+let loaded=[];
 const PAGE=100;
 
-function card(p){
+function card(p,i){
   const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Batizado';
   const data=p.data_nascimento ? new Date(p.data_nascimento).toLocaleDateString('pt-PT') : (p.data_obito? new Date(p.data_obito).toLocaleDateString('pt-PT'):'Data não especificada');
   const freguesia=p.freguesia||'Celorico da Beira';
   const avos=[p.avo_paterno,p.avo_paterna,p.avo_materno,p.avo_materna].filter(Boolean);
   const hasAvos=avos.length>0;
   const legit=p.legitimidade?`<span style="background:${p.legitimidade==='legitimo'?'rgba(34,197,94,0.15)':'rgba(239,68,68,0.15)'};color:${p.legitimidade==='legitimo'?'#22c55e':'#ef4444'};padding:3px 8px;border-radius:20px;font-size:0.75rem">${p.legitimidade}</span>`:'';
-  return `<div class="result-card">
+  return `<div class="result-card" onclick="openDetail(${i})" style="cursor:pointer">
     <div style="display:flex;justify-content:space-between;align-items:center"><div class="result-name">👶 ${nome}</div><span style="background:rgba(108,99,255,0.15);color:#8b83ff;padding:4px 10px;border-radius:20px;font-size:0.8rem">Batismo ${legit}</span></div>
     <div class="result-meta"><span>📅 ${data}</span><span>📍 ${freguesia}</span>${p.pai?`<span>👨 ${p.pai}</span>`:''}${p.mae?`<span>👩 ${p.mae}</span>`:''}</div>
     ${(p.pai||p.mae)?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--text2);margin-top:8px">${p.pai?`Pai: <span style="color:var(--text)">${p.pai}</span>${p.naturalidade_pai?` <span style="color:var(--text2)">(${p.naturalidade_pai})</span>`:''} &nbsp;`:''}${p.mae?`Mãe: <span style="color:var(--text)">${p.mae}</span>${p.naturalidade_mae?` <span style="color:var(--text2)">(${p.naturalidade_mae})</span>`:''}`:''}</div>`:''}
     ${hasAvos?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.82rem;color:var(--text2);margin-top:8px">🌲 Avós: ${p.avo_paterno?`Paterno: <span style="color:var(--text)">${p.avo_paterno}</span> & `:''}${p.avo_paterna?`<span style="color:var(--text)">${p.avo_paterna}</span> | `:''}${p.avo_materno?`Materno: <span style="color:var(--text)">${p.avo_materno}</span> & `:''}${p.avo_materna?`<span style="color:var(--text)">${p.avo_materna}</span>`:''}</div>`:''}
     ${(p.godfather||p.godmother)?`<div style="font-size:0.82rem;color:var(--text2);margin-top:6px">👥 Padrinhos: ${p.godfather||''}${p.godfather&&p.godmother?' & ':''}${p.godmother||''}</div>`:''}
     ${p.assinatura?`<div style="font-size:0.78rem;color:var(--text2);margin-top:4px;font-style:italic">✒️ ${p.assinatura}</div>`:''}
-    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">${p.imagem_url?`<a href="${p.imagem_url}" target="_blank" class="doc-link">📄 Ver livro no Digitarq ↗</a>`:''}<span style="color:#8b83ff;font-size:0.85rem">Ver detalhes →</span></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">${p.imagem_url?`<a href="${p.imagem_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">📄 Ver livro no Digitarq ↗</a>`:''}<span style="color:#8b83ff;font-size:0.85rem">Ver detalhes →</span></div>
   </div>`;
 }
 
@@ -108,9 +119,11 @@ async function fetchBatch(reset){
     if(!r.ok) throw new Error(r.status);
     const data=await r.json();
     const c=document.getElementById('res');
-    if(reset) c.innerHTML='';
+    let base=0;
+    if(reset){ c.innerHTML=''; loaded=data; }
+    else { base=loaded.length; loaded=loaded.concat(data); }
     if(!data.length && reset) c.innerHTML='<div class="loading">Ainda sem batismos — 236 livros por processar (BIRT). Filtra por <code>Óbitos</code> na pesquisa principal enquanto aguardas.</div>';
-    else c.insertAdjacentHTML('beforeend', data.map(card).join(''));
+    else c.insertAdjacentHTML('beforeend', data.map((p,k)=>card(p,base+k)).join(''));
     totalLoaded+=data.length; offset+=data.length; hasMore=data.length===PAGE;
     document.getElementById('cnt').textContent=`A mostrar ${totalLoaded} batismos${hasMore?' — carrega mais':''}`;
     document.getElementById('more').style.display=hasMore?'block':'none';
@@ -129,6 +142,37 @@ document.getElementById('btn').onclick=()=>{q=document.getElementById('q').value
 document.getElementById('q').onkeypress=e=>{if(e.key==='Enter'){q=e.target.value.trim(); offset=0; hasMore=true; fetchBatch(true);}};
 document.getElementById('moreBtn').onclick=()=>fetchBatch(false);
 window.addEventListener('scroll',()=>{ if(loading||!hasMore) return; if(window.innerHeight+window.scrollY>=document.body.offsetHeight-400) fetchBatch(false); });
+function openDetail(i){
+  const p=loaded[i];
+  if(!p) return;
+  const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Batizado';
+  const dNasc=p.data_nascimento?new Date(p.data_nascimento).toLocaleDateString('pt-PT'):null;
+  const dObito=p.data_obito?new Date(p.data_obito).toLocaleDateString('pt-PT'):null;
+  const avos=[['Avô paterno',p.avo_paterno],['Avó paterna',p.avo_paterna],['Avô materno',p.avo_materno],['Avó materna',p.avo_materna]].filter(x=>x[1]);
+  document.getElementById('modalContent').innerHTML=`
+    <h2 style="font-size:1.4rem;margin-bottom:14px">👶 ${nome}</h2>
+    <div class="drow">
+      <div><strong>Tipo:</strong> <span class="v">Batismo</span></div>
+      ${dNasc?`<div><strong>Nascimento:</strong> <span class="v">${dNasc}</span></div>`:''}
+      ${dObito?`<div><strong>Óbito:</strong> <span class="v">${dObito}</span></div>`:''}
+      <div><strong>Freguesia:</strong> <span class="v">${p.freguesia||'—'}</span></div>
+      <div><strong>Concelho:</strong> <span class="v">${p.concelho||'Celorico da Beira'}</span></div>
+      ${p.pai?`<div><strong>Pai:</strong> <span class="v">${p.pai}</span>${p.naturalidade_pai?` <span style="font-size:0.85rem">(${p.naturalidade_pai})</span>`:''}</div>`:''}
+      ${p.mae?`<div><strong>Mãe:</strong> <span class="v">${p.mae}</span>${p.naturalidade_mae?` <span style="font-size:0.85rem">(${p.naturalidade_mae})</span>`:''}</div>`:''}
+      ${p.legitimidade?`<div><strong>Legitimidade:</strong> <span class="v">${p.legitimidade}</span></div>`:''}
+      ${avos.map(a=>`<div><strong>${a[0]}:</strong> <span class="v">${a[1]}</span></div>`).join('')}
+      ${p.godfather?`<div><strong>Padrinho:</strong> <span class="v">${p.godfather}</span></div>`:''}
+      ${p.godmother?`<div><strong>Madrinha:</strong> <span class="v">${p.godmother}</span></div>`:''}
+      ${p.numero_assento?`<div><strong>Nº Assento:</strong> <span class="v">${p.numero_assento}</span></div>`:''}
+      ${p.assinatura?`<div><strong>Assinatura:</strong> <span class="v" style="font-style:italic">${p.assinatura}</span></div>`:''}
+    </div>
+    ${p.imagem_url?`<div style="margin:16px 0"><a href="${p.imagem_url}" target="_blank" class="doc-link" style="display:inline-block;padding:10px 20px;background:var(--accent);color:#fff;border-color:var(--accent)">📄 Abrir imagem no Digitarq ↗</a></div>`:''}
+    ${p.texto_original?`<div><h4 style="margin:10px 0 6px">Transcrição (HTR):</h4><div style="background:var(--bg);padding:14px;border-radius:8px;border:1px solid var(--border);font-family:monospace;font-size:0.85rem;color:var(--text2);max-height:200px;overflow-y:auto;white-space:pre-wrap">${p.texto_original}</div></div>`:''}`;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('detailModal').classList.remove('open'); }
+document.getElementById('detailModal').addEventListener('click',e=>{ if(e.target.id==='detailModal') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 fetchBatch(true);
 </script>
 </body>
