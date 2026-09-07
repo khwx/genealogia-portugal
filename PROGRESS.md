@@ -25,19 +25,19 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-07 (execução autónoma — Velosa 1285/1413, scripts Vide/Santa Maria prontos, Vercel rotas + menu fix)
+## 2026-09-07 (execução autónoma — Velosa 1413/1413 COMPLETO, Vide Entre Vinhas lançado, menu padronizado 18/18 templates)
 
 ### Estado verificado
-- **DEAT completo** `25/25` `35001`. **BIRT 10/25** `Supabase 11045`.
-- **Velosa BIRT 1285/1413** (91%) `pid 238655` `0 errors` — acaba em ~20min
-- **Scripts preparados**: Vide Entre Vinhas `1491` págs, Celorico (Santa Maria) `3369` págs — `py_compile OK`
-- **Supabase Total 46046** (DEAT 35001 + BIRT 11045)
-- **Vercel fixes**: 11 rotas adicionadas (404 resolvido), árvore des-saturada (500 nós max), modal batismos, menu hamburguer em todas as páginas
+- **DEAT completo** `25/25` `35001`. **BIRT 11/25** `Supabase 13046`.
+- **Velosa BIRT 1413/1413 COMPLETO** → sync COMPLETO ✅ (pid 238655, 0 errors, 6h12min)
+- **Vide Entre Vinhas BIRT lançado** `1491 pages` (pid 268115) — ~11h estimado
+- **Supabase Total 48047** (DEAT 35001 + BIRT 13046)
+- **Menu padronizado**: 18/18 templates com nav-links + hamburger idêntico (fix 6 templates: index, about, stats, search_results, obito_detail, freguesia)
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Velosa 1413** → sync → **Vide Entre Vinhas 1491** → Celorico (Santa Maria) 3369 → ...
-2. Até `25/25` BIRT (11/25) → MARR `1030 livros`
+1. **Completar Vide Entre Vinhas 1491** → sync → Celorico (Santa Maria) 3369 → ...
+2. Até `25/25` BIRT (14/25) → MARR `1030 livros`
 
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
 
