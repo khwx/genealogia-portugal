@@ -25,14 +25,14 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-07 (execução autónoma — Velosa 1413/1413 COMPLETO, Vide Entre Vinhas lançado, menu padronizado 18/18 templates)
+## 2026-09-07 (execução autónoma — Velosa 1413/1413 COMPLETO, Vide Entre Vinhas 4/1491 a decorrer, menu padronizado 18/18)
 
 ### Estado verificado
 - **DEAT completo** `25/25` `35001`. **BIRT 11/25** `Supabase 13046`.
 - **Velosa BIRT 1413/1413 COMPLETO** → sync COMPLETO ✅ (pid 238655, 0 errors, 6h12min)
-- **Vide Entre Vinhas BIRT lançado** `1491 pages` (pid 268115) — ~11h estimado
+- **Vide Entre Vinhas BIRT a decorrer** `4/1491` (0%) (pid 268115) — ~11h estimado
 - **Supabase Total 48047** (DEAT 35001 + BIRT 13046)
-- **Menu padronizado**: 18/18 templates com nav-links + hamburger idêntico (fix 6 templates: index, about, stats, search_results, obito_detail, freguesia)
+- **Menu padronizado**: 18/18 templates com nav-links + hamburger idêntico
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
