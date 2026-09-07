@@ -25,17 +25,18 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-07 (execução autónoma — Rapa sync COMPLETO, Supabase BIRT 11045, Velosa 50/1413)
+## 2026-09-07 (execução autónoma — Velosa 1285/1413, scripts Vide/Santa Maria prontos, Vercel rotas + menu fix)
 
 ### Estado verificado
 - **DEAT completo** `25/25` `35001`. **BIRT 10/25** `Supabase 11045`.
-- **Rapa BIRT 1030/1030 COMPLETO** → sync COMPLETO `1364` no Supabase ✅
+- **Velosa BIRT 1285/1413** (91%) `pid 238655` `0 errors` — acaba em ~20min
+- **Scripts preparados**: Vide Entre Vinhas `1491` págs, Celorico (Santa Maria) `3369` págs — `py_compile OK`
 - **Supabase Total 46046** (DEAT 35001 + BIRT 11045)
-- **Velosa BIRT 50/1413** (4%) `pid 238655` `0 errors` (~12h estimado)
+- **Vercel fixes**: 11 rotas adicionadas (404 resolvido), árvore des-saturada (500 nós max), modal batismos, menu hamburguer em todas as páginas
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
-1. **Completar Velosa 1413** → sync → Vide Entre Vinhas 1491 → Açores 1787 → ...
+1. **Completar Velosa 1413** → sync → **Vide Entre Vinhas 1491** → Celorico (Santa Maria) 3369 → ...
 2. Até `25/25` BIRT (11/25) → MARR `1030 livros`
 
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
