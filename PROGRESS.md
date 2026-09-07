@@ -11,6 +11,20 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
+
+### Estado verificado
+- **DEAT completo** `25/25` `35001`. **BIRT 9/25 HTR** + sync Rapa em curso.
+- **Rapa BIRT 1030/1030 COMPLETO** `0 errors` — `33779` ficheiros HTR
+- **Sync Rapa→Supabase** em curso `pid 238616`
+- **Velosa BIRT 1413 págs lançada** `pid 238655` (7 livros)
+- **Supabase** `44682` (BIRT 9681 + Prados pending no count anterior)
+- Menu responsivo em **todas as 22 páginas** + 12 rotas `200 OK`.
+
+### Próximos passos
+1. **Completar Velosa 1413** → sync → Vide Entre Vinhas 1491 → Açores 1787 → ...
+2. Até `25/25` BIRT (10/25) → MARR `1030 livros`
+
 ## 2026-09-07 (fix — menu responsivo nas 15 páginas restantes + rotas /about /stats)
 
 ### Tarefa implementada — todas as páginas com menu responsivo
