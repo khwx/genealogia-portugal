@@ -16,6 +16,12 @@
         .nav-links { display: flex; gap: 16px; }
         .nav-link { color: var(--text2); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
         .nav-link:hover, .nav-link.active { color: var(--text); }
+        .menu-toggle { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+        @media (max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-links { display: none; position: absolute; top: 60px; left: 0; right: 0; background: var(--bg2); flex-direction: column; padding: 12px 24px 16px; gap: 14px; border-bottom: 1px solid var(--border); z-index: 99; }
+            .nav-links.open { display: flex; }
+        }
         .hero { text-align: center; padding: 40px 20px 20px; }
         .hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; }
         .hero p { color: var(--text2); max-width: 700px; margin: 0 auto; line-height: 1.6; }
@@ -42,11 +48,12 @@
 <body>
     <div class="topbar">
         <a href="/" class="logo">Genealogia <span>Portugal</span></a>
+        <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button>
         <div class="nav-links">
             <a href="/" class="nav-link">Pesquisa</a>
             <a href="/batismos" class="nav-link">Batismos 👶</a>
             <a href="/casamentos" class="nav-link">Casamentos 💍</a>
-            <a href="/family_tree.html" class="nav-link">Árvore 🌲</a>
+            <a href="/family-tree" class="nav-link">Árvore 🌲</a>
             <a href="/mapa" class="nav-link">Mapa</a>
             <a href="/cobertura.html" class="nav-link active">Cobertura</a>
             <a href="/validar" class="nav-link">Revisão</a>

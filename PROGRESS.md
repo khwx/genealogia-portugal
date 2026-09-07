@@ -11,6 +11,15 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Rotas Flask**: `/pessoa/<id>`, `/arvore/<id>`, `/pessoas` servem templates; catch-all preservado.
 - **Verificação**: `py_compile OK`, `run_tests.sh ALL TESTS PASSED`, 3 templates 12–20KB, D3.js integrado, acentuação pt-PT ok.
 
+## 2026-09-05 (fix — menu responsivo + link Árvore partido em 6 páginas)
+
+### Tarefa implementada — menu hambúrguer + fix /family-tree
+- **Bug link partido**: menu apontava `/family_tree.html` (404, ficheiro está em `templates/`) em 5 ficheiros → corrigido para `/family-tree` (rota Flask). Zero refs partidas restantes.
+- **Menu responsivo**: botão hambúrguer `☰` + dropdown vertical `@media 768px` em `index.html`, `cobertura.html`, `templates/batismos.html`, `templates/casamentos.html`, `templates/map.html`; `family_tree.html` com scroll horizontal mobile.
+- **Menu mapa completo**: `map.html` só tinha 4 links → agora 7 (faltavam Batismos/Casamentos/Árvore).
+- **Verificação**: `run_tests.sh ALL TESTS PASSED`, 8 rotas Flask `200 OK` (`/`, `/batismos`, `/casamentos`, `/family-tree`, `/mapa`, `/pessoas`, `/cobertura.html`, `/validar`).
+- **Páginas**: sim, 17 templates criados (`pessoa_detail`, `arvore_pessoa`, `pessoas`, `apelidos`, `timeline`, `validate`, etc.) — todas servidas por rotas Flask.
+
 ## 2026-09-05 (execução autónoma — Prados sync COMPLETO, Supabase BIRT 9681, Rapa 450/1030)
 
 ### Estado verificado
