@@ -794,8 +794,169 @@ def update_dates():
     print(f"No date found: {skipped_no_date}")
     print(f"Errors: {errors}")
 
+# Colunas novas que podem ainda não existir no Supabase (ver
+# migrations/add_padrinhos_texto.sql). O envio usa fallback: se o
+# Supabase responder 400 a queixar-se de coluna desconhecida, o registo
+# é reenviado sem essas colunas em vez de falhar.
+NEW_COLS = ("godfather", "godmother", "texto_original")
+
+
+def post_with_fallback(record):
+    """POST a record, retrying without NEW_COLS if the migration is missing.
+
+    Returns the supabase_request result dict. Never raises.
+    """
+    result = supabase_request("POST", "pessoas", record)
+    if result["status"] == "error":
+        body = str(result.get("body", "")).lower()
+        if result.get("code") in (400,) and "column" in body and any(
+            c in body for c in NEW_COLS
+        ):
+            slim = {k: v for k, v in record.items() if k not in NEW_COLS}
+            print("  (migração padrinhos/texto em falta — a enviar sem essas colunas)")
+            return supabase_request("POST", "pessoas", slim)
+    return result
+
+
+def patch_with_fallback(rec_id, patch_data):
+    """PATCH a record, retrying without NEW_COLS if the migration is missing."""
+    result = supabase_request("PATCH", f"pessoas?id=eq.{rec_id}", patch_data)
+    if result["status"] == "error":
+        body = str(result).lower()
+        if "column" in body and any(c in body for c in NEW_COLS):
+            slim = {k: v for k, v in patch_data.items() if k not in NEW_COLS}
+            if not slim:
+                return result
+            print("  (migração padrinhos/texto em falta — a atualizar sem essas colunas)")
+            return supabase_request("PATCH", f"pessoas?id=eq.{rec_id}", slim)
+    return result
+
+
 BACKFILL_URL = "--backfill-url" in sys.argv
 BACKFILL_RELATIONS = "--backfill-relations" in sys.argv
+BACKFILL_BIRT = "--backfill-birt" in sys.argv
+
+
+def build_birt_patch(data):
+    """Build a PATCH dict with BIRT rich fields from one HTR file's data.
+
+    Reads the same `baptized` structure the sync uses (first entry) plus
+    the transcription text. Returns None when there is nothing to write.
+    Pure, network-free helper (testable).
+    """
+    baptized = data.get("baptized")
+    entry = None
+    if isinstance(baptized, list):
+        for e in baptized:
+            if isinstance(e, dict) and (e.get("name") or e.get("nome")):
+                entry = e
+                break
+    if entry is None:
+        return None
+    patch = {}
+    for col, src in (
+        ("pai", ("father", "pai")),
+        ("mae", ("mother", "mae")),
+        ("avo_paterno", ("avo_paterno",)),
+        ("avo_paterna", ("avo_paterna",)),
+        ("avo_materno", ("avo_materno",)),
+        ("avo_materna", ("avo_materna",)),
+        ("legitimidade", ("legitimidade",)),
+        ("naturalidade_pai", ("father_naturalidade", "naturalidade_pai")),
+        ("naturalidade_mae", ("mother_naturalidade", "naturalidade_mae")),
+        ("assinatura", ("assinatura",)),
+        ("godfather", ("godfather",)),
+        ("godmother", ("godmother",)),
+    ):
+        for key in src:
+            val = (entry.get(key) or "").strip()
+            if val:
+                patch[col] = val[:100]
+                break
+    transcription = (data.get("transcription") or "").strip()
+    if transcription:
+        patch["texto_original"] = transcription[:4000]
+    if not patch:
+        return None
+    return patch
+
+
+def backfill_birt():
+    """PATCH existing BIRT records with rich fields re-read from HTR files.
+
+    Disk-only (no Gemini API calls). Updates every BIRT row whose file_id
+    has a local HTR JSON with a `baptized` entry. Safe to re-run.
+    """
+    print("=== Backfill BIRT (rich fields from disk, no API) ===\n")
+
+    records = fetch_paginated(
+        "id,file_id,pai,mae,avo_paterno,avo_paterna,avo_materno,avo_materna,"
+        "legitimidade,assinatura,naturalidade_pai,naturalidade_mae",
+        "tipo_registo=eq.BIRT",
+    )
+    print(f"BIRT rows in DB: {len(records)}")
+
+    # Sonda única: a migração padrinhos/texto já foi aplicada?
+    # Se não, as colunas novas são removidas dos patches à partida
+    # (poupa 15k pedidos falhados e o backfill continua útil).
+    probe = supabase_request("GET", "pessoas?select=godfather&limit=1")
+    if probe["status"] == "error" and "column" in str(probe).lower():
+        print("NOTA: migração add_padrinhos_texto.sql ainda por aplicar — padrinhos/texto ficam para depois.")
+        have_new_cols = False
+    else:
+        print("Migração padrinhos/texto presente — backfill completo (incl. padrinhos e transcrição).")
+        have_new_cols = True
+    updated = 0
+    skipped = 0
+    errors = 0
+    missing_migration_warned = False
+
+    for i, rec in enumerate(records):
+        file_id = rec.get("file_id")
+        if not file_id:
+            skipped += 1
+            continue
+        json_path = INPUT_DIR / f"{file_id}.json"
+        if not json_path.exists():
+            skipped += 1
+            continue
+        try:
+            with open(json_path) as f:
+                data = json.load(f)
+        except Exception:
+            skipped += 1
+            continue
+        patch_data = build_birt_patch(data)
+        if patch_data is None:
+            skipped += 1
+            continue
+        # Gap-fill: só escreve colunas vazias na BD (não reescreve o que já lá está)
+        patch_data = {k: v for k, v in patch_data.items() if not rec.get(k)}
+        if not have_new_cols:
+            # migração em falta: remove colunas novas à partida
+            patch_data = {k: v for k, v in patch_data.items()
+                          if k not in ("godfather", "godmother", "texto_original")}
+        if not patch_data:
+            skipped += 1
+            continue
+        if DRY_RUN:
+            updated += 1
+            continue
+        result = patch_with_fallback(rec["id"], patch_data)
+        if result["status"] == "success":
+            updated += 1
+        else:
+            msg = str(result).lower()
+            if "column" in msg and not missing_migration_warned:
+                print("\n!!! NOTA: alguma coluna (pai/mae/...) não existe no Supabase.")
+                print("Verifica as migrações em migrations/. O backfill continua sem essas colunas.")
+                missing_migration_warned = True
+            errors += 1
+        if (i + 1) % 500 == 0:
+            print(f"Progress: {i+1}/{len(records)} (updated: {updated}, skipped: {skipped}, errors: {errors})")
+
+    print(f"\n=== Backfill BIRT Complete ===")
+    print(f"Updated: {updated} | Skipped (no data): {skipped} | Errors: {errors}")
 
 def build_relation_patch(persons):
     """Build the {pai,mae,conjuge} patch dict for the first deceased person.
@@ -893,6 +1054,10 @@ def main():
 
     if BACKFILL_RELATIONS:
         backfill_relations()
+        return
+
+    if BACKFILL_BIRT:
+        backfill_birt()
         return
 
     state = load_state()
@@ -1059,9 +1224,18 @@ def main():
                         val = (person.get(src) or person.get(col) or "").strip()
                         if val:
                             record[col] = val[:100]
-                
+                    # Padrinhos + transcrição (precisam de migrations/add_padrinhos_texto.sql;
+                    # post_with_fallback trata da ausência sem falhar)
+                    for col in ("godfather", "godmother"):
+                        val = (person.get(col) or "").strip()
+                        if val:
+                            record[col] = val[:100]
+                    transcription = (data.get("transcription") or "").strip()
+                    if transcription:
+                        record["texto_original"] = transcription[:4000]
+
                 if not DRY_RUN:
-                    result = supabase_request("POST", "pessoas", record)
+                    result = post_with_fallback(record)
                     if result["status"] == "error":
                         if result.get("code") == 409:
                             synced.add(file_id)
