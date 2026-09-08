@@ -25,11 +25,11 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-08 (execução autónoma — Santa Maria 1361/3369 a decorrer)
+## 2026-09-08 (execução autónoma — Santa Maria 1370/3369 a decorrer)
 
 ### Estado verificado
 - **DEAT completo** `25/25` `35001`. **BIRT 12/25** `Supabase 15324`.
-- **Celorico (Santa Maria) BIRT** `1361/3369` (40%) `pid 331748` `0 errors` ~5h40m
+- **Celorico (Santa Maria) BIRT** `1370/3369` (40%) `pid 331748` `0 errors` ~5h44m
 - **Próximos scripts prontos**: Celorico (São Pedro) `2811` — `py_compile OK`
 - **Supabase Total 50325** (DEAT 35001 + BIRT 15324)
 - `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado, `git status` limpo.
