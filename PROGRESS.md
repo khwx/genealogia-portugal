@@ -25,13 +25,14 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-07 (execução autónoma — Vide Entre Vinhas 550/1491 a decorrer)
+## 2026-09-07 (execução autónoma — Vide Entre Vinhas 1089/1491 em curso)
 
 ### Estado verificado
 - **DEAT completo** `25/25` `35001`. **BIRT 11/25** `Supabase 13046`.
-- **Vide Entre Vinhas BIRT a decorrer** `550/1491` (37%) `pid 268115` `0 errors` ~5h decorridas (~7h restantes)
+- **Vide Entre Vinhas BIRT** `1089/1491` (73%) `pid 268115` `0 errors` ~10h decorridas (~3h restantes)
+- **Próximo script pronto**: Celorico (Santa Maria) `3369` págs — `py_compile OK`
 - **Supabase Total 48047** (DEAT 35001 + BIRT 13046)
-- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado, `git status` limpo.
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Próximos passos
 1. **Completar Vide Entre Vinhas 1491** → sync → Celorico (Santa Maria) 3369 → ...
