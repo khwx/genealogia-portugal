@@ -25,25 +25,14 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-08 (auditoria sync → 5 falhas encontradas, correcção em curso)
+## 2026-09-08 (backfill BIRT COMPLETO — pai/mae/padrinhos/texto preenchidos)
 
-### Auditoria (cobertura campo-a-campo no Supabase, 15324 BIRT)
-1. **pai/mae a 0%** em todas as freguesias novas (só Aldeia da Serra tinha) — `SYNC_RELATIONS` desligado no `.env`.
-2. **Padrinhos extraídos mas nunca guardados** — sem colunas `godfather`/`godmother` no Supabase.
-3. **Transcrição HTR nunca guardada** — sem coluna `texto_original` (modal "Ver detalhes" sem texto).
-4. **Freguesias antigas sem campos ricos** — Aldeia (avos 1%), Casas do Rio/Galisteu/São Martinho (0-4%), syncs com prompt antigo.
-5. **Mesquitela BIRT (1947) + MARR (1077) ausentes** — HTR formato antigo (sem `record_type`/`baptized`); a retranscrever no fim.
-
-### Correcção aplicada (por ordem de sentido)
-- `.env`: `SYNC_RELATIONS=1` (pai/mae entram já nos próximos syncs).
-- `migrations/add_padrinhos_texto.sql`: colunas `godfather/godmother/texto_original` + índices (**passo manual**: correr no Supabase SQL Editor).
-- `sync_htr_supabase.py`: `post_with_fallback`/`patch_with_fallback` (funciona com ou sem a migração), registo BIRT inclui padrinhos+texto, novo modo `--backfill-birt` (gap-fill: só escreve colunas vazias, 100% do disco, 0 chamadas API).
-- **Backfill BIRT a decorrer** em background (`13972` rows, só colunas existentes até a migração ser aplicada).
-
-### Por fazer (depois da migração manual)
-1. Utilizador aplica `add_padrinhos_texto.sql` no Supabase (~30s).
-2. Re-correr `--backfill-birt` → preenche padrinhos + transcrições.
-3. Retranscrever Mesquitela BIRT+MARR (3024 págs) com prompts actuais → sync.
+### Resultado (cobertura Supabase antes → depois)
+- **pai**: 0% → 53-96% · **mae**: 0% → 54-98% · **padrinhos**: 0% → 64-95% · **texto_original**: 0% → 86-100%
+- **Aldeia da Serra**: avos 1%→89%, legit 1%→85% (ficheiros já tinham dados ricos) ✅
+- **Backfill**: `15273` actualizados, `51` sem dados, `0` erros (2 rondas: campos existentes + padrinhos/texto pós-migração do utilizador)
+- **Casas do Rio / São Martinho**: avos 0% porque o HTR tem 0% avos (livros não registam avós — dado de origem, não falha de sync)
+- Falhas 1-4/5 resolvidas. Falta: **Mesquitela BIRT+MARR (3024 págs)** por retranscrever.
 
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
 
