@@ -25,17 +25,17 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-08 (execução autónoma — Santa Maria 1352/3369, script São Pedro pronto)
+## 2026-09-08 (execução autónoma — Santa Maria 1361/3369 a decorrer)
 
 ### Estado verificado
 - **DEAT completo** `25/25` `35001`. **BIRT 12/25** `Supabase 15324`.
-- **Celorico (Santa Maria) BIRT** `1352/3369` (40%) `pid 331748` `0 errors` ~5h30m
-- **Celorico (São Pedro) script pronto** `2811` págs `py_compile OK`
+- **Celorico (Santa Maria) BIRT** `1361/3369` (40%) `pid 331748` `0 errors` ~5h40m
+- **Próximos scripts prontos**: Celorico (São Pedro) `2811` — `py_compile OK`
 - **Supabase Total 50325** (DEAT 35001 + BIRT 15324)
-- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado.
+- `status_check.py` → `status: OK`, `ALL TESTS PASSED`, `.env` ignorado, `git status` limpo.
 
 ### Próximos passos
-1. **Completar Celorico (Santa Maria) 3369** → sync → Celorico (São Pedro) 2811 → Linhares 2468 → ...
+1. Completar Celorico (Santa Maria) 3369 → sync → Celorico (São Pedro) 2811 → Linhares 2468 → ...
 2. Até `25/25` BIRT (13/25) → MARR `1030 livros`
 
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
