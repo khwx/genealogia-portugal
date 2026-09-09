@@ -25,7 +25,18 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-08 (auditoria nomes → backfill name-match + fix 923 mis-fills, sync 100%)
+## 2026-09-09 (Santa Maria 3369/3369 COMPLETO → sync 6706, São Pedro lançado, 7 Salgueirais recuperados)
+
+### Pipeline
+- **Santa Maria BIRT 3369/3369 COMPLETO** `0 errors` → sync → **`6706` pessoas no Supabase** ✅
+- **São Pedro BIRT lançado** `2811 pages` (pid 449436)
+- **7 ficheiros vazios Salgueirais** (falhas escrita 5 Set): 5 retranscritos OK (2 com 8192 tokens), 2 parciais com transcrição salva via regex → sync +10 pessoas
+- **Supabase Total 57041** (DEAT 35001 + BIRT 22040) — +6700 neste ciclo
+- **BIRT 13/25 completo**
+- Nota: "Total in DB" impresso pelo sync está errado (contagem interna); contagem viva via API é a correcta. Background morre entre turnos — correr tarefas curtas em foreground.
+
+### Próximos
+São Pedro 2811 → sync → Linhares 2468 → ... → MARR no fim. Mesquitela BIRT+MARR (3024) por retranscrever.
 
 ### Descobertas e correcções
 - **Fetch select sem colunas novas** inflacionava o dry-run (15273 falsos) → corrigido; ronda 3 aplicou `1422` reais; dry-run agora **`0` por actualizar: tudo o que está no disco está no Supabase** ✅
