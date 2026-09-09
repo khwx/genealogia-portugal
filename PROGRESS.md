@@ -27,6 +27,12 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 
 ## 2026-09-09 (segurança FECHADA — RLS ativo, secret no .env, sondas apagadas)
 
+### Verificação final (utilizador completou Vercel)
+- **anon INSERT**: `401` ✅ · **anon UPDATE**: 0 linhas ✅ · **READ**: 200 ✅
+- **Backend usa SECRET** ✅ · **sondas 60999/61000**: apagadas ✅
+- **Git limpo**: 13 matches `sb_secret` = só placeholders/testes/scanner — **0 chaves reais** ✅ (repo tem secret-scanner CI gate)
+- Testes: `ALL TESTS PASSED` · site `OK`
+
 ### Verificação final
 - **anon INSERT**: `401` BLOQUEADO ✅ · **anon UPDATE**: 0 linhas ✅ · **READ público**: 200 ✅
 - **secret key** no `.env` (sem aspas — formato do ficheiro) + código já a prefere ✅
