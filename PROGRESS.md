@@ -25,7 +25,13 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-09 (execução autónoma — São Pedro 185/2811, script Linhares pronto)
+## 2026-09-09 (2 workers paralelos — São Pedro + Linhares)
+
+### Decisão
+- Ritmo sequencial era ~120/h (~15 dias). Utilizador: não fazer tudo com calma.
+- **2 workers paralelos** (São Pedro pid 449436 + Linhares pid 485807), cada um sequencial-calmo com backoff 30s/5min e rotação de 22 chaves → ~2x débito (~240/h), taxa por chave continua ~2-4 RPM (seguro, longe dos limites).
+- MARR a 5% = só ficheiros antigos Mesquitela (1077, formato antigo, por retranscrever no fim). MARR real começa após BIRT.
+- `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Estado
 - **DEAT completo** `25/25` `35001`. **BIRT 13/25** `Supabase 22040`.
