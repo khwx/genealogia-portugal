@@ -25,7 +25,16 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-09 (segurança — fork + gasto Vercel investigados, RLS e dieta API)
+## 2026-09-09 (segurança FECHADA — RLS ativo, secret no .env, sondas apagadas)
+
+### Verificação final
+- **anon INSERT**: `401` BLOQUEADO ✅ · **anon UPDATE**: 0 linhas ✅ · **READ público**: 200 ✅
+- **secret key** no `.env` (sem aspas — formato do ficheiro) + código já a prefere ✅
+- **Sondas 60999+61000 apagadas** via secret ✅ (lixo zero na BD)
+- Nota: aspas no `.env` davam 401 — valores aqui são sempre sem aspas.
+
+### ⏳ Falta SÓ o Vercel (utilizador)
+Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem isto o `/validar` fica só de leitura em produção.
 
 ### Descobertas
 - **Fork (adalbertobrant)**: só copiou código público — sem custo para nós. Risco real: anon key pública permitia **INSERT+UPDATE** (sonda criou id 60999; DELETE já era bloqueado). `.env` nunca no git; `AIza` no histórico = blobs base64 falsos positivos.
