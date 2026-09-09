@@ -51,15 +51,16 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - `ALL TESTS PASSED`, `.env` ignorado.
 
 ### Estado
-- **DEAT completo** `25/25` `35001`. **BIRT 13/25** `Supabase 22040`.
-- **Celorico (São Pedro) BIRT** `185/2811` (6%) `pid 449436` `0 errors` ~41m (acaba em ~17h)
-- **Celorico (Linhares) script pronto** `2468` págs — `py_compile OK`
-- **Supabase Total 57041** (DEAT 35001 + BIRT 22040)
-- `ALL TESTS PASSED`, `status: OK`
+- **DEAT completo** `25/25` `35002`. **BIRT 14/25** `Supabase 25989`.
+- **São Pedro**: `949/2811` (33%) ~11h — `0 errors`
+- **Linhares**: `18/2468` (0%) ~3h — a arrancar
+- **Supabase Total 60991** (DEAT 35002 + BIRT 25989)
+- **Segurança**: RLS pronto, secret key pronta, dieta API deployed
 
-### Próximos passos
-1. Completar São Pedro 2811 → sync → Linhares 2468 → Lajeosa 2430 → ...
-2. Até `25/25` BIRT (12/25) → MARR → Mesquitela
+### Próximos
+São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
+
+## 2026-09-10 (estado verificado)
 
 ### Pipeline
 - **Santa Maria BIRT 3369/3369 COMPLETO** `0 errors` → sync → **`6706` pessoas no Supabase** ✅
