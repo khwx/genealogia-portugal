@@ -25,7 +25,18 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-09 (Santa Maria 3369/3369 COMPLETO → sync 6706, São Pedro lançado, 7 Salgueirais recuperados)
+## 2026-09-09 (execução autónoma — São Pedro 185/2811, script Linhares pronto)
+
+### Estado
+- **DEAT completo** `25/25` `35001`. **BIRT 13/25** `Supabase 22040`.
+- **Celorico (São Pedro) BIRT** `185/2811` (6%) `pid 449436` `0 errors` ~41m (acaba em ~17h)
+- **Celorico (Linhares) script pronto** `2468` págs — `py_compile OK`
+- **Supabase Total 57041** (DEAT 35001 + BIRT 22040)
+- `ALL TESTS PASSED`, `status: OK`
+
+### Próximos passos
+1. Completar São Pedro 2811 → sync → Linhares 2468 → Lajeosa 2430 → ...
+2. Até `25/25` BIRT (12/25) → MARR → Mesquitela
 
 ### Pipeline
 - **Santa Maria BIRT 3369/3369 COMPLETO** `0 errors` → sync → **`6706` pessoas no Supabase** ✅
