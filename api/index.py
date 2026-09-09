@@ -28,7 +28,9 @@ if os.path.exists(env_file):
 app = Flask(__name__, template_folder=os.path.join(_root, 'templates'))
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://qljopxbxgflozrcdblrl.supabase.co')
-SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '') or os.environ.get('SUPABASE_ANON_KEY', '')
+# Backend prefere a SECRET key (escreve via RLS); cai para publishable (só lê).
+# Ver migrations/add_rls_pessoas.sql. Nunca hardcodar chaves (repo público).
+SUPABASE_KEY = os.environ.get('SUPABASE_SECRET_KEY', '') or os.environ.get('SUPABASE_KEY', '') or os.environ.get('SUPABASE_ANON_KEY', '')
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -479,7 +481,9 @@ def get_pessoas():
         if sobrenome.startswith('ilike.'):
             sobrenome = sobrenome[6:].strip('*%')
         try:
-            limit = max(1, min(int(request.args.get('limit', 50)), 1000))
+            # Cap 100: as listas paginam 20-50/pág; limite alto só servia bots
+            # a sacar MBs (select incluía texto_original). Poupa Vercel egress.
+            limit = max(1, min(int(request.args.get('limit', 50)), 100))
         except ValueError:
             limit = 50
         try:
@@ -491,7 +495,13 @@ def get_pessoas():
         def _valid_year(v):
             return v.isdigit() and 1000 <= int(v) <= 2999
 
-        url = SUPABASE_URL + '/rest/v1/pessoas?select=*'
+        # Colunas essenciais (sem texto_original: até 4KB/registo — detalhe
+        # vai por /api/pessoa/<id>). Reduz ~80% do tráfego deste endpoint.
+        LIST_COLS = ("id,nome,sobrenome,freguesia,concelho,data_nascimento,"
+                     "data_obito,tipo_registo,pai,mae,numero_registo,"
+                     "numero_assento,imagem_url,fonte,idade,legitimidade,"
+                     "godfather,godmother,assinatura,criado_em")
+        url = SUPABASE_URL + '/rest/v1/pessoas?select=' + LIST_COLS
         conditions = []
         # Excluir da pesquisa pública os registos rejeitados/ilegíveis na revisão
         # (qualidade = 0). Mantém os registos ainda por validar (qualidade NULL) e
@@ -541,7 +551,7 @@ def get_pessoas():
                 return s
             phon = norm(query)
             if phon != query.lower():
-                url2 = SUPABASE_URL + '/rest/v1/pessoas?select=*'
+                url2 = SUPABASE_URL + '/rest/v1/pessoas?select=' + LIST_COLS
                 cond2 = f"or(nome.ilike.*{phon}*,sobrenome.ilike.*{phon}*,freguesia.ilike.*{phon}*)"
                 url2 += '&' + cond2 + f'&order=criado_em.desc&limit={limit}&offset={offset}'
                 r2 = requests.get(url2, headers=HEADERS, timeout=30)

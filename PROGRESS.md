@@ -25,7 +25,24 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-09 (2 workers paralelos — São Pedro + Linhares)
+## 2026-09-09 (segurança — fork + gasto Vercel investigados, RLS e dieta API)
+
+### Descobertas
+- **Fork (adalbertobrant)**: só copiou código público — sem custo para nós. Risco real: anon key pública permitia **INSERT+UPDATE** (sonda criou id 60999; DELETE já era bloqueado). `.env` nunca no git; `AIza` no histórico = blobs base64 falsos positivos.
+- **Gasto Vercel GB**: `/api/pessoas` fazia `select=*` (incl. texto_original 4KB) com limite até 1000 → até ~5MB/resposta, óptimo para bots.
+- **Chave hardcoded**: publishable key literal em 3 templates + default no sync (limpo no sync; templates mantêm publishable = pública por design).
+
+### Correcções (código, já testadas)
+- `api/index.py`: `/api/pessoas` só colunas essenciais (sem texto_original, -80% tráfego), limite 1000→100; prefere `SUPABASE_SECRET_KEY`.
+- `sync_htr_supabase.py`: prefere `SUPABASE_SECRET_KEY`; removida key hardcoded do default.
+- `migrations/add_rls_pessoas.sql`: RLS (select público, escrita só secret).
+- Sonda 60999 ocultada das listas (qualidade=0); **apagar no dashboard** (Table Editor).
+- Testes: `ALL TESTS PASSED`, 6 rotas 200.
+
+### ⏳ Passos manuais do utilizador (5 min, dashboard Supabase)
+1. SQL Editor → correr `migrations/add_rls_pessoas.sql`.
+2. Settings → API → copiar **Secret key** → `.env`: `SUPABASE_SECRET_KEY="sb_secret_..."` + Vercel env vars.
+3. Table Editor → apagar linha id `60999`.
 
 ### Decisão
 - Ritmo sequencial era ~120/h (~15 dias). Utilizador: não fazer tudo com calma.

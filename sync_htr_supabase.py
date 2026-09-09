@@ -22,7 +22,10 @@ from pathlib import Path
 from datetime import datetime
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://qljopxbxgflozrcdblrl.supabase.co")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1")
+# Escrita usa a SECRET key quando existe (bypassa RLS); senão cai para a
+# publishable (funciona até o RLS ser fechado — ver migrations/add_rls_pessoas.sql).
+# Nunca hardcodar chaves aqui: este ficheiro vai para o GitHub público.
+SUPABASE_KEY = os.environ.get("SUPABASE_SECRET_KEY", "") or os.environ.get("SUPABASE_KEY", "")
 
 INPUT_DIR = Path(os.environ.get("INPUT_DIR", "/home/pxtkhw/projetos/obitos/output/htr_text"))
 METADATA_DIR = Path(os.environ.get("METADATA_DIR", "/home/pxtkhw/projetos/obitos/output/htr_metadata"))
