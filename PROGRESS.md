@@ -25,6 +25,16 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
+## 2026-09-08 (auditoria nomes → backfill name-match + fix 923 mis-fills, sync 100%)
+
+### Descobertas e correcções
+- **Fetch select sem colunas novas** inflacionava o dry-run (15273 falsos) → corrigido; ronda 3 aplicou `1422` reais; dry-run agora **`0` por actualizar: tudo o que está no disco está no Supabase** ✅
+- **Contaminação cruzada**: rondas 1-2 escreviam a 1ª pessoa do ficheiro em todas as linhas (4733 ficheiros multi-pessoa). Amostras confirmaram pais trocados.
+- **Fix**: `--fix-misfill` (match exacto nome+sobrenome, só casos certos pai/mae) → **`923` linhas corrigidas, 0 erros, 0 restantes** ✅
+- `build_birt_patch` agora recebe o nome da linha e nunca adivinha (sem match → skip).
+- Resposta à pergunta "falta sincronizar alguns?": **não — 15324/15324 verificados**. O resto é dado que o HTR não tem (avós em Casas do Rio/São Martinho) + Mesquitela por retranscrever.
+- Testes: `ALL TESTS PASSED`.
+
 ## 2026-09-08 (execução autónoma — Santa Maria 89%, script São Pedro pronto)
 
 ### Estado

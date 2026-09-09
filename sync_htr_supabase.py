@@ -835,24 +835,150 @@ def patch_with_fallback(rec_id, patch_data):
 BACKFILL_URL = "--backfill-url" in sys.argv
 BACKFILL_RELATIONS = "--backfill-relations" in sys.argv
 BACKFILL_BIRT = "--backfill-birt" in sys.argv
+FIX_MISFILL = "--fix-misfill" in sys.argv
+
+RICH_COLS = ("pai", "mae", "avo_paterno", "avo_paterna", "avo_materno",
+             "avo_materna", "legitimidade", "naturalidade_pai",
+             "naturalidade_mae", "assinatura", "godfather", "godmother")
 
 
-def build_birt_patch(data):
+def fix_misfill():
+    """Fix rows contaminated by the old first-entry backfill.
+
+    Rounds 1-2 of --backfill-birt patched every row of a file with the
+    FIRST baptized entry. In multi-person files, persons 2+ could receive
+    person 1's parents/grandparents. This mode finds rows (strong name
+    match only) whose pai/mae equals the first entry's but NOT their own
+    entry's, and rewrites the full rich set from the correct entry
+    (clearing contaminated values to NULL). Dry-run safe.
+    """
+    from collections import defaultdict
+
+    print("=== Fix Misfill (multi-person files, strong name match) ===\n")
+    records = fetch_paginated(
+        "id,file_id,nome,sobrenome," + ",".join(RICH_COLS),
+        "tipo_registo=eq.BIRT",
+    )
+    print(f"BIRT rows in DB: {len(records)}")
+    byfid = defaultdict(list)
+    for rec in records:
+        if rec.get("file_id"):
+            byfid[rec["file_id"]].append(rec)
+    print(f"Files with >1 row: {sum(1 for r in byfid.values() if len(r) > 1)}")
+
+    fixed = 0
+    checked = 0
+    errors = 0
+    for fid, recs in byfid.items():
+        if len(recs) <= 1:
+            continue
+        json_path = INPUT_DIR / f"{fid}.json"
+        if not json_path.exists():
+            continue
+        try:
+            with open(json_path) as f:
+                data = json.load(f)
+        except Exception:
+            continue
+        entries = [e for e in (data.get("baptized") or [])
+                   if isinstance(e, dict) and (e.get("name") or e.get("nome"))]
+        if len(entries) <= 1:
+            continue
+        first = entries[0]
+        first_pai = _norm_name(first.get("father") or first.get("pai"))
+        first_mae = _norm_name(first.get("mother") or first.get("mae"))
+        for rec in recs:
+            if not rec.get("nome") or not rec.get("sobrenome"):
+                continue  # strong match only
+            want = _norm_name(f"{rec['nome']} {rec['sobrenome']}".strip())
+            own = None
+            for e in entries:
+                if _norm_name(e.get("name") or e.get("nome")) == want:
+                    own = e
+                    break
+            if own is None or own is first:
+                continue
+            own_pai = _norm_name(own.get("father") or own.get("pai"))
+            own_mae = _norm_name(own.get("mother") or own.get("mae"))
+            bad = False
+            if own_pai and first_pai:
+                db_pai = _norm_name(rec.get("pai"))
+                if db_pai and db_pai == first_pai and db_pai != own_pai:
+                    bad = True
+            if own_mae and first_mae:
+                db_mae = _norm_name(rec.get("mae"))
+                if db_mae and db_mae == first_mae and db_mae != own_mae:
+                    bad = True
+            if not bad:
+                continue
+            checked += 1
+            # rebuild full rich set from the CORRECT entry
+            correct = build_birt_patch(
+                {"baptized": [own], "transcription": data.get("transcription")}) or {}
+            key_map = {"pai": ("father", "pai"), "mae": ("mother", "mae")}
+            patch = {}
+            for col in RICH_COLS:
+                if correct.get(col):
+                    patch[col] = correct[col]
+                else:
+                    # own entry lacks it: clear only if DB holds 1st entry's value
+                    srcs = key_map.get(col, (col,))
+                    first_v = ""
+                    for s in srcs:
+                        if first.get(s):
+                            first_v = first[s]
+                            break
+                    if first_v and _norm_name(rec.get(col)) == _norm_name(first_v):
+                        patch[col] = None  # contaminated: clear
+            if correct.get("texto_original"):
+                patch["texto_original"] = correct["texto_original"]
+            if not patch:
+                continue
+            if DRY_RUN:
+                fixed += 1
+                continue
+            result = patch_with_fallback(rec["id"], patch)
+            if result["status"] == "success":
+                fixed += 1
+            else:
+                errors += 1
+    print(f"\n=== Fix Misfill Complete ===")
+    print(f"Fixed: {fixed} | Errors: {errors}")
+
+
+def _norm_name(s):
+    """Normalize a name for matching (lowercase, single spaces)."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
+    return " ".join(s.lower().split())
+
+
+def build_birt_patch(data, row_nome="", row_sobrenome=""):
     """Build a PATCH dict with BIRT rich fields from one HTR file's data.
 
-    Reads the same `baptized` structure the sync uses (first entry) plus
-    the transcription text. Returns None when there is nothing to write.
-    Pure, network-free helper (testable).
+    The entry is matched to the row by name (nome + sobrenome) so files
+    with several baptized persons patch each row with ITS person — never
+    the first entry. Falls back to the first valid entry only when no
+    row name is given (sync path). Returns None when there is nothing
+    to write. Pure, network-free helper (testable).
     """
     baptized = data.get("baptized")
-    entry = None
+    entries = []
     if isinstance(baptized, list):
         for e in baptized:
             if isinstance(e, dict) and (e.get("name") or e.get("nome")):
+                entries.append(e)
+    if not entries:
+        return None
+    entry = entries[0]
+    want = _norm_name(f"{row_nome} {row_sobrenome}".strip())
+    if want:
+        for e in entries:
+            if _norm_name(e.get("name") or e.get("nome")) == want:
                 entry = e
                 break
-    if entry is None:
-        return None
+        else:
+            return None  # row does not match any person in this file: do not guess
     patch = {}
     for col, src in (
         ("pai", ("father", "pai")),
@@ -890,8 +1016,9 @@ def backfill_birt():
     print("=== Backfill BIRT (rich fields from disk, no API) ===\n")
 
     records = fetch_paginated(
-        "id,file_id,pai,mae,avo_paterno,avo_paterna,avo_materno,avo_materna,"
-        "legitimidade,assinatura,naturalidade_pai,naturalidade_mae",
+        "id,file_id,nome,sobrenome,pai,mae,avo_paterno,avo_paterna,avo_materno,"
+        "avo_materna,legitimidade,assinatura,naturalidade_pai,naturalidade_mae,"
+        "godfather,godmother,texto_original",
         "tipo_registo=eq.BIRT",
     )
     print(f"BIRT rows in DB: {len(records)}")
@@ -926,7 +1053,7 @@ def backfill_birt():
         except Exception:
             skipped += 1
             continue
-        patch_data = build_birt_patch(data)
+        patch_data = build_birt_patch(data, rec.get("nome", ""), rec.get("sobrenome", ""))
         if patch_data is None:
             skipped += 1
             continue
@@ -1058,6 +1185,10 @@ def main():
 
     if BACKFILL_BIRT:
         backfill_birt()
+        return
+
+    if FIX_MISFILL:
+        fix_misfill()
         return
 
     state = load_state()
