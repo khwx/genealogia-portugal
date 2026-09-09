@@ -25,7 +25,17 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-09 (segurança FECHADA — RLS ativo, secret no .env, sondas apagadas)
+## 2026-09-09 (pais em falta em Santa Maria → causa + fix + backfill)
+
+### Causa
+- Santa Maria tinha pai/mae 0% apesar de `SYNC_RELATIONS=1` no `.env`: o **sync nunca lia o `.env`** (só `os.environ`), por isso a flag e a secret eram ignoradas nos syncs.
+- Avós/legit/padrinhos/texto estavam bem (bloco incondicional): só pai/mae/conjuge eram gated.
+
+### Fix
+- `sync_htr_supabase.py` carrega `.env` sozinho (padrão dos scripts HTR).
+- Backfill: `8849` actualizados, 0 erros → SM pai 0%→**72%**, mae 0%→**76%**.
+- Disco SM tem 73% com pai — BD com 72% = tudo o que há (livros omitem pais; resto é skip de segurança por nome).
+- Testes: `ALL TESTS PASSED`.
 
 ### Verificação final (utilizador completou Vercel)
 - **anon INSERT**: `401` ✅ · **anon UPDATE**: 0 linhas ✅ · **READ**: 200 ✅

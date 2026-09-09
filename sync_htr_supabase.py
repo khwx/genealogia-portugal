@@ -21,6 +21,17 @@ import time
 from pathlib import Path
 from datetime import datetime
 
+# Carrega .env local (mesmo padrão dos scripts HTR). Sem isto, flags como
+# SYNC_RELATIONS e a SECRET key eram silenciosamente ignoradas quando o
+# script corria sem as variáveis exportadas (causou pai/mae a 0% em Santa Maria).
+_ENV_FILE = Path(__file__).resolve().parent / ".env"
+if _ENV_FILE.exists():
+    for _line in open(_ENV_FILE):
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://qljopxbxgflozrcdblrl.supabase.co")
 # Escrita usa a SECRET key quando existe (bypassa RLS); senão cai para a
 # publishable (funciona até o RLS ser fechado — ver migrations/add_rls_pessoas.sql).
