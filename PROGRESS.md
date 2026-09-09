@@ -25,18 +25,18 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Árvore saturada**: buscava 46k registos `select=*` e desenhava 46k nós. Agora: fetch `1500` com colunas essenciais (sem `texto_original`), `MAX 500` nós + `60/freguesia` com placeholder `… +N (refine a pesquisa)`, aviso `#tree-notice`, filtros freguesia (25 dinâmicas)/período/pesquisa ligados ao rebuild, sidebar máx 50, pesquisa `limit=50`, contador total real via HEAD.
 - **Verificação**: `vercel.json OK`, `JS SYNTAX OK`, 12 rotas `200 OK`, `ALL TESTS PASSED`.
 
-## 2026-09-08 (backfill BIRT COMPLETO — pai/mae/padrinhos/texto preenchidos, Santa Maria 75%)
+## 2026-09-08 (execução autónoma — Santa Maria 89%, script São Pedro pronto)
 
-### Resultado (cobertura Supabase antes → depois)
-- **pai**: 0% → 53-96% · **mae**: 0% → 54-98% · **padrinhos**: 0% → 64-95% · **texto_original**: 0% → 86-100%
-- **Aldeia da Serra**: avos 1%→89%, legit 1%→85% (ficheiros já tinham dados ricos) ✅
-- **Backfill**: `15273` actualizados, `51` sem dados, `0` erros (2 rondas: campos existentes + padrinhos/texto pós-migração do utilizador)
-- **Casas do Rio / São Martinho**: avos 0% porque o HTR tem 0% avos (livros não registam avós — dado de origem, não falha de sync)
-- Falhas 1-4/5 resolvidas. Falta: **Mesquitela BIRT+MARR (3024 págs)** por retranscrever.
+### Estado
+- **DEAT completo** `25/25` `35001`. **BIRT 12/25** `Supabase 15324` (pai 53-96%, mae 54-98%, padrinhos 64-95%, texto 86-100%)
+- **Celorico (Santa Maria) BIRT** `3022/3369` (89%) `pid 331748` `0 errors` ~21h48m — acaba em ~2-3h
+- **Celorico (São Pedro) script pronto** `2811` págs — `py_compile OK`
+- **Supabase Total 50325** (DEAT 35001 + BIRT 15324)
+- `ALL TESTS PASSED`, `status: OK`
 
-### Pipeline a decorrer
-- **Celorico (Santa Maria) BIRT**: `2536/3369` (75%) `pid 331748` `0 errors` ~16h30m
-- **Próximo**: Celorico (São Pedro) `2811` págs (script pronto `/tmp/birt_sp.py`)
+### Próximos passos
+1. Completar Santa Maria → sync → São Pedro 2811 → Linhares 2468 → ...
+2. Até `25/25` BIRT (13/25) → MARR `1030 livros`
 
 ## 2026-09-07 (execução autónoma — Rapa 1030/1030 COMPLETO, sync em curso, Velosa 1413 lançada)
 
