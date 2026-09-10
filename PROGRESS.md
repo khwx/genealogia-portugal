@@ -85,6 +85,21 @@ Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem is
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
+## 2026-09-11 (execução autónoma — São Pedro 1038/2811, Linhares 104/2468)
+
+### Estado
+- **DEAT completo** `25/25` `35001`. **BIRT 14/25** `Supabase 25989`.
+- **São Pedro**: `1038/2811` (36%) ~6h — 6 keys activas
+- **Linhares**: `104/2468` (4%) ~6h — 6 keys activas
+- **Supabase Total 60990** (DEAT 35001 + BIRT 25989)
+- **Segurança**: RLS ativo, secret ativa, sondas apagadas, testes `OK`
+
+### Fix aplicado
+16/22 chaves Gemini estavam mortas (404/429/timeout) — scripts ficavam 11min por ficheiro a tentar todas. Reduzido para 6 chaves activas + backoff imediato após 3×429 → throughput restaurado.
+
+### Próximos
+São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
+
 ## 2026-09-10 (execução autónoma — São Pedro 994/2811, Linhares 64/2468, 429s a aparecer)
 
 ### Estado
