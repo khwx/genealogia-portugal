@@ -2,6 +2,40 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-10 (fix throughput — workers stuck, gemini-3.5-flash-lite 22/22 keys)
+
+### Problema
+- Workers São Pedro e Linhares a correrem horas sem progresso no disco.
+- Causa 1: script tinha **4 chaves úteis** (3 duplicadas hardcoded), não 22.
+- Causa 2: `consecutive_429` contava timeouts e erros de rede → 3 falhas = sleep 300s (5 min!).
+- Causa 3: `time.sleep(30)` em 429, `time.sleep(1.5)` entre ficheiros — muito lento.
+
+### Diagnóstico de chaves (sondagem completa)
+- `gemini-3.5-flash-lite`: **22/22 chaves OK**, 0.5s média — **modelo ideal para throughput**
+- `gemini-3.6-flash`: ~15/22 OK, 1-3s, mas key00-02 em 429 e flaky timeouts
+- `gemini-2.5-flash`: 7/22 OK (chaves velhas) — 13 chaves novas dão 404
+- `gemini-2.5-flash-lite`: 0/22 — 404 em todas
+
+### Fix aplicado
+1. Worker template reescrito: lê 22 chaves do `.env`, `gemini-3.5-flash-lite`, timeout 5s
+2. Backoff reduzido: 429→2s sleep, erros→0.3s sleep, sem cooldown de 5min
+3. Round-robin key rotation (não tenta todas as keys por ficheiro)
+4. `time.sleep(0.5)` entre ficheiros (vs 1.5s)
+5. Workers SP+Lin reiniciados → **~3-4 ficheiros/min combinados**
+
+### Estado (09:07 WEST)
+- **DEAT**: `25/25` `35001` ✅
+- **BIRT**: `25989` Supabase
+- **São Pedro**: `1226/2811` (43%) — workers a processar
+- **Linhares**: `287/2468` (11%) — workers a processar
+- **Supabase Total**: `60990`
+- Testes: `ALL TESTS PASSED`, `status: OK`
+
+### Próximos
+São Pedro → sync → Linhares sync → Lajeosa 2430 → ... (9 freguesias restantes BIRT) → MARR
+
+---
+
 ## 2026-09-05 (Stitch — 3 páginas árvore: /pessoa/<id>, /arvore/<id>, /pessoas)
 
 ### Tarefa implementada — páginas Stitch para árvore genealógica
