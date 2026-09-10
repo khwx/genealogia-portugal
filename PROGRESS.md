@@ -85,23 +85,19 @@ Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem is
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
-## 2026-09-10 (estado verificado)
+## 2026-09-10 (execução autónoma — São Pedro 973/2811, Linhares 46/2468)
 
-### Pipeline
-- **Santa Maria BIRT 3369/3369 COMPLETO** `0 errors` → sync → **`6706` pessoas no Supabase** ✅
-- **São Pedro BIRT lançado** `2811 pages` (pid 449436)
-- **7 ficheiros vazios Salgueirais** (falhas escrita 5 Set): 5 retranscritos OK (2 com 8192 tokens), 2 parciais com transcrição salva via regex → sync +10 pessoas
-- **Supabase Total 57041** (DEAT 35001 + BIRT 22040) — +6700 neste ciclo
-- **BIRT 13/25 completo**
-- Nota: "Total in DB" impresso pelo sync está errado (contagem interna); contagem viva via API é a correcta. Background morre entre turnos — correr tarefas curtas em foreground.
+### Estado
+- **DEAT completo** `25/25` `35001`. **BIRT 14/25** `Supabase 25989`.
+- **São Pedro**: `973/2811` (34%) ~16h — `0 errors`
+- **Linhares**: `46/2468` (1%) ~8h — a arrancar
+- **Supabase Total 60990** (DEAT 35001 + BIRT 25989)
+- **Segurança**: RLS ativo, secret ativa, sondas apagadas, testes `OK`
 
 ### Próximos
-São Pedro 2811 → sync → Linhares 2468 → ... → MARR no fim. Mesquitela BIRT+MARR (3024) por retranscrever.
+São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
-### Descobertas e correcções
-- **Fetch select sem colunas novas** inflacionava o dry-run (15273 falsos) → corrigido; ronda 3 aplicou `1422` reais; dry-run agora **`0` por actualizar: tudo o que está no disco está no Supabase** ✅
-- **Contaminação cruzada**: rondas 1-2 escreviam a 1ª pessoa do ficheiro em todas as linhas (4733 ficheiros multi-pessoa). Amostras confirmaram pais trocados.
-- **Fix**: `--fix-misfill` (match exacto nome+sobrenome, só casos certos pai/mae) → **`923` linhas corrigidas, 0 erros, 0 restantes** ✅
+## 2026-09-10 (estado verificado)
 - `build_birt_patch` agora recebe o nome da linha e nunca adivinha (sem match → skip).
 - Resposta à pergunta "falta sincronizar alguns?": **não — 15324/15324 verificados**. O resto é dado que o HTR não tem (avós em Casas do Rio/São Martinho) + Mesquitela por retranscrever.
 - Testes: `ALL TESTS PASSED`.
