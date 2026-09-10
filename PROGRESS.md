@@ -85,6 +85,19 @@ Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem is
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
+## 2026-09-11 (fix — 13 "chaves mortas" recuperadas via gemini-3.6-flash)
+
+### Diagnóstico (sondagem 1-a-1, só índices)
+- **key00, key01**: `429` quota esgotada (vão recuperar com cooldown).
+- **13 chaves (07-14, 17-21)**: `404` em 2.5/1.5/2.0-flash — Google responde "use gemini-3.6-flash". São chaves de projetos novos sem acesso aos modelos antigos. `models:list` confirma 50 modelos disponíveis.
+- **Teste**: `gemini-3.6-flash=OK` nas chaves novas ✅
+
+### Fix
+- `MODELS=["gemini-2.5-flash","gemini-3.6-flash",...]` em `/tmp/birt_sp.py`, `/tmp/birt_linhares.py`, `/tmp/birt_lajeosa.py` + default `GEMINI_MODELS` em `htr_cloud_v2.py` (repo).
+- Chaves restauradas a 22 (tinha hardcoded 6); chaves velhas acertam no 1º modelo, novas no 2º (só +5s).
+- Workers reiniciados (SP 562043, LIN 562072) → **~20 chaves úteis em vez de 6**.
+- Testes: `py_compile OK` nos 3 scripts + repo.
+
 ## 2026-09-11 (execução autónoma — São Pedro 1143/2811, Linhares 234/2468)
 
 ### Estado

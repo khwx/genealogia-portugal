@@ -66,7 +66,7 @@ INVENTARIO_JSON = Path(os.environ.get("INVENTARIO_JSON", str(OUTPUT_PARENT / "ob
 GEMINI_KEYS = os.environ.get("GEMINI_KEYS", "")
 GEMINI_KEYS = [k.strip() for k in GEMINI_KEYS.split(",") if k.strip()]
 
-GEMINI_MODELS = os.environ.get("GEMINI_MODELS", "gemini-3-flash-preview,gemini-2.5-flash").split(",")
+GEMINI_MODELS = os.environ.get("GEMINI_MODELS", "gemini-2.5-flash,gemini-3.6-flash,gemini-3-flash-preview").split(",")
 GEMINI_MODELS = [m.strip() for m in GEMINI_MODELS if m.strip()]
 
 MAX_IMAGE_WIDTH = int(os.environ.get("MAX_IMAGE_WIDTH", "1500"))
