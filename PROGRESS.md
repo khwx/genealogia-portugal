@@ -85,22 +85,22 @@ Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem is
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
-## 2026-09-11 (execução autónoma — São Pedro 1120/2811, Linhares 201/2468)
+## 2026-09-11 (execução autónoma — São Pedro 1143/2811, Linhares 234/2468)
 
 ### Estado
 - **DEAT completo** `25/25` `35001`. **BIRT 14/25** `Supabase 25989`.
-- **São Pedro**: `1120/2811` (39%) ~19h — 6 keys activas, 0 errors
-- **Linhares**: `201/2468` (8%) ~19h — 6 keys activas, 0 errors
+- **São Pedro**: `1143/2811` (40%) ~23h — 6 keys activas, 0 errors
+- **Linhares**: `234/2468` (9%) ~23h — 6 keys activas, 0 errors, [150/2404]
 - **Supabase Total 60990** (DEAT 35001 + BIRT 25989)
 - **Segurança**: RLS ativo, secret ativa, sondas apagadas, testes `OK`
 
 ### Ritmo
-SP +12/2h (~6/h), Linhares +14/2h (~7/h). Estável. SP completo ~8h, Linhares ~12h.
+SP +23/4h (~6/h), Linhares +33/4h (~8/h). Linhares a ganhar ritmo. SP completo ~7h, Linhares ~10h.
 
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
-## 2026-09-11 (execução autónoma — São Pedro 1108/2811, Linhares 187/2468)
+## 2026-09-11 (execução autónoma — São Pedro 1120/2811, Linhares 201/2468)
 
 ### Estado
 - **DEAT completo** `25/25` `35001`. **BIRT 14/25** `Supabase 25989`.
