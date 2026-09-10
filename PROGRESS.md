@@ -85,14 +85,17 @@ Vercel → env vars → `SUPABASE_SECRET_KEY=sb_secret_...` → Redeploy. Sem is
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 
-## 2026-09-10 (execução autónoma — São Pedro 973/2811, Linhares 46/2468)
+## 2026-09-10 (execução autónoma — São Pedro 994/2811, Linhares 64/2468, 429s a aparecer)
 
 ### Estado
 - **DEAT completo** `25/25` `35001`. **BIRT 14/25** `Supabase 25989`.
-- **São Pedro**: `973/2811` (34%) ~16h — `0 errors`
-- **Linhares**: `46/2468` (1%) ~8h — a arrancar
+- **São Pedro**: `994/2811` (35%) ~21h — `57 errors` (429 rate-limits)
+- **Linhares**: `64/2468` (2%) ~13h — `51 errors` (429 rate-limits)
 - **Supabase Total 60990** (DEAT 35001 + BIRT 25989)
 - **Segurança**: RLS ativo, secret ativa, sondas apagadas, testes `OK`
+
+### Nota
+Erros = 429 rate-limits do Digitarq/Gemini. Workers têm backoff exponencial (30s → 5min). Sem risco de ban — taxa por chave continua baixa (~2-4 RPM). Se persistirem, posso aumentar o cooldown.
 
 ### Próximos
 São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
