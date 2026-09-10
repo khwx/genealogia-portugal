@@ -2,6 +2,29 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-10 (levantamento de falhas + reprocessamento preparado, pausado)
+
+### Levantamento completo (disco + sync)
+- **BIRT em falta 19868/38505**: SP 100 + Linhares 1728 (a processar) + 10 fregs por iniciar 18039 + 1 órfã São Martinho (`25857184`)
+- **DEAT em falta: 0/26813** ✅ — disco 100%
+- **Parse falhado: 2744** (6%): 1457 sem tipo (formato `---TRANSCRIPTION---` antigo) + 649 DEAT + 637 BIRT — maioria é **JSON truncado** (transcrição cortada a meio por limite de tokens), ex: *"baptizei a Anna, exposta..."*
+- **Sync: 2633 por sincronizar, todos <2 dias** (output fresco SP/Linhares) — sem atraso antigo ✅
+- **Vazios (~15%) são legítimos**: termos de abertura/encerramento dos livros
+
+### Descoberta: 621 ficheiros mal classificados
+`25841838` e +620 estavam no mapa DEAT antigo mas pertencem a livros BIRT (ex: Mesquitela). Inventário BIRT prevalece — alvos corrigidos DEAT→BIRT. **Sync futuro deve fazer upsert por file_id** para corrigir o tipo na BD.
+
+### Reprocessamento (`/tmp/reprocess_broken.py`, 2746 alvos: 1485 DEAT + 1259 BIRT + 1 órfã)
+- Backup do original partido → `output/htr_text_broken_backup/`; `maxOutputTokens 8192` (causa do truncamento); log de falhas com motivo → `output/reprocess_failed.jsonl`; ritmo calmo
+- **Tentativa concurrente FALHOU**: `429` nas 22 chaves — os dois workers degradam-se (quota partilhada por projeto). 0 correções, 0 danos (originais intactos, backups redundantes limpos)
+- **Decisão: PAUSADO até Linhares acabar (~12h)**. Sequencial (12h + 11h) vence concurrente degradado (65h). Alvos em `/tmp/reprocess_targets.json`, script pronto a lançar
+
+### Estado workers
+- Principal `575050`: SP 96% → Linhares 27%, 93% sucesso, saudável
+- Reprocess: pausado, a relançar após Linhares
+
+---
+
 ## 2026-09-10 (fix throughput — workers stuck, gemini-3.5-flash-lite 22/22 keys)
 
 ### Problema
