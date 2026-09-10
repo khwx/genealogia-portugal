@@ -82,3 +82,9 @@ reprocess_celorico_villas.py
 # Ignore all generated output (already-tracked files remain in clones)
 output/
 inspiration/
+
+# Large local-only files (kept on disk, never deployed): HTR listings,
+# offline backup tarball, stray .deb packages
+output/data/doc_file_listings.json
+backup/
+*.deb

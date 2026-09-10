@@ -1,0 +1,32 @@
+# Ficheiros necessários em runtime (NÃO excluir):
+#   index.html, api/, templates/, parish_coords.json,
+#   arquivo_refs.json, output/data/celorico_completo.json
+# Tudo o resto abaixo é peso morto no bundle da function.
+
+backup/
+*.deb
+*.log
+.cache/
+output/htr_text/
+output/htr_metadata/
+output/images/
+output/full_images/
+output/ocr_text/
+output/text/
+output/sync_htr_state.json
+output/obitos_inventario.csv
+output/obitos_inventario.xlsx
+output/inventario_completo_clb.csv
+output/obitos_inventario.json
+inventario.json
+PROGRESS.md
+WEB_IMPROVEMENTS_PLAN.md
+TAREFAS.md
+TODO.md
+AGENTS.md
+scripts/
+migrations/
+tests/
+test_*.py
+*_test.py
+inspiration/
