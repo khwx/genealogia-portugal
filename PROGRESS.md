@@ -20,6 +20,12 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Acalmado `/tmp/birt_all.py`: máx **6 chaves por ficheiro** (antes 22 — evitava cascata 22× quando a quota aperta) + pausa **1.2s** entre ficheiros (antes 0.8s)
 - Causa do 429 geral: quando poucas chaves falham, cada ficheiro queimava as 22 tentativas → efeito cascata até esgotar RPD
 
+### Teto diário por chave — impossível ser bloqueado (pedido utilizador)
+- Prioridade declarada: **nunca ficar sem API**, velocidade não interessa
+- `/tmp/birt_all.py` agora tem **teto de 300 sucessos/dia/chave** (Google dá 500) persistido em `output/key_usage.json` — chaves no teto são saltadas até ao dia seguinte
+- Mesmo com bug, o consumo máximo possível é 22×300=6600/dia, abaixo dos 11000 da conta; na prática ~1500/dia (ritmo 2s)
+- Ritmo: pausa 2.0s/ficheiro (~1.5/min). Com o teto como garantia rígida, o bloqueio diário fica matematicamente impossível
+
 ---
 
 ## 2026-09-10 (levantamento de falhas + reprocessamento preparado, pausado)
