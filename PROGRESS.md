@@ -15,6 +15,11 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Relançamento retoma automaticamente SP (100) + Linhares (restantes) — `todo` recalculado no arranque
 - Após Linhares: reprocess 2746 → sync geral → 10 freguesias restantes
 
+### Ritmo calmo, uma freguesia de cada vez (pedido utilizador)
+- Confirmado: só 1 worker ativo (fase paralela terminou; reprocess pausado) — SP acaba primeiro, Linhares depois, no mesmo script
+- Acalmado `/tmp/birt_all.py`: máx **6 chaves por ficheiro** (antes 22 — evitava cascata 22× quando a quota aperta) + pausa **1.2s** entre ficheiros (antes 0.8s)
+- Causa do 429 geral: quando poucas chaves falham, cada ficheiro queimava as 22 tentativas → efeito cascata até esgotar RPD
+
 ---
 
 ## 2026-09-10 (levantamento de falhas + reprocessamento preparado, pausado)
