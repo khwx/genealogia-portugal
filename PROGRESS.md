@@ -15,6 +15,13 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Relançamento retoma automaticamente SP (100) + Linhares (restantes) — `todo` recalculado no arranque
 - Após Linhares: reprocess 2746 → sync geral → 10 freguesias restantes
 
+### Watchdog funcionou (08:09) — SP 99%, Linhares 85%
+- Chaves recuperaram 4/4 às 08:09, worker lançado sozinho, correu até ao fim das listas e terminou normalmente
+- SP `2711→2789/2811` (96→99%), Linhares `976→2102/2468` (39→85%)
+- 366 erros no Linhares = retryável (sem output, ficam na lista); maioria do período de recuperação parcial das chaves
+- Relançado worker `692994` com settings calmos (teto 300/chave, 6 tentativas, 2s) para limpar restantes (~388): SP 22 → Linhares ~366
+- A seguir: sync SP+Linhares → Supabase, depois reprocess 2746
+
 ### Ritmo calmo, uma freguesia de cada vez (pedido utilizador)
 - Confirmado: só 1 worker ativo (fase paralela terminou; reprocess pausado) — SP acaba primeiro, Linhares depois, no mesmo script
 - Acalmado `/tmp/birt_all.py`: máx **6 chaves por ficheiro** (antes 22 — evitava cascata 22× quando a quota aperta) + pausa **1.2s** entre ficheiros (antes 0.8s)
