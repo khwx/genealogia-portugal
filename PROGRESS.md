@@ -2,6 +2,21 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-11 (quota diária esgotada — worker pausado, watchdog armado)
+
+### Estado
+- Worker `575050` morreu ~05:36 após 12h (SP 96% `2711/2811`, Linhares 39% `976/2468`)
+- **Todas as 22 chaves em `429`**: RPD 500/chave do lite esgotado na madrugada (SP+Linhares ~2200 ficheiros + retries)
+- Reset da quota Google ~08:00 WEST. Nada perdido: em falta continua tudo na lista (disco = todo)
+- Erros finais do Linhares (532) foram 429 de fim de quota, não falhas reais — serão retomados
+
+### Ação
+- `/tmp/watchdog.py` em background (pid 668190): sonda 4 chaves de 5 em 5 min, lança `/tmp/birt_all.py` sozinho quando 4/4 OK, depois termina
+- Relançamento retoma automaticamente SP (100) + Linhares (restantes) — `todo` recalculado no arranque
+- Após Linhares: reprocess 2746 → sync geral → 10 freguesias restantes
+
+---
+
 ## 2026-09-10 (levantamento de falhas + reprocessamento preparado, pausado)
 
 ### Levantamento completo (disco + sync)
