@@ -20,7 +20,7 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 MIGRATIONS = ROOT / "migrations"
 
 # Tokens that, as standalone SQL, would destroy or empty data.

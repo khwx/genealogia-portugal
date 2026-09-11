@@ -29,4 +29,8 @@ migrations/
 tests/
 test_*.py
 *_test.py
+tools/
+docs/
+*.ipynb
+Dockerfile*
 inspiration/

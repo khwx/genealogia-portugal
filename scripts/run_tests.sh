@@ -10,7 +10,7 @@ fail=0
 
 run() {
     echo "=== $1 ==="
-    if python3 "$1"; then
+    if PYTHONPATH="$PWD" python3 "$1"; then
         echo "OK: $1"
     else
         echo "FAIL: $1"
@@ -26,12 +26,12 @@ run scripts/precommit_secrets.py
 run scripts/test_coverage_report.py
 run scripts/test_scan_secrets.py
 run scripts/test_precommit_secrets.py
-run test_sync_pagination.py
-run test_sync_relations.py
-run test_htr_type_aware.py
-run test_migrations.py
-run test_name_phonetics.py
-run test_api_quality_filter.py
+run tests/test_sync_pagination.py
+run tests/test_sync_relations.py
+run tests/test_htr_type_aware.py
+run tests/test_migrations.py
+run tests/test_name_phonetics.py
+run tests/test_api_quality_filter.py
 
 if [ "$fail" -ne 0 ]; then
     echo "RESULT: FAILED"

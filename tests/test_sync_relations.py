@@ -15,7 +15,7 @@ def _load_module(name, path):
     return mod
 
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 sync = _load_module("sync_htr_supabase", ROOT / "sync_htr_supabase.py")
 
 

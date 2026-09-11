@@ -2,6 +2,18 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-09-11 (limpeza e reestruturação do repo — 170→156 ficheiros)
+
+### Feito (backup primeiro: branch `backup-pre-cleanup` pushed)
+- **Raiz 120→20 ficheiros**: só runtime + apresentação (api, templates, páginas, JSONs usados, cfgs)
+- `tests/` ← 10 testes raiz (+fix paths `parent.parent` e `PYTHONPATH` no run_tests.sh)
+- `scripts/` ← 4 utilitários ainda úteis (gen_arquivo_refs, get_images, fetch_page_listings, list_books)
+- `tools/archive/` ← ~70 scripts exploratórios/.sh/notebooks/Dockerfiles (histórico, fora de uso)
+- `docs/` ← PROGRESS, WEB_IMPROVEMENTS_PLAN, PIPELINE, DOCUMENTATION
+- **Untracked (em disco)**: 13 `.deb`, inventários CSV/XLSX/JSON gerados, `inventario.json` (só output do gerar_inventario.js)
+- **README reescrito**: reflete a realidade (Supabase+Gemini+Vercel, estrutura, setup, segurança)
+- Verificação: `ALL TESTS PASSED`, `COMPILE OK`, scan 0 segredos; deploy intacto (api, templates, rotas, JSONs runtime e `.vercelignore` revistos)
+
 ## 2026-09-11 (quota diária esgotada — worker pausado, watchdog armado)
 
 ### Estado

@@ -84,7 +84,10 @@ output/
 inspiration/
 
 # Large local-only files (kept on disk, never deployed): HTR listings,
-# offline backup tarball, stray .deb packages
+# offline backup tarball, stray .deb packages, generated inventories
 output/data/doc_file_listings.json
+output/inventario_completo_clb.csv
+output/obitos_inventario.*
+inventario.json
 backup/
 *.deb
