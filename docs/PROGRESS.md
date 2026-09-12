@@ -39,7 +39,7 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **São Pedro (BIRT):** 2811/2811 (COMPLETO) ✅
 - **Linhares (BIRT):** 2468/2468 (COMPLETO) ✅
 - **Sync:** COMPLETO — 45331 registos no Supabase ✅
-- **Reprocess:** a correr — 1098 ficheiros BIRT/DEAT com parsed_ok=False
+- **Reprocess:** 1098 → 728 restantes (370 recuperados na 1ª ronda); ritmo aumentado 2s→3s por segurança (user OK); worker ativo
 - **Workers reconstruídos** em `output/workers/` (gitignored, sobrevive a reboots)
 
 ### Próximos
