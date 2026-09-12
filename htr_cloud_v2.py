@@ -163,15 +163,17 @@ def parse_gemini_json(text):
 
 PROMPT_BY_TYPE = {
     "DEAT": """You are a transcription assistant for Portuguese historical documents.
-This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal.
+This image shows a page from a death register (livro de óbitos) from Celorico da Beira, Portugal. Pages may also contain wills (testamentos) and bequests (legados).
 Output ONLY a JSON object (no other text) with this structure:
 {
   "transcription": "full transcribed text here",
-  "deceased": [ { "name": "...", "death_date": "YYYY-MM-DD", "age": "...", "father": "...", "mother": "...", "spouse": "..." } ]
+  "deceased": [ { "name": "...", "death_date": "YYYY-MM-DD", "age": "...", "father": "...", "mother": "...", "spouse": "...", "testamento": true, "legados": ["..."] } ]
 }
+IMPORTANT: never repeat the same phrase twice. Transcribe each passage once and move on; if you notice yourself repeating, stop the transcription there and finish the JSON.
 If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
     "BIRT": """You are a specialized paleography assistant for Portuguese parish records (Livros Paroquiais de Batismos de Celorico da Beira).
 Transcribe the page and extract structured details for each baptized person.
+IMPORTANT: never repeat the same phrase twice. Transcribe each passage once and move on; if you notice yourself repeating, stop the transcription there and finish the JSON.
 Output ONLY a valid JSON object (no other text) with this structure:
 {
   "transcription": "full verbatim transcription",
@@ -199,6 +201,7 @@ Output ONLY a valid JSON object (no other text) with this structure:
 If a field is not present or illegible, use null. Do NOT invent content. Output ONLY the JSON.""",
     "MARR": """You are a transcription assistant for Portuguese historical documents.
 This image shows a page from a marriage register (livro de casamentos) from Celorico da Beira, Portugal.
+IMPORTANT: never repeat the same phrase twice. Transcribe each passage once and move on; if you notice yourself repeating, stop the transcription there and finish the JSON.
 Output ONLY a JSON object (no other text) with this structure:
 {
   "transcription": "full transcribed text here",
@@ -469,7 +472,7 @@ class HTRProcessor:
                         {"text": prompt},
                     ]
                 }],
-                "generationConfig": {"temperature": 0.1, "maxOutputTokens": 2000},
+                "generationConfig": {"temperature": 0.1, "maxOutputTokens": 8192},
             }
 
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"

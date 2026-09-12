@@ -42,6 +42,7 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Reprocess:** 1098 → 101 marcados `retry_exhausted` (loops de repetição do modelo, user viu exemplos e aprovou parar); 627 recuperados
 - **Resync fix:** sync saltava ficheiros já no state mesmo após reprocess — apagadas linhas de 959 ficheiros da BD + removidos do state; resync de 966 a correr
 - **BIRT restantes lançado:** Lajeosa já estava no disco (0/0); **Vale de Azares** a processar (2407)
+- **Prompt v2 (user validou 2 págs com IA externa):** anti-loop anti-repetição + `testamento/legados` no DEAT (antes perdíamos esses dados!) + tokens 4096→8192; aplicado em `htr_cloud_v2.py` e nos 3 workers; retry dos 170 esgotados a correr com prompt novo
 - **Workers reconstruídos** em `output/workers/` (gitignored, sobrevive a reboots)
 
 ### Próximos
