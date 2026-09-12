@@ -33,17 +33,19 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Corrigido bug de path (ROOT apontava a output/ em vez de repo); worker `7732` ativo nos 9 restantes de Linhares
 - A relançar a seguir: sync SP+Linhares → reprocess 2746 (scripts a reconstruir) → 10 freguesias
 
-## 2026-09-11 (BIRT SP+Linhares COMPLETO, Sync em curso)
+## 2026-09-11 (BIRT SP+Linhares COMPLETO, Sync COMPLETO, Reprocess em curso)
 
 ### Estado
 - **São Pedro (BIRT):** 2811/2811 (COMPLETO) ✅
 - **Linhares (BIRT):** 2468/2468 (COMPLETO) ✅
-- **Sync:** lançado `sync_htr_supabase.py` (pid 9254) — a sincronizar 45331 ficheiros para Supabase
+- **Sync:** COMPLETO — 45331 registos no Supabase ✅
+- **Reprocess:** a correr — 1098 ficheiros BIRT/DEAT com parsed_ok=False
+- **Workers reconstruídos** em `output/workers/` (gitignored, sobrevive a reboots)
 
 ### Próximos
-1. Aguardar conclusão do Sync (~1h)
-2. Lançar reprocessamento dos 2746 erros (formato antigo/truncados) → script preparado
-3. 10 freguesias restantes (18k págs, script preparado)
+1. Aguardar fim do reprocess (~1h30 a ritmo calmo)
+2. Sync reprocessados → Supabase
+3. Lançar 10 freguesias BIRT restantes (Lajeosa, Vale de Azares, Maçal, Açores, Forno Telheiro, Baraçal, Cortiçô da Serra, Ratoeira, Minhocal, Jejua) → script em output/workers/birt_remaining.py
 
 ### Ritmo calmo, uma freguesia de cada vez (pedido utilizador)
 - Confirmado: só 1 worker ativo (fase paralela terminou; reprocess pausado) — SP acaba primeiro, Linhares depois, no mesmo script
