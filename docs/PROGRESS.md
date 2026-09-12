@@ -27,6 +27,12 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Relançamento retoma automaticamente SP (100) + Linhares (restantes) — `todo` recalculado no arranque
 - Após Linhares: reprocess 2746 → sync geral → 10 freguesias restantes
 
+### Reboot limpou /tmp — workers reconstruídos em output/workers/
+- Reboot apagou `/tmp/*.py` (workers, watchdog, targets). Disco e BD intactos: SP 100%, Linhares 2459/2468
+- Worker reconstruído em `output/workers/birt_all.py` (gitignored, sobrevive a reboots; doc_ids resolvidos do inventário em runtime, sem ids hardcoded)
+- Corrigido bug de path (ROOT apontava a output/ em vez de repo); worker `7732` ativo nos 9 restantes de Linhares
+- A relançar a seguir: sync SP+Linhares → reprocess 2746 (scripts a reconstruir) → 10 freguesias
+
 ### Watchdog funcionou (08:09) — SP 99%, Linhares 85%
 - Chaves recuperaram 4/4 às 08:09, worker lançado sozinho, correu até ao fim das listas e terminou normalmente
 - SP `2711→2789/2811` (96→99%), Linhares `976→2102/2468` (39→85%)
