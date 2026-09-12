@@ -33,12 +33,17 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - Corrigido bug de path (ROOT apontava a output/ em vez de repo); worker `7732` ativo nos 9 restantes de Linhares
 - A relançar a seguir: sync SP+Linhares → reprocess 2746 (scripts a reconstruir) → 10 freguesias
 
-### Watchdog funcionou (08:09) — SP 99%, Linhares 85%
-- Chaves recuperaram 4/4 às 08:09, worker lançado sozinho, correu até ao fim das listas e terminou normalmente
-- SP `2711→2789/2811` (96→99%), Linhares `976→2102/2468` (39→85%)
-- 366 erros no Linhares = retryável (sem output, ficam na lista); maioria do período de recuperação parcial das chaves
-- Relançado worker `692994` com settings calmos (teto 300/chave, 6 tentativas, 2s) para limpar restantes (~388): SP 22 → Linhares ~366
-- A seguir: sync SP+Linhares → Supabase, depois reprocess 2746
+## 2026-09-11 (BIRT SP+Linhares COMPLETO, Sync em curso)
+
+### Estado
+- **São Pedro (BIRT):** 2811/2811 (COMPLETO) ✅
+- **Linhares (BIRT):** 2468/2468 (COMPLETO) ✅
+- **Sync:** lançado `sync_htr_supabase.py` (pid 9254) — a sincronizar 45331 ficheiros para Supabase
+
+### Próximos
+1. Aguardar conclusão do Sync (~1h)
+2. Lançar reprocessamento dos 2746 erros (formato antigo/truncados) → script preparado
+3. 10 freguesias restantes (18k págs, script preparado)
 
 ### Ritmo calmo, uma freguesia de cada vez (pedido utilizador)
 - Confirmado: só 1 worker ativo (fase paralela terminou; reprocess pausado) — SP acaba primeiro, Linhares depois, no mesmo script
