@@ -39,7 +39,9 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **São Pedro (BIRT):** 2811/2811 (COMPLETO) ✅
 - **Linhares (BIRT):** 2468/2468 (COMPLETO) ✅
 - **Sync:** COMPLETO — 45331 registos no Supabase ✅
-- **Reprocess:** 1098 → 728 restantes (370 recuperados na 1ª ronda); ritmo aumentado 2s→3s por segurança (user OK); worker ativo
+- **Reprocess:** 1098 → 101 marcados `retry_exhausted` (loops de repetição do modelo, user viu exemplos e aprovou parar); 627 recuperados
+- **Resync fix:** sync saltava ficheiros já no state mesmo após reprocess — apagadas linhas de 959 ficheiros da BD + removidos do state; resync de 966 a correr
+- **BIRT restantes lançado:** Lajeosa já estava no disco (0/0); **Vale de Azares** a processar (2407)
 - **Workers reconstruídos** em `output/workers/` (gitignored, sobrevive a reboots)
 
 ### Próximos
