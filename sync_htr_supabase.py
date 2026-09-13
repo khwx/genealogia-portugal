@@ -812,7 +812,7 @@ def update_dates():
 # migrations/add_padrinhos_texto.sql). O envio usa fallback: se o
 # Supabase responder 400 a queixar-se de coluna desconhecida, o registo
 # é reenviado sem essas colunas em vez de falhar.
-NEW_COLS = ("godfather", "godmother", "texto_original")
+NEW_COLS = ("godfather", "godmother", "texto_original", "legados")
 
 
 def post_with_fallback(record):
@@ -1378,6 +1378,14 @@ def main():
                     transcription = (data.get("transcription") or "").strip()
                     if transcription:
                         record["texto_original"] = transcription[:4000]
+
+                # DEAT extra: legados (lista -> texto; precisa de ALTER TABLE pessoas ADD COLUMN legados TEXT)
+                if record_type == "DEAT":
+                    leg = person.get("legados")
+                    if isinstance(leg, list):
+                        leg = "; ".join(str(x) for x in leg if x)
+                    if leg:
+                        record["legados"] = str(leg)[:2000]
 
                 if not DRY_RUN:
                     result = post_with_fallback(record)
