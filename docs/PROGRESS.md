@@ -45,6 +45,8 @@ Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h
 - **Prompt v2 (user validou 2 págs com IA externa):** anti-loop anti-repetição + `testamento/legados` no DEAT (antes perdíamos esses dados!) + tokens 4096→8192; aplicado em `htr_cloud_v2.py` e nos 3 workers; retry dos 170 esgotados a correr com prompt novo
 - **Coluna `legados` (user criou via SQL):** sync atualizado (NEW_COLS + extração DEAT) = daqui em diante automático; para trás = backfill só-texto (transcrição local porque texto_original=NULL nas antigas): 1ª ronda 426 linhas; relançado para restantes (~1000 ficheiros, ~22% com legados falhados na amostra)
 - **BUG seasonal (14 set):** workers de longa duração congelavam `_today` no arranque → teto diário nunca resetava → 100% erros após 300 sucessos/chave (Minhocal 1500/1500 erros!). Fix `_usage_today()` dinâmico nos 5 workers; worker relançado a recuperar
+- **BUG nomes (16 set):** worker saltava 'Lajeosa'/'Maçal' em silêncio (inventário: 'Lajeosa do Mondego'/'Maçal do Chão'). Fix nomes + aviso quando freguesia dá 0 doc_ids
+- **429 em imagens (16 set):** probes de texto OK mas imagem 429 — teste decisivo (10min parado → imagem OK) provou ser ritmo, não quota. Ritmo worker 3s→6s; backfill em pausa durante worker de imagem
 - **Workers reconstruídos** em `output/workers/` (gitignored, sobrevive a reboots)
 
 ### Próximos
