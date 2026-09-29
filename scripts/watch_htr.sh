@@ -81,7 +81,9 @@ STUCK_START=""
 WAIT_DAY=""
 LAST_8H=""
 QUICK_RESTARTS=0
-LAST_RESTART_EPOCH=0
+LAST_RESTART_EPOCH=$(date +%s)
+RUN_PRODUCED=0
+RUN_START_TOTAL=$LAST_TOTAL
 
 log "=== watch_htr arrancou (relança em ~60s se o worker cair) ==="
 status_line
@@ -98,6 +100,7 @@ while true; do
         elif [ -z "$STUCK_START" ]; then
             STUCK_START=$now
         fi
+        [ "$total" -gt "$RUN_START_TOTAL" ] && RUN_PRODUCED=1
 
         if [ -n "$STUCK_START" ] && [ $((now - STUCK_START)) -ge $STUCK_SECS ]; then
             log "aviso: 0 ficheiros novos em ${STUCK_MIN}min com worker vivo — teto diário provavelmente gasto. A matar e a descansar até à meia-noite."
@@ -109,6 +112,19 @@ while true; do
     else
         # worker morto: relança, exceto se estamos a aguardar o reset diário
         if [ "$WAIT_DAY" != "$(date +%Y-%m-%d)" ] || [ -z "$WAIT_DAY" ]; then
+            # trabalho esgotado? a última ronda terminou NORMAL ("Total files in
+            # disco") sem ter produzido ficheiro nenhum e durou mais que 1min.
+            # Nesse caso a fila está vazia: descansa 8h e só então volta a ver.
+            if [ "$RUN_PRODUCED" -eq 0 ] \
+               && [ $((now - LAST_RESTART_EPOCH)) -gt 60 ] \
+               && tail -n 6 "$WORKER_LOG" 2>/dev/null | grep -q "Total files in disco:"; then
+                status_line
+                log "trabalho esgotado — a descansar 8h (volto a verificar)."
+                sleep 28800
+                RUN_PRODUCED=0
+                RUN_START_TOTAL=$(total_files)
+                continue
+            fi
             # crash em cadeia? backoff se relança sem nenhum progresso
             if [ $((now - LAST_RESTART_EPOCH)) -lt 120 ]; then
                 QUICK_RESTARTS=$((QUICK_RESTARTS + 1))
@@ -122,6 +138,8 @@ while true; do
                 continue
             fi
             log "worker falecido — a relançar."
+            RUN_START_TOTAL=$(total_files)
+            RUN_PRODUCED=0
             launch_worker
             LAST_RESTART_EPOCH=$(date +%s)
             sleep 5
