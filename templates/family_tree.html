@@ -186,8 +186,8 @@ async function loadFromSupabase() {
         
         const COLS = 'id,nome,sobrenome,data_obito,data_nascimento,data_casamento,freguesia,concelho,tipo_registo,pai,mae,conjuge,avo_paterno,avo_paterna,avo_materno,avo_materna,legitimidade,godfather,godmother,assinatura,naturalidade_pai,naturalidade_mae,imagem_url,fonte,idade,criado_em';
         const [pplRes, booksRes] = await Promise.all([
-            fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=${COLS}&order=criado_em.desc&limit=200`, { headers }),
-            fetch(`${SUPABASE_URL}/rest/v1/livros?select=*&freguesia=like.*Celorico*&limit=50`, { headers })
+            fetch(`${SUPABASE_URL}/rest/v1/pessoas?select=${COLS}&order=criado_em.desc&limit=1500`, { headers }),
+            fetch(`${SUPABASE_URL}/rest/v1/livros?select=*&freguesia=like.*Celorico*`, { headers })
         ]);
         
         allPeople = await pplRes.json();
@@ -280,8 +280,8 @@ function populateFreguesiaFilter() {
     if (cur && counts[cur]) sel.value = cur;
 }
 
-const MAX_PER_FREG = 20;
-const MAX_TOTAL_NODES = 100;
+const MAX_PER_FREG = 100;
+const MAX_TOTAL_NODES = 1000;
 
 function buildHierarchy() {
     const fregSel = (document.getElementById('freguesia-filter') || {}).value || '';
