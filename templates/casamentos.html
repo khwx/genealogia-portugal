@@ -2,13 +2,187 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Casamentos — Genealogia Portugal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<style>:root{--bg:#0f1117;--bg2:#1a1d27;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text)} .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between} .logo{color:var(--text);text-decoration:none;font-weight:700} .nav-links{display:flex;align-items:center} .nav-link{color:var(--text2);text-decoration:none;margin-left:16px} .nav-link.active{color:var(--text)} .menu-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);font-size:1.2rem;border-radius:8px;padding:4px 12px;cursor:pointer} @media(max-width:768px){.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--bg2);flex-direction:column;align-items:stretch;padding:12px 24px 16px;gap:14px;border-bottom:1px solid var(--border);z-index:99}.nav-links.open{display:flex}.nav-link{margin-left:0}} .hero{text-align:center;padding:40px 20px} .card{max-width:900px;margin:0 auto 40px;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;text-align:center} .pill{background:rgba(108,99,255,0.15);color:#8b83ff;padding:6px 14px;border-radius:20px}</style>
+<title>Casamentos — Genealogia Portugal (Celorico da Beira)</title>
+<meta name="description" content="Pesquisa em casamentos de Celorico da Beira (1654-1911) — livros paroquiais. Filtra por noivos, testemunhas, dispensa e freguesia.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--border:#2e3347;--text:#e8eaf6;--text2:#8b93b8;--accent:#6c63ff;--accent2:#8b83ff;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:1.1rem;font-weight:700;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent2)}
+.nav-links{display:flex;align-items:center}
+.nav-link{color:var(--text2);text-decoration:none;font-size:0.9rem;font-weight:500;margin-left:16px}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.menu-toggle{display:none;background:none;border:1px solid var(--border);color:var(--text);font-size:1.2rem;border-radius:8px;padding:4px 12px;cursor:pointer}
+@media(max-width:768px){.menu-toggle{display:block}.nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:var(--bg2);flex-direction:column;align-items:stretch;padding:12px 24px 16px;gap:14px;border-bottom:1px solid var(--border);z-index:99}.nav-links.open{display:flex}.nav-link{margin-left:0}}
+.hero{text-align:center;padding:40px 20px 20px}
+.hero h1{font-size:2.2rem;font-weight:700;margin-bottom:8px}
+.hero p{color:var(--text2);max-width:700px;margin:0 auto;line-height:1.6}
+.search-container{max-width:750px;margin:0 auto 20px;padding:0 20px;width:100%}
+.search-box{display:flex;background:var(--bg2);border:2px solid var(--border);border-radius:100px;padding:6px;transition:.3s}
+.search-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(108,99,255,0.15)}
+.search-input{flex:1;background:transparent;border:none;color:var(--text);font-size:1.05rem;padding:12px 20px;outline:none;font-family:inherit}
+.search-btn{background:var(--accent);color:white;border:none;border-radius:100px;padding:0 28px;font-weight:600;cursor:pointer}
+.search-btn:hover{background:var(--accent2)}
+.results-container{max-width:1000px;margin:0 auto 40px;padding:0 20px;width:100%}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;transition:.2s}
+.result-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.result-name{font-size:1.2rem;font-weight:600}
+.result-meta{display:flex;gap:16px;color:var(--text2);font-size:0.9rem;flex-wrap:wrap;margin:8px 0}
+.doc-link{background:var(--bg3);color:var(--text);text-decoration:none;font-size:0.85rem;padding:6px 14px;border-radius:8px;border:1px solid var(--border)}
+.doc-link:hover{background:var(--accent);color:white}
+.loading{text-align:center;padding:40px;color:var(--text2)}
+.parish-tag{background:var(--bg2);border:1px solid var(--border);color:var(--text2);padding:6px 12px;border-radius:20px;font-size:0.8rem;cursor:pointer}
+.parish-tag.active{background:var(--accent);color:white;border-color:var(--accent)}
+#detailModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+#detailModal.open{display:flex}
+.modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
+.modal-close{position:absolute;top:20px;right:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem}
+.drow{display:grid;gap:10px;color:var(--text2);font-size:0.95rem}
+.drow strong{color:var(--text2);font-weight:600}
+.drow span.v{color:var(--text)}
+@media(max-width:640px){.modal-box{padding:18px;max-height:92vh}}
+</style>
 </head>
 <body>
-<div class="topbar"><a href="/" class="logo">Genealogia <span>Portugal</span></a><button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button><div class="nav-links"><a href="/" class="nav-link">Pesquisa</a><a href="/batismos" class="nav-link">Batismos 👶</a><a href="/casamentos" class="nav-link active">Casamentos 💍</a><a href="/family-tree" class="nav-link">Árvore 🌲</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a><a href="/validar" class="nav-link">Revisão</a></div></div>
-<div class="hero"><h1>💍 Casamentos (1654-1911)</h1><p style="color:var(--text2);max-width:600px;margin:10px auto;">Schema pronto (`tipo_registo=MARR`). Assim que os livros de casamentos forem transcritos, aparecerão aqui com filtros por noivos, data e freguesia.</p></div>
-<div class="card"><p style="color:var(--text2);">De momento só temos <strong style="color:var(--text)">óbitos</strong> indexados. Usa a pesquisa com filtro <span class="pill">Casamentos 💍</span> — quando houver dados MARR, esta página lista-os automaticamente.</p><div style="margin-top:16px;"><a href="/?tipo=MARR" style="color:var(--accent);">Ver casamentos na pesquisa →</a></div></div>
+<div class="topbar">
+<a href="/" class="logo">Genealogia <span>Portugal</span></a>
+<button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">☰</button>
+<div class="nav-links"><a href="/" class="nav-link">Pesquisa</a><a href="/batismos" class="nav-link">Batismos 👶</a><a href="/casamentos" class="nav-link active">Casamentos 💍</a><a href="/family-tree" class="nav-link">Árvore 🌲</a><a href="/mapa" class="nav-link">Mapa</a><a href="/cobertura.html" class="nav-link">Cobertura</a><a href="/validar" class="nav-link">Revisão</a></div>
+</div>
+<div class="hero">
+<h1>💍 Casamentos (1654–1911)</h1>
+<p>Livros paroquiais de casamentos de Celorico da Beira. Pesquisa por noivo, noiva, testemunhas e freguesia. Cada casamento gera dois registos — um para o noivo e outro para a noiva, cruzados em <code style="background:var(--bg3);padding:2px 6px;border-radius:6px">conjuge</code>.</p>
+</div>
+<div class="search-container">
+<div class="search-box">
+<input id="q" class="search-input" placeholder="Noivo, noiva, testemunha, freguesia..." autocomplete="off">
+<button id="btn" class="search-btn">Pesquisar</button>
+</div>
+<div id="parishFilters" style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+<span style="color:var(--text2);font-size:0.85rem;align-self:center">Freguesia:</span>
+<button class="parish-tag active" onclick="filtrarFreg('')">Todas</button>
+</div>
+</div>
+<div style="max-width:1000px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center">
+<span id="cnt" style="color:var(--text2);font-size:0.9rem">A carregar...</span>
+<span id="live" style="color:var(--text2);font-size:0.8rem"></span>
+</div>
+<div class="results-container" id="res"><div class="loading">A carregar casamentos...</div></div>
+<div id="more" style="text-align:center;padding:20px;display:none"><button id="moreBtn" class="parish-tag" style="padding:10px 24px">Carregar mais</button></div>
+
+<div id="detailModal"><div class="modal-box"><button class="modal-close" onclick="closeModal()">✕</button><div id="modalContent"></div></div></div>
+
+<script>
+const SUPABASE_URL='https://qljopxbxgflozrcdblrl.supabase.co';
+const SUPABASE_KEY='sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
+const H={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+let q='', freg='', offset=0, totalLoaded=0, hasMore=true, loading=false;
+let loaded=[];
+const PAGE=100;
+
+function card(p,i){
+  const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Noivo';
+  const data=p.data_casamento ? new Date(p.data_casamento).toLocaleDateString('pt-PT') : 'Data não especificada';
+  const freguesia=p.freguesia||'Celorico da Beira';
+  const estado=p.estado_civil?`<span style="background:rgba(108,99,255,0.15);color:#8b83ff;padding:3px 8px;border-radius:20px;font-size:0.75rem">${p.estado_civil}</span>`:'';
+  return `<div class="result-card" onclick="openDetail(${i})" style="cursor:pointer">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div class="result-name">💍 ${nome}${p.conjuge?` <span style="color:var(--text2);font-weight:400">+ ${p.conjuge}</span>`:''}</div>${estado}</div>
+    <div class="result-meta"><span>📅 ${data}</span><span>📍 ${freguesia}</span>${p.pai?`<span>👨 ${p.pai}</span>`:''}${p.mae?`<span>👩 ${p.mae}</span>`:''}</div>
+    ${((p.pai||p.mae)&&p.conjuge&&(p.conjuge!==nome))?`<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--text2);margin-top:8px">${p.pai?`Pai: <span style="color:var(--text)">${p.pai}</span> &nbsp;`:''}${p.mae?`Mãe: <span style="color:var(--text)">${p.mae}</span>`:''}</div>`:''}
+    ${p.dispensa?`<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:#f87171;margin-top:8px">⛪ Dispensa: ${p.dispensa}</div>`:''}
+    ${p.testemunhas?`<div style="font-size:0.82rem;color:var(--text2);margin-top:6px">👥 Testemunhas: ${p.testemunhas}</div>`:''}
+    ${p.profissao?`<div style="font-size:0.82rem;color:var(--text2);margin-top:4px">🧑‍🌾 ${p.profissao}</div>`:''}
+    ${p.assinatura?`<div style="font-size:0.78rem;color:var(--text2);margin-top:4px;font-style:italic">✒️ ${p.assinatura}</div>`:''}
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:8px">${p.imagem_url?`<a href="${p.imagem_url}" target="_blank" class="doc-link" onclick="event.stopPropagation()">📄 Ver livro no Digitarq ↗</a>`:''}<span style="color:#8b83ff;font-size:0.85rem">Ver detalhes →</span></div>
+  </div>`;
+}
+
+async function fetchBatch(reset){
+  if(loading) return;
+  loading=true;
+  try{
+    let url=`${SUPABASE_URL}/rest/v1/pessoas?select=*&tipo_registo=eq.MARR&order=criado_em.desc&limit=${PAGE}&offset=${offset}`;
+    const conds=[];
+    if(q) conds.push(`or(nome.ilike.*${q}*,sobrenome.ilike.*${q}*,conjuge.ilike.*${q}*,testemunhas.ilike.*${q}*)`);
+    if(freg) conds.push(`freguesia.ilike.*${freg}*`);
+    if(conds.length) url+='&'+conds.join('&');
+    const r=await fetch(url,{headers:H});
+    if(!r.ok) throw new Error(r.status);
+    const data=await r.json();
+    const c=document.getElementById('res');
+    let base=0;
+    if(reset){ c.innerHTML=''; loaded=data; }
+    else { base=loaded.length; loaded=loaded.concat(data); }
+    if(!data.length && reset) c.innerHTML='<div class="loading">Ainda sem casamentos — livros MARR por processar. Usa a pesquisa principal <code>/?tipo=MARR</code> ou aguarda o pipeline HTR terminar.</div>';
+    else c.insertAdjacentHTML('beforeend', data.map((p,k)=>card(p,base+k)).join(''));
+    totalLoaded+=data.length; offset+=data.length; hasMore=data.length===PAGE;
+    document.getElementById('cnt').textContent=`A mostrar ${totalLoaded} casamentos${hasMore?' — carrega mais':''}`;
+    document.getElementById('more').style.display=hasMore?'block':'none';
+    document.getElementById('live').textContent=`MARR live • ${new Date().toLocaleTimeString('pt-PT')}`;
+  }catch(e){
+    if(reset) document.getElementById('res').innerHTML=`<div class="loading" style="color:#ef4444">Erro: ${e.message}</div>`;
+  }finally{loading=false}
+}
+
+async function loadParishes(){
+  try{
+    const url=`${SUPABASE_URL}/rest/v1/pessoas?select=freguesia&tipo_registo=eq.MARR&limit=2000`;
+    const r=await fetch(url,{headers:H});
+    if(!r.ok) return;
+    const data=await r.json();
+    const fs=[...new Set(data.map(p=>p.freguesia).filter(Boolean))].sort();
+    const box=document.getElementById('parishFilters');
+    box.innerHTML='<span style="color:var(--text2);font-size:0.85rem;align-self:center">Freguesia:</span><button class="parish-tag active" onclick="filtrarFreg(\'\')">Todas</button>'+fs.map(f=>`<button class="parish-tag" onclick="filtrarFreg('${f}')">${f}</button>`).join('');
+  }catch(e){}
+}
+
+function filtrarFreg(f){
+  freg=f;
+  document.querySelectorAll('.parish-tag').forEach(b=>b.classList.toggle('active', b.textContent.includes(f||'Todas')));
+  offset=0; hasMore=true; fetchBatch(true);
+}
+document.getElementById('btn').onclick=()=>{q=document.getElementById('q').value.trim(); offset=0; hasMore=true; fetchBatch(true);};
+document.getElementById('q').onkeypress=e=>{if(e.key==='Enter'){q=e.target.value.trim(); offset=0; hasMore=true; fetchBatch(true);}};
+document.getElementById('moreBtn').onclick=()=>fetchBatch(false);
+window.addEventListener('scroll',()=>{ if(loading||!hasMore) return; if(window.innerHeight+window.scrollY>=document.body.offsetHeight-400) fetchBatch(false); });
+function openDetail(i){
+  const p=loaded[i];
+  if(!p) return;
+  const nome=`${p.nome||''} ${p.sobrenome||''}`.trim()||'Noivo';
+  const dCas=p.data_casamento?new Date(p.data_casamento).toLocaleDateString('pt-PT'):null;
+  const sovj = p.conjuge ? `${p.conjuge}` : '—';
+  document.getElementById('modalContent').innerHTML=`
+    <h2 style="font-size:1.4rem;margin-bottom:14px">💍 ${nome}${p.conjuge?` <span style="color:var(--accent2)">+</span> ${p.conjuge}`:''}</h2>
+    <div class="drow">
+      <div><strong>Tipo:</strong> <span class="v">Casamento</span></div>
+      ${dCas?`<div><strong>Data do casamento:</strong> <span class="v">${dCas}</span></div>`:''}
+      <div><strong>Freguesia:</strong> <span class="v">${p.freguesia||'—'}</span></div>
+      <div><strong>Concelho:</strong> <span class="v">${p.concelho||'Celorico da Beira'}</span></div>
+      ${p.estado_civil?`<div><strong>Estado civil:</strong> <span class="v">${p.estado_civil}</span></div>`:''}
+      ${p.idade?`<div><strong>Idade:</strong> <span class="v">${p.idade} anos</span></div>`:''}
+      ${p.profissao?`<div><strong>Ocupação:</strong> <span class="v">${p.profissao}</span></div>`:''}
+      ${p.naturalidade?`<div><strong>Naturalidade:</strong> <span class="v">${p.naturalidade}</span></div>`:''}
+      ${p.pai?`<div><strong>Pai:</strong> <span class="v">${p.pai}</span></div>`:''}
+      ${p.mae?`<div><strong>Mãe:</strong> <span class="v">${p.mae}</span></div>`:''}
+      <div><strong>Conjuge:</strong> <span class="v">${sovj}</span></div>
+      ${p.numero_assento?`<div><strong>Nº Assento:</strong> <span class="v">${p.numero_assento}</span></div>`:''}
+      ${p.dispensa?`<div><strong>Dispensa:</strong> <span class="v">${p.dispensa}</span></div>`:''}
+      ${p.testemunhas?`<div><strong>Testemunhas:</strong> <span class="v">${p.testemunhas}</span></div>`:''}
+      ${p.legitimacao?`<div><strong>Legitimação:</strong> <span class="v">${p.legitimacao}</span></div>`:''}
+      ${p.assinatura?`<div><strong>Assinatura:</strong> <span class="v" style="font-style:italic">${p.assinatura}</span></div>`:''}
+    </div>
+    ${p.imagem_url?`<div style="margin:16px 0"><a href="${p.imagem_url}" target="_blank" class="doc-link" style="display:inline-block;padding:10px 20px;background:var(--accent);color:#fff;border-color:var(--accent)">📄 Abrir imagem no Digitarq ↗</a></div>`:''}
+    ${p.texto_original?`<div><h4 style="margin:10px 0 6px">Transcrição (HTR):</h4><div style="background:var(--bg);padding:14px;border-radius:8px;border:1px solid var(--border);font-family:monospace;font-size:0.85rem;color:var(--text2);max-height:200px;overflow-y:auto;white-space:pre-wrap">${p.texto_original}</div></div>`:''}`;
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('detailModal').classList.remove('open'); }
+document.getElementById('detailModal').addEventListener('click',e=>{ if(e.target.id==='detailModal') closeModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+loadParishes();
+fetchBatch(true);
+</script>
 </body>
 </html>

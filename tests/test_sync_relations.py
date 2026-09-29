@@ -134,10 +134,78 @@ def test_normalize_death_date():
     assert sync.normalize_death_date(None) is None
 
 
+def test_extract_persons_from_marriages():
+    # Each marriage -> two persons (groom + bride), cross-linked via conjuge.
+    marriages = [
+        {
+            "name": "Francisco Rodrigues Mina",
+            "spouse": "Maria Paiva",
+            "marriage_date": "1876-06-20",
+            "father": "José Rodrigues",
+            "mother": "Antonia do Olival",
+            "spouse_father": "José Paiva",
+            "spouse_mother": "Maria da Luiza",
+            "naturalidade": "Linhares",
+            "spouse_naturalidade": "Linhares",
+            "estado_civil": "viúvo de Theresa Ferreira",
+            "spouse_estado_civil": "viúva de Jozé da Cunha Borges",
+            "idade": 57,
+            "spouse_idade": 54,
+            "ocupacao": "jornaleiro",
+            "spouse_ocupacao": "jornaleira",
+            "numero_assento": "4",
+            "dispensa": "dispensa em 3.º e 4.º grau de consanguinidade",
+            "testemunhas": ["João Joaquim Ferraz", "Antonio Augusto Paes de Faria"],
+            "legitimacao": ["filho Joam nascido a 8 de Setembro de 1856"],
+            "assinatura": "Prior Antonio Ribeiro Pessoa Cabral",
+        }
+    ]
+    persons = sync.extract_persons_from_marriages(marriages)
+    assert len(persons) == 2
+
+    g = persons[0]
+    assert g["nome"] == "Francisco Rodrigues"
+    assert g["sobrenome"] == "Mina"
+    assert g["conjuge"] == "Maria Paiva"
+    assert g["pai"] == "José Rodrigues"
+    assert g["mae"] == "Antonia do Olival"
+    assert g["naturalidade"] == "Linhares"
+    assert g["estado_civil"] == "viúvo de Theresa Ferreira"
+    assert g["idade"] == 57
+    assert g["profissao"] == "jornaleiro"
+    assert g["marriage_date"] == "1876-06-20"
+    assert g["numero_assento"] == "4"
+    assert g["dispensa"] == "dispensa em 3.º e 4.º grau de consanguinidade"
+    assert "João Joaquim Ferraz" in g["testemunhas"]
+    assert g["assinatura"] == "Prior Antonio Ribeiro Pessoa Cabral"
+
+    b = persons[1]
+    assert b["nome"] == "Maria"
+    assert b["sobrenome"] == "Paiva"
+    assert b["conjuge"] == "Francisco Rodrigues Mina"
+    assert b["pai"] == "José Paiva"
+    assert b["mae"] == "Maria da Luiza"
+    assert b["idade"] == 54
+    assert b["profissao"] == "jornaleira"
+    assert b["marriage_date"] == "1876-06-20"
+
+    # Spouse null -> only one person (the groom), conjuge empty.
+    lonely = [{"name": "João", "spouse": None, "marriage_date": "1800-01-01"}]
+    p = sync.extract_persons_from_marriages(lonely)
+    assert len(p) == 1
+    assert p[0]["conjuge"] == ""
+
+    # Empty / malformed -> no persons.
+    assert sync.extract_persons_from_marriages([]) == []
+    assert sync.extract_persons_from_marriages(None) == []
+    assert sync.extract_persons_from_marriages([{"foo": "bar"}]) == []
+
+
 if __name__ == "__main__":
     test_extract_persons_relations()
     test_extract_persons_relations_pt_keys()
     test_build_relation_patch()
     test_build_url_patch()
     test_normalize_death_date()
+    test_extract_persons_from_marriages()
     print("OK: all sync_relations tests passed")

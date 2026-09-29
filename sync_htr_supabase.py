@@ -362,6 +362,103 @@ def extract_persons_from_deceased(deceased_list):
         })
     return persons
 
+def _split_name(name):
+    """Split a full name into (nome, sobrenome), ignoring honorifics."""
+    parts = [p for p in name.split() if p.lower().strip('.,;:') not in TITLE_WORDS]
+    if not parts:
+        return "", ""
+    if len(parts) == 1:
+        return parts[0][:100], ""
+    return " ".join(parts[:-1])[:100], parts[-1][:50]
+
+
+def extract_persons_from_marriages(marriages):
+    """Convert structured `persons` entries (marriages, from Gemini) into
+    person dicts. Each marriage produces TWO persons — the groom and the
+    bride — cross-linked via `conjuge`, so both spouses get their own
+    profile/tree node. `marriage_date` and the cross-pairing are kept so the
+    MARR sync branch can persist them.
+
+    Each entry supports: name, spouse, marriage_date, father, mother,
+    spouse_father, spouse_mother, naturalidade, spouse_naturalidade,
+    estado_civil, spouse_estado_civil, idade, spouse_idade, ocupacao,
+    spouse_ocupacao, numero_assento, dispensa, testemunhas, legitimacao,
+    assinatura.
+    """
+    persons = []
+    if not isinstance(marriages, list):
+        return persons
+    for entry in marriages:
+        if not isinstance(entry, dict):
+            continue
+        groom = (entry.get("name") or entry.get("nome") or "").strip()
+        bride = (entry.get("spouse") or entry.get("conjuge") or "").strip()
+        if not groom:
+            continue
+        shared = {
+            "marriage_date": entry.get("marriage_date"),
+            "numero_assento": (entry.get("numero_assento") or entry.get("assento") or "").strip()[:60],
+            "dispensa": (entry.get("dispensa") or "").strip()[:500],
+            "assinatura": (entry.get("assinatura") or "").strip()[:100],
+        }
+        testemunhas = entry.get("testemunhas") or []
+        legitimacao = entry.get("legitimacao") or []
+        if isinstance(testemunhas, list):
+            testemunhas = "; ".join(str(t).strip() for t in testemunhas if str(t).strip())
+        if isinstance(legitimacao, list):
+            legitimacao = "; ".join(str(t).strip() for t in legitimacao if str(t).strip())
+        shared["testemunhas"] = str(testemunhas)[:1000]
+        shared["legitimacao"] = str(legitimacao)[:1000]
+
+        if bride:
+            groom_p = dict(shared)
+            groom_p.update({
+                "nome": _split_name(groom)[0],
+                "sobrenome": _split_name(groom)[1],
+                "pai": (entry.get("father") or "").strip()[:100],
+                "mae": (entry.get("mother") or "").strip()[:100],
+                "conjuge": bride[:100],
+                "naturalidade": (entry.get("naturalidade") or "").strip()[:200],
+                "estado_civil": (entry.get("estado_civil") or "").strip()[:200],
+                "profissao": (entry.get("ocupacao") or "").strip()[:200],
+            })
+            idade = entry.get("idade")
+            try:
+                groom_p["idade"] = int(idade) if str(idade).isdigit() or str(idade).strip().lstrip('-').isdigit() else None
+            except Exception:
+                groom_p["idade"] = None
+            persons.append(groom_p)
+
+            bride_p = dict(shared)
+            bride_p.update({
+                "nome": _split_name(bride)[0],
+                "sobrenome": _split_name(bride)[1],
+                "pai": (entry.get("spouse_father") or "").strip()[:100],
+                "mae": (entry.get("spouse_mother") or "").strip()[:100],
+                "conjuge": groom[:100],
+                "naturalidade": (entry.get("spouse_naturalidade") or "").strip()[:200],
+                "estado_civil": (entry.get("spouse_estado_civil") or "").strip()[:200],
+                "profissao": (entry.get("spouse_ocupacao") or "").strip()[:200],
+            })
+            idade_s = entry.get("spouse_idade")
+            try:
+                bride_p["idade"] = int(idade_s) if str(idade_s).isdigit() or str(idade_s).strip().lstrip('-').isdigit() else None
+            except Exception:
+                bride_p["idade"] = None
+            persons.append(bride_p)
+        else:
+            groom_p = dict(shared)
+            groom_p.update({
+                "nome": _split_name(groom)[0],
+                "sobrenome": _split_name(groom)[1],
+                "pai": (entry.get("father") or "").strip()[:100],
+                "mae": (entry.get("mother") or "").strip()[:100],
+                "conjuge": "",
+            })
+            persons.append(groom_p)
+    return persons
+
+
 def extract_detalhes(transcription):
     """Extract rich details (idade, causa, naturalidade, numero_assento, etc.) from transcription.
     Works on already-saved transcriptions, no Gemini needed. Covers NotebookLM example."""
@@ -812,7 +909,8 @@ def update_dates():
 # migrations/add_padrinhos_texto.sql). O envio usa fallback: se o
 # Supabase responder 400 a queixar-se de coluna desconhecida, o registo
 # é reenviado sem essas colunas em vez de falhar.
-NEW_COLS = ("godfather", "godmother", "texto_original", "legados")
+NEW_COLS = ("godfather", "godmother", "texto_original", "legados",
+            "dispensa", "testemunhas", "legitimacao")
 
 
 def post_with_fallback(record):
@@ -1279,14 +1377,21 @@ def main():
                         persons.append({"nome": " ".join(parts[:-1])[:100], "sobrenome": parts[-1][:50], **base})
                 structured = True
                 used_structured = True
+            elif isinstance(data.get("persons"), list) and bool([d for d in data.get("persons") if isinstance(d, dict) and (d.get("name") or d.get("nome"))]):
+                # MARR: casamentos — cada entry é um casamento (noivo+noiva),
+                # expandido em 2 pessoas (ver extract_persons_from_marriages).
+                persons = extract_persons_from_marriages(data.get("persons"))
+                structured = True
+                used_structured = True
+                record_type = "MARR"
             elif isinstance(deceased, list) and bool([d for d in deceased if isinstance(d, dict) and (d.get("name") or d.get("nome"))]):
                 persons = extract_persons_from_deceased(deceased)
                 structured = True
                 used_structured = True
             else:
                 # Filter: check if valid death record (only for DEAT fallback)
-                if record_type == "BIRT":
-                    # BIRT without structured data: skip (needs HTR)
+                if record_type in ("BIRT", "MARR"):
+                    # BIRT/MARR without structured data: skip (needs HTR)
                     filtered_count += 1
                     synced.add(file_id)
                     continue
@@ -1322,6 +1427,24 @@ def main():
                         "data_nascimento": birth_date,
                         "data_obito": None,
                         "tipo_registo": "BIRT",
+                        "freguesia": freguesia,
+                        "concelho": "Celorico da Beira",
+                        "distrito": "Guarda",
+                        "fonte": "HTR Gemini 3 Flash Preview",
+                        "imagem_url": imagem_url_for(file_id),
+                        "file_id": file_id,
+                        "criado_em": datetime.now().isoformat(),
+                    }
+                elif record_type == "MARR":
+                    marriage_date = normalize_death_date(person.get("marriage_date") or "")
+                    if not marriage_date:
+                        marriage_date = extract_date(raw_text)
+                    record = {
+                        "nome": person["nome"],
+                        "sobrenome": person.get("sobrenome", ""),
+                        "data_casamento": marriage_date,
+                        "data_obito": None,
+                        "tipo_registo": "MARR",
                         "freguesia": freguesia,
                         "concelho": "Celorico da Beira",
                         "distrito": "Guarda",
@@ -1386,6 +1509,21 @@ def main():
                         leg = "; ".join(str(x) for x in leg if x)
                     if leg:
                         record["legados"] = str(leg)[:2000]
+
+                # MARR extra: relações + campos ricos de casamento. As chaves vêm
+                # já mapeadas pelo extract_persons_from_marriages (colunas DB).
+                if record_type == "MARR":
+                    for col in ("pai", "mae", "conjuge", "naturalidade", "estado_civil",
+                                "profissao", "numero_assento", "dispensa", "assinatura",
+                                "testemunhas", "legitimacao"):
+                        val = person.get(col)
+                        if val not in (None, ""):
+                            record[col] = str(val)[:1000 if col in ("testemunhas", "legitimacao", "dispensa") else 200]
+                    if person.get("idade") is not None:
+                        record["idade"] = int(person["idade"])
+                    transcription = (data.get("transcription") or "").strip()
+                    if transcription:
+                        record["texto_original"] = transcription[:4000]
 
                 if not DRY_RUN:
                     result = post_with_fallback(record)

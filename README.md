@@ -5,21 +5,24 @@ Pesquisa e exploração dos **livros paroquiais de Celorico da Beira** (batismos
 🌐 **Site:** https://genealogia-portugal.vercel.app
 
 ## Estado atual
-- **Óbitos:** 25/25 freguesias completas (~35 000 registos)
-- **Batismos:** em curso (13/25 freguesias sincronizadas)
-- **Casamentos:** após os batismos
+- **Óbitos:** 25/25 freguesias completas (~35 000 registos) ✔
+- **Batismos:** 36 551/38 505 páginas (94,9%)
+- **Casamentos:** 17 290/18 362 páginas (94,2%) — Mesquitela em curso; campos ricos (dispensa, testemunhas, legitimação, estado civil)
 
 ## Como funciona
-1. **HTR** (`htr_cloud_v2.py`) — descarrega páginas do [Digitarq](https://digitarq.arquivos.pt), transcreve com a API Gemini, grava JSON em `output/htr_text/`
-2. **Sync** (`sync_htr_supabase.py`) — envia os registos para o Supabase (tabela `pessoas`)
+1. **HTR** (`output/workers/`) — descarrega páginas do [Digitarq](https://digitarq.arquivos.pt), transcreve com a API Gemini, grava JSON em `output/htr_text/` (workers por tipo: `marr_all.py` casamentos, `birt_all.py`/`birt_remaining.py` batismos)
+2. **Sync** (`sync_htr_supabase.py`) — envia os registos para o Supabase (tabela `pessoas`), com ramo específico para casamentos (2 registos por casamento: noivo + noiva, cruzados em `conjuge`)
 3. **Web** (`api/index.py` + `templates/`) — Flask no Vercel: pesquisa, batismos, casamentos, árvore D3, mapa, cobertura
+4. **Guardian autónomo** (`scripts/watch_htr.sh`) — mantém o worker a correr 24/7: relança se cair, respeita o teto diário das chaves Gemini (descansa à meia-noite) e regista o estado a cada 8h em `output/daily_logs/watch_htr.log`
 
 ## Estrutura
 ```
 api/            Flask (rotas + API REST sobre o Supabase)
 templates/      Páginas HTML (pesquisa, batismos, árvore, mapa, …)
 index.html      Página inicial
-scripts/        Testes, scanners de segredos, utilitários (get_images, gen_arquivo_refs, …)
+scripts/        Testes, scanners de segredos, utilitários (get_images, gen_arquivo_refs, watch_htr, …)
+output/workers/ Workers de transcrição HTR por tipo de registo
+output/htr_text/ JSON transcritos por página (file_id.json) — o "data warehouse" do pipeline
 tests/          Testes unitários (corridos por scripts/run_tests.sh)
 migrations/     SQL do Supabase (tabela pessoas + RLS)
 tools/archive/  Scripts exploratórios antigos (histórico, fora de uso)

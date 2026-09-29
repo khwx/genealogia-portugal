@@ -199,15 +199,38 @@ Output ONLY a valid JSON object (no other text) with this structure:
   ]
 }
 If a field is not present or illegible, use null. Do NOT invent content. Output ONLY the JSON.""",
-    "MARR": """You are a transcription assistant for Portuguese historical documents.
-This image shows a page from a marriage register (livro de casamentos) from Celorico da Beira, Portugal.
+    "MARR": """You are a specialized paleography assistant for Portuguese parish records (Livros Paroquiais de Casamentos de Celorico da Beira).
+Transcribe the page and extract structured details for each marriage record.
 IMPORTANT: never repeat the same phrase twice. Transcribe each passage once and move on; if you notice yourself repeating, stop the transcription there and finish the JSON.
-Output ONLY a JSON object (no other text) with this structure:
+Output ONLY a valid JSON object (no other text) with this structure:
 {
-  "transcription": "full transcribed text here",
-  "persons": [ { "name": "cônjuge 1", "marriage_date": "YYYY-MM-DD", "spouse": "cônjuge 2", "father": "...", "mother": "...", "spouse_father": "...", "spouse_mother": "..." } ]
+  "transcription": "full verbatim transcription",
+  "persons": [
+    {
+      "name": "groom full name",
+      "spouse": "bride full name",
+      "marriage_date": "YYYY-MM-DD",
+      "father": "groom father full name or null",
+      "mother": "groom mother full name or null",
+      "spouse_father": "bride father full name or null",
+      "spouse_mother": "bride mother full name or null",
+      "naturalidade": "groom birthplace/residence or null",
+      "spouse_naturalidade": "bride birthplace/residence or null",
+      "estado_civil": "groom civil state (solteiro/viúvo) + previous spouse name if any, or null",
+      "spouse_estado_civil": "bride civil state (solteira/viúva) + previous spouse name if any, or null",
+      "idade": "groom age in years (integer) or null",
+      "spouse_idade": "bride age in years (integer) or null",
+      "ocupacao": "groom occupation or null",
+      "spouse_ocupacao": "bride occupation or null",
+      "numero_assento": "record/folha number (e.g. '4' from 'Assento N.º 4') or null",
+      "dispensa": "canonical dispensation granted or null",
+      "testemunhas": ["witness 1 name", "witness 2 name"],
+      "legitimacao": ["legitimated child description or null"],
+      "assinatura": "priest signature or null"
+    }
+  ]
 }
-If you cannot read something, use [ilegível]. Do NOT invent content. Output ONLY the JSON.""",
+Use null for missing or illegible fields (except testemunhas/legitimacao which should be [] if none). Do NOT invent content. Output ONLY the JSON.""",
 }
 # Default record type when a file_id cannot be resolved to a book type. All
 # currently downloaded TIFFs are óbitos (DEAT); defaulting to DEAT preserves the
