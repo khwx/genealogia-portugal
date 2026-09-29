@@ -29,14 +29,20 @@
         #tree-container svg { width: 100%; height: 100%; }
         .node { cursor: pointer; }
         .node circle { stroke-width: 2px; }
-        .node text { font-size: 11px; fill: #e2e8f0; font-family:'Source Serif 4',serif;font-weight:600 }
+        .node text { font-size: 11px; fill: #e2e8f0; font-family:'Source Serif 4',serif;font-weight:600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .node--obito circle { fill: #db761f; stroke: #a85a18; }
         .node--birt circle { fill: #6C63FF; stroke: #4f46e5; }
         .node--marr circle { fill: #d4af37; stroke: #b7952e; }
-        .node--family circle { fill: #6C63FF; stroke: #4f46e5; }
+        .node--family circle { fill: #10b981; stroke: #059669; }
         .node--more circle { fill: transparent; stroke: #475569; stroke-dasharray: 3 3; }
         .node--more text { fill: #64748b; font-style: italic; font-size: 10px; }
-        #tree-notice { background: #1e293b; border-bottom: 1px solid #334155; color: #94a3b8; font-size: 12px; padding: 6px 20px; }
+        #tree-notice { background: #1e293b; border-bottom: 1px solid #334155; color: #94a3b8; font-size: 12px; padding: 8px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        .legend { display: flex; gap: 14px; align-items: center; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .tree-zoom-controls { position: absolute; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 6px; z-index: 10; }
+        .tree-zoom-btn { background: #1e293b; color: #e2e8f0; border: 1px solid #475569; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .tree-zoom-btn:hover { background: #334155; }
         .node--person circle { fill: #3b82f6; stroke: #2563eb; }
         .link { fill: none; stroke: #475569; stroke-width: 1.5px; stroke-opacity: 0.6; }
         .tooltip { position: absolute; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 12px; font-size: 13px; pointer-events: none; z-index: 100; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
@@ -117,9 +123,22 @@
         <button onclick="searchPeople()">Pesquisar</button>
         <button onclick="loadFromSupabase()">Recarregar BD</button>
     </div>
-    <div id="tree-notice"></div>
+    <div id="tree-notice">
+        <span id="notice-text">A carregar registos...</span>
+        <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span> Freguesia</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#6C63FF"></span> Batismo</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#d4af37"></span> Casamento</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#db761f"></span> Óbito</div>
+        </div>
+    </div>
     <div id="tree-container">
         <div class="loading"><div class="spinner"></div><div>A carregar dados...</div></div>
+        <div class="tree-zoom-controls">
+            <button class="tree-zoom-btn" onclick="zoomIn()" title="Aproximar">+</button>
+            <button class="tree-zoom-btn" onclick="zoomOut()" title="Afastar">-</button>
+            <button class="tree-zoom-btn" onclick="resetZoom()" title="Repor Vista" style="font-size:12px">⌂</button>
+        </div>
     </div>
     <div class="tooltip" id="tooltip" style="display:none;"></div>
     <div class="sidebar" id="sidebar">
@@ -139,9 +158,26 @@ const SUPABASE_URL = 'https://qljopxbxgflozrcdblrl.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
 const DIGITARQ_BASE = 'https://digitarq.arquivos.pt';
 
-let allPeople = [];
-let allBooks = [];
-let treeData = null;
+let svgZoom = null;
+let svgSelection = null;
+
+function zoomIn() {
+    if (svgSelection && svgZoom) {
+        svgSelection.transition().duration(300).call(svgZoom.scaleBy, 1.3);
+    }
+}
+
+function zoomOut() {
+    if (svgSelection && svgZoom) {
+        svgSelection.transition().duration(300).call(svgZoom.scaleBy, 0.77);
+    }
+}
+
+function resetZoom() {
+    if (svgSelection && svgZoom) {
+        svgSelection.transition().duration(300).call(svgZoom.transform, d3.zoomIdentity);
+    }
+}
 
 async function loadFromSupabase() {
     document.querySelector('.loading').style.display = 'block';
@@ -197,14 +233,16 @@ function buildTree() {
     const width = container.clientWidth;
     const height = container.clientHeight;
     
-    const svg = d3.select('#tree-container').append('svg')
+    svgSelection = d3.select('#tree-container').append('svg')
         .attr('width', width).attr('height', height);
     
-    const g = svg.append('g');
+    const g = svgSelection.append('g');
     
-    svg.call(d3.zoom().scaleExtent([0.1, 4]).on('zoom', (event) => {
+    svgZoom = d3.zoom().scaleExtent([0.1, 4]).on('zoom', (event) => {
         g.attr('transform', event.transform);
-    }));
+    });
+    
+    svgSelection.call(svgZoom);
     
     const root = buildHierarchy();
     const treeLayout = d3.tree().size([width - 200, height - 200]);
@@ -281,9 +319,9 @@ function buildHierarchy() {
         delete f._hidden;
     });
 
-    const notice = document.getElementById('tree-notice');
-    if (notice) {
-        notice.textContent = hidden > 0
+    const noticeText = document.getElementById('notice-text');
+    if (noticeText) {
+        noticeText.textContent = hidden > 0
             ? `A mostrar ${shown} de ${matched} registos — use freguesia, período ou pesquisa para refinar.`
             : (matched > 0 ? `${matched} registo(s) no diagrama.` : 'Sem resultados — ajuste os filtros.');
     }
