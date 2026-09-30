@@ -276,8 +276,18 @@ def _is_valid_calendar_date(y, m, d):
     """Check if (y, m, d) is a valid calendar date (catches Feb 29 on non-leap years, etc.)."""
     days_in_month = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if m == 2 and y % 4 == 0 and (y % 100 != 0 or y % 400 == 0):
-        return d <= 29
+        return 1 <= d <= 29
     return 1 <= d <= days_in_month[m]
+
+def _clamp_ymd(y, mo, d):
+    """Clamp unknown date components (00) to 01 so partial dates like
+    '1892-02-00' (mês conhecido, dia desconhecido) stay insertable instead
+    of producing an out-of-range Postgres error. Returns (y, mo, d)."""
+    if mo == 0:
+        mo = 1
+    if d == 0:
+        d = 1
+    return y, mo, d
 
 def normalize_death_date(value):
     """Normalize a death_date from the structured `deceased` field.
@@ -295,6 +305,7 @@ def normalize_death_date(value):
     m = re.match(r'^(\d{4})-(\d{1,2})-(\d{1,2})$', v)
     if m:
         y, mo, d = (int(x) for x in m.groups())
+        y, mo, d = _clamp_ymd(y, mo, d)
         if 1500 <= y <= 2100 and 1 <= mo <= 12 and _is_valid_calendar_date(y, mo, d):
             return f"{y:04d}-{mo:02d}-{d:02d}"
         return None
@@ -303,6 +314,7 @@ def normalize_death_date(value):
     m = re.match(r'^(\d{1,2})/(\d{1,2})/(\d{4})$', v)
     if m:
         d, mo, y = (int(x) for x in m.groups())
+        y, mo, d = _clamp_ymd(y, mo, d)
         if 1500 <= y <= 2100 and 1 <= mo <= 12 and _is_valid_calendar_date(y, mo, d):
             return f"{y:04d}-{mo:02d}-{d:02d}"
         return None
