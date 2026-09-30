@@ -25,7 +25,7 @@
         .controls select, .controls input { background: #0f172a; color: #e2e8f0; border: 1px solid #475569; padding: 6px 10px; border-radius: 6px; font-size: 13px; }
         .controls button { background: #2563eb; color: white; border: none; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
         .controls button:hover { background: #1d4ed8; }
-        #tree-container { width: 100%; height: calc(100vh - 140px); overflow: hidden; position: relative; }
+        #tree-container { width: 100%; height: calc(100vh - 140px); overflow: auto; position: relative; }
         #tree-container svg { width: 100%; height: 100%; }
         .node { cursor: pointer; }
         .node circle { stroke-width: 2px; }
@@ -245,20 +245,24 @@ function buildTree() {
     svgSelection.call(svgZoom);
     
     const root = buildHierarchy();
-    const treeLayout = d3.tree().size([width - 200, height - 200]);
+    const treeLayout = d3.tree().nodeSize([30, 200]); // [vertical, horizontal] spacing
     treeLayout(root);
     
+    // Adjust container offset based on tree size if needed, but tree is now dynamic.
+    // For now, center the tree roughly.
+    g.attr('transform', `translate(100, 50)`);
+
     g.selectAll('.link')
         .data(root.links())
         .join('path')
         .attr('class', 'link')
-        .attr('d', d3.linkVertical().x(d => d.x + 100).y(d => d.y + 100));
+        .attr('d', d3.linkHorizontal().x(d => d.y).y(d => d.x)); // Swapped x/y for horizontal layout
     
     const node = g.selectAll('.node')
         .data(root.descendants())
         .join('g')
         .attr('class', d => `node node--${d.data.type || 'person'}`)
-        .attr('transform', d => `translate(${d.x + 100},${d.y + 100})`)
+        .attr('transform', d => `translate(${d.y},${d.x})`) // Swapped x/y
         .on('click', (event, d) => { if (d.data.data) showDetails(d.data); })
         .on('mouseover', (event, d) => showTooltip(event, d.data))
         .on('mouseout', hideTooltip);
