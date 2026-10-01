@@ -1761,3 +1761,12 @@ São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 ### A decorrer
 - `output/workers/birt_all.py` (só Mesquitela, 1 947) + `sync_htr_supabase.py` (MARR-Mesquitela + BIRT novos) em background
 - A seguir: sync final BIRT-Mesquitela + backfill; limpar legado quando acabar
+
+## 2026-10-01 (Mesquitela 100% transcrita e sincronizada)
+
+### Feito
+- **BIRT Mesquitela 1 947/1 947**: 4 passagens (1553 → 332 → 48 → 12) + 1 manual (prompt leve); resto eram capas/termos — worker se auto-recupera nos erros transitórios
+- **MARR Mesquitela**: 1 077 no state limpos + sync → **1 315 pessoas** na BD
+- **BD pessoas: 123 750** (DEAT 35 705, BIRT 66 752, MARR 21 293); Mesquitela BIRT 2 479
+- Fila `htr_text_pending_marr/` arquivada em `htr_text_legacy_marr_old/`; legado BIRT em `htr_text_legacy_mesquitela_birt/`
+- Guardian em dormência correta (verifica de 8 em 8h); worker parado sem trabalho
