@@ -1745,3 +1745,19 @@ São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
   BIRT/MARR (`htr_cloud_v2.py` com `PROMPT_BY_TYPE`) para povoar os novos tipos.
 - Cartões específicos por evento (cônjuge em casamentos, pais em batismos)
   quando houver dados MARR/BIRT.
+
+## 2026-09-30 (MARR 100% + Mesquitela BIRT/MARR resolvidos)
+
+### Estado
+- **MARR 18 362/18 362 ficheiros (100%)** — última: Cadafaz `79023272` (imagem vazia no Digitarq, 0 bytes; marcador escrito) + 2 fragmentos (Vale/Lajeosa) transcritos com prompt leve
+- **Mesquitela MARR (1 077)**: retranscrita com prompt rico; 576 com `persons`; 32 já na BD, resto a sincronizar
+- **Mesquitela BIRT (1 947)**: nunca tinha sido transcrita (ficheiros DEAT a tapar o `already_done`); movidos para `output/htr_text_legacy_mesquitela_birt/`, worker BIRT lançado só para Mesquitela
+- **BD pessoas: 119 988** (DEAT 35 705, BIRT 64 273, MARR 20 010); backfill ricos MARR 6 618 linhas
+- Migração `add_marr_casamentos.sql` aplicada no Supabase (dispensa/testemunhas/legitimacao)
+- Página `/casamentos` + `?tipo=MARR` verificadas no ar (API devolve MARR, filtros OK)
+- Fix sync: `_is_valid_calendar_date` aceitava dia 0 em fevereiros bissextos (`1892-02-00` → 400); agora clamp 00→01 (`58bef61`)
+- Fix guardian: dormência só após ronda normal sem produzir (`0dba308`); guardian adormecido até ~21h (fila vazia)
+
+### A decorrer
+- `output/workers/birt_all.py` (só Mesquitela, 1 947) + `sync_htr_supabase.py` (MARR-Mesquitela + BIRT novos) em background
+- A seguir: sync final BIRT-Mesquitela + backfill; limpar legado quando acabar
