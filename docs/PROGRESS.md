@@ -1770,3 +1770,11 @@ São Pedro → sync → Linhares sync → Lajeosa 2430 → ...
 - **BD pessoas: 123 750** (DEAT 35 705, BIRT 66 752, MARR 21 293); Mesquitela BIRT 2 479
 - Fila `htr_text_pending_marr/` arquivada em `htr_text_legacy_marr_old/`; legado BIRT em `htr_text_legacy_mesquitela_birt/`
 - Guardian em dormência correta (verifica de 8 em 8h); worker parado sem trabalho
+
+## 2026-10-01 (lista das 88 resolvida: 88/88)
+
+### Feito
+- `scripts/retry_manual88.py`: retry em lote das 88 BIRT `retry_exhausted` com prompt leve → **87/88 ok (2 639 batizados)** + 1 manual (45280832, 3 batizados) = **88/88**
+- Sync: +2 304 pessoas BIRT líquidas; desduplicação de 247 linhas (2 syncs concorrentes por engano — nunca correr 2 syncs ao mesmo tempo; `db_synced` só protege no arranque)
+- `scripts/assess_dup88.py` + `scripts/delete_dup88.py` para auditoria/remoção de duplicados
+- Fix sync datas 00→01 (`58bef61`); testes OK
