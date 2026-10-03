@@ -4,7 +4,8 @@
 
 ## Lista do necessário — Trancoso
 
-- [x] **Backup Celorico no GitHub** — repo `genealogia-transcricoes` (tarballs por tipo + inventários)
+- [x] **Backup Celorico no GitHub** — `backups-transcricoes/` no próprio repo
+      (tarballs por tipo + inventários + RESTORE.md; ~38MB)
 - [ ] **1. Inventário de livros** — `output/trancoso_inventario.json` (43 paróquias `tcs01–tcs43`,
       tabelas BIRT/MARR/DEAT do Tombo.pt; só leitura, sem chaves) → script `scripts/build_inventario_tcs.py`
 - [ ] **2. Page listings** — `output/data/doc_file_listings_tcs.json` (fids por livro, via API Digitarq;
@@ -15,7 +16,7 @@
 - [ ] **5. Sync Supabase** — `sync_htr_supabase.py` com mapeamento fid→freguesia de Trancoso
       (estender `build_file_to_freguesia` + `INPUT_DIR` ou pasta por concelho)
 - [ ] **6. Frontend** — filtro por concelho (`/`, `/batismos`, `/casamentos`, `/mapa`); stats por concelho
-- [ ] **7. Backup Trancoso no GitHub** — tarballs `trancoso-*.tar.gz` no repo `genealogia-transcricoes`
+- [ ] **7. Backup Trancoso no GitHub** — tarballs `trancoso-*.tar.gz` em `backups-transcricoes/`
 - [ ] **8. Verificação** — cobertura por freguesia × tipo; `?concelho=Trancoso` no ar
 
 ## Depois: Pinhel (`pnh`, `output/pinhel_inventario.json`) — mesmos 8 passos.
