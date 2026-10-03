@@ -2,6 +2,23 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-10-03 (checkpoint autónomo 8h — pipeline completo)
+
+### Estado verificado
+- **HTR transcrição**: 80 650 ficheiros JSON em `output/htr_text/`
+  - DEAT (óbitos): 17 564 — 25/25 freguesias completas
+  - BIRT (batismos): 38 499 — 99,98% (38 505 páginas totais)
+  - MARR (casamentos): 18 362 — 100% (18 362 páginas totais)
+- **Sync Supabase**: COMPLETO — 80 650 ficheiros sincronizados, 51 388 registos na tabela `pessoas`
+- **Watchdog MARR**: detectou "trabalho esgotado" a 30/09, descansa 8h entre verificações (log em `output/daily_logs/watch_htr.log`)
+- **Segurança**: scanner 0 segredos em 174 ficheiros rastreados; `.env` ignorado e não rastreado; RLS ativo no Supabase
+- **Testes**: `ALL TESTS PASSED` (10 suites), `python3 -m py_compile api/index.py` OK
+
+### Próximos
+- Pipeline HTR→Sync concluído. Próximos passos dependem de nova expansão (ex: outras concelhos, Mesquitela MARR restante).
+
+---
+
 ## 2026-09-11 (limpeza e reestruturação do repo — 170→156 ficheiros)
 
 ### Feito (backup primeiro: branch `backup-pre-cleanup` pushed)
