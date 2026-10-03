@@ -6,12 +6,12 @@
 
 - [x] **Backup Celorico no GitHub** — `backups-transcricoes/` no próprio repo
       (tarballs por tipo + inventários + RESTORE.md; ~38MB)
-- [ ] **1. Inventário de livros** — `output/trancoso_inventario.json` (43 paróquias `tcs01–tcs43`,
-      tabelas BIRT/MARR/DEAT do Tombo.pt; só leitura, sem chaves) → script `scripts/build_inventario_tcs.py`
-- [ ] **2. Page listings** — `output/data/doc_file_listings_tcs.json` (fids por livro, via API Digitarq;
-      reutilizar `scripts/fetch_page_listings.py` com o inventário novo)
-- [ ] **3. Transcrição HTR** — workers `birt/marr/deat` com `FREGUESIAS` de Trancoso (~6s/pág;
-      guardian `watch_htr` adaptado ou novo por concelho)
+- [x] **1. Inventário de livros** — `output/trancoso_inventario.json` ✅ 2026-10-03
+      (41 paróquias, 4 605 livros: BIRT 1 597, MARR 1 501, DEAT 1 507)
+- [x] **2. Page listings** — `output/data/doc_file_listings_tcs.json` ✅ 2026-10-03
+      (**98 685 páginas**: BIRT 40 548, MARR 26 475, DEAT 31 662)
+- [ ] **3. Transcrição HTR** — A DECORRER (MARR primeiro: `output/workers/marr_tcs.py` →
+      `output/htr_text_tcs/`, guardian `scripts/watch_htr_tcs.sh`; começou Aldeia Nova)
 - [ ] **4. Migração/schema** — nenhuma (tabela `pessoas` já tem `concelho`; usar `concelho='Trancoso'`)
 - [ ] **5. Sync Supabase** — `sync_htr_supabase.py` com mapeamento fid→freguesia de Trancoso
       (estender `build_file_to_freguesia` + `INPUT_DIR` ou pasta por concelho)
