@@ -44,6 +44,11 @@ CELORICO_JSON = Path(os.environ.get("CELORICO_JSON", "/home/pxtkhw/projetos/obit
 FREGUESIA_MAPPING_JSON = Path(os.environ.get("FREGUESIA_MAPPING_JSON", "/home/pxtkhw/projetos/obitos/output/data/freguesia_file_mapping.json"))
 STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/sync_htr_state.json"))
 
+# Trancoso support
+CONCELHO = os.environ.get("CONCELHO", "Celorico da Beira")
+TRANCOSO_INVENTORY_JSON = Path(os.environ.get("TRANCOSO_INVENTORY_JSON", "/home/pxtkhw/projetos/obitos/output/trancoso_inventario.json"))
+TRANCOSO_LISTINGS_JSON = Path(os.environ.get("TRANCOSO_LISTINGS_JSON", "/home/pxtkhw/projetos/obitos/output/data/doc_file_listings_tcs.json"))
+
 # Original digitization source — kept as a link so we don't store images locally.
 DIGITARQ_BASE = os.environ.get("DIGITARQ_BASE", "https://digitarq.arquivos.pt")
 def imagem_url_for(file_id):
@@ -146,14 +151,15 @@ def is_good_quality(raw_text):
 
 def build_file_to_freguesia():
     """Build mapping from file_id to freguesia. Uses combined mapping if available,
-    falls back to celorico_completo.json, and enriches with BIRT/MARR via doc listings."""
+    falls back to aqueles_completo.json, and enriches with BIRT/MARR via doc listings.
+    Also supports Trancoso inventory via TRANCOSO_INVENTORY_JSON and TRANCOSO_LISTINGS_JSON."""
     mapping = {}
     # 1. Try combined mapping file (includes all freguesias DEAT)
     if FREGUESIA_MAPPING_JSON.exists():
         with open(FREGUESIA_MAPPING_JSON) as f:
             data = json.load(f)
         mapping.update(data.get("mapping", {}))
-    # 2. Fallback: load from celorico_completo.json
+    # 2. Fallback: load from aqueles_completo.json
     if not mapping and CELORICO_JSON.exists():
         with open(CELORICO_JSON) as f:
             data = json.load(f)
@@ -189,6 +195,31 @@ def build_file_to_freguesia():
                             mapping[fid] = freg
     except Exception:
         pass
+    # 4. Trancoso inventory support
+    if CONCELHO == "Trancoso":
+        try:
+            if TRANCOSO_INVENTORY_JSON.exists() and TRANCOSO_LISTINGS_JSON.exists():
+                with open(TRANCOSO_INVENTORY_JSON) as f:
+                    invent = json.load(f)
+                with open(TRANCOSO_LISTINGS_JSON) as f:
+                    listings = json.load(f)
+                doc_to_freg = {}
+                for doc in invent:
+                    url = doc.get("url_info", "")
+                    if "documentDetails/" in url:
+                        doc_id = url.split("documentDetails/")[1]
+                        doc_to_freg[doc_id] = doc.get("freguesia", "")
+                    elif "fileViewer/" in url:
+                        doc_id = url.split("fileViewer/")[1].split("?")[0]
+                        doc_to_freg[doc_id] = doc.get("freguesia", "")
+                for doc_id, freg in doc_to_freg.items():
+                    if doc_id in listings:
+                        for entry in listings[doc_id]:
+                            fid = str(entry.get("id", ""))
+                            if fid and fid not in mapping:
+                                mapping[fid] = freg
+        except Exception:
+            pass
     return mapping
 
 def is_valid_death_record(raw_text):
@@ -1440,7 +1471,7 @@ def main():
                         "data_obito": None,
                         "tipo_registo": "BIRT",
                         "freguesia": freguesia,
-                        "concelho": "Celorico da Beira",
+                        "concelho": CONCELHO,
                         "distrito": "Guarda",
                         "fonte": "HTR Gemini 3 Flash Preview",
                         "imagem_url": imagem_url_for(file_id),
@@ -1458,7 +1489,7 @@ def main():
                         "data_obito": None,
                         "tipo_registo": "MARR",
                         "freguesia": freguesia,
-                        "concelho": "Celorico da Beira",
+                        "concelho": CONCELHO,
                         "distrito": "Guarda",
                         "fonte": "HTR Gemini 3 Flash Preview",
                         "imagem_url": imagem_url_for(file_id),
@@ -1476,7 +1507,7 @@ def main():
                         "data_obito": death_date,
                         "tipo_registo": "DEAT",
                         "freguesia": freguesia,
-                        "concelho": "Celorico da Beira",
+                        "concelho": CONCELHO,
                         "distrito": "Guarda",
                         "fonte": "HTR Gemini 3 Flash Preview",
                         "imagem_url": imagem_url_for(file_id),
