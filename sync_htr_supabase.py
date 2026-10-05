@@ -49,6 +49,11 @@ CONCELHO = os.environ.get("CONCELHO", "Celorico da Beira")
 TRANCOSO_INVENTORY_JSON = Path(os.environ.get("TRANCOSO_INVENTORY_JSON", "/home/pxtkhw/projetos/obitos/output/trancoso_inventario.json"))
 TRANCOSO_LISTINGS_JSON = Path(os.environ.get("TRANCOSO_LISTINGS_JSON", "/home/pxtkhw/projetos/obitos/output/data/doc_file_listings_tcs.json"))
 
+# Trancoso-specific defaults to avoid conflicts with Celorico sync
+if CONCELHO == "Trancoso":
+    INPUT_DIR = Path(os.environ.get("INPUT_DIR", "/home/pxtkhw/projetos/obitos/output/htr_text_tcs"))
+    STATE_FILE = Path(os.environ.get("STATE_FILE", "/home/pxtkhw/projetos/obitos/output/sync_htr_state_tcs.json"))
+
 # Original digitization source — kept as a link so we don't store images locally.
 DIGITARQ_BASE = os.environ.get("DIGITARQ_BASE", "https://digitarq.arquivos.pt")
 def imagem_url_for(file_id):
