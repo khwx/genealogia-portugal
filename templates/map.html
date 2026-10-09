@@ -61,7 +61,7 @@
 
     <div class="hero">
         <h1>Distribuição Geográfica de Registos</h1>
-        <p>Análise de concentração de óbitos e registos paroquiais por freguesia em Celorico da Beira.</p>
+        <p>Análise de concentração de óbitos e registos paroquiais por concelho e freguesia.</p>
     </div>
 
     <div class="map-wrapper">
@@ -73,6 +73,10 @@
             <div class="stat-card">
                 <div class="stat-lbl">Freguesias Mapeadas</div>
                 <div class="stat-val" id="statFregs">12</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-lbl">Concelhos</div>
+                <div class="stat-val" id="statConcelhos">1</div>
             </div>
             <div class="stat-card">
                 <div class="stat-lbl">Freguesia com Mais Registos</div>
@@ -90,6 +94,12 @@
                     <span id="legendMax">0</span>
                 </div>
             </div>
+        </div>
+
+        <div class="map-card" id="unmappedCard" style="margin-top: 24px; display: none;">
+            <h3 style="color: var(--text); margin-bottom: 6px; font-size: 1.15rem;">Freguesias ainda sem marcador</h3>
+            <p style="color: var(--text2); font-size: 0.9rem; margin-bottom: 12px;">Com registos na base de dados mas sem coordenadas no mapa. Pesquisa direta:</p>
+            <div id="unmappedList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
         </div>
 
         <div class="map-card" style="margin-top: 24px;">
@@ -145,6 +155,10 @@
                     if (item.count > 0 && item.count < minCount) minCount = item.count;
                 });
                 if (!isFinite(minCount)) minCount = 0;
+                // Freguesias com registos mas sem coordenadas (ex: Trancoso):
+                // sem marcador, mas contam para os totais e têm link de pesquisa.
+                const unmapped = data.filter(d => d.count > 0 && !d.coords);
+                const concSet = new Set(data.filter(d => d.count > 0).map(d => d.concelho || 'Celorico da Beira'));
 
                 // Cor por densidade: gradiente que varia com o número de registos
                 // (azul escuro -> azul claro -> verde -> amarelo -> vermelho)
@@ -195,6 +209,7 @@
                         .bindPopup(`
                             <div style="color: #111; font-family: Inter, sans-serif; padding: 4px; min-width: 220px;">
                                 <strong style="font-size: 1.1rem; color: #4f46e5;">${item.freguesia}</strong><br>
+                                <span style="font-size: 0.85rem; color: #6b7280;">${item.concelho || 'Celorico da Beira'}</span><br>
                                 <span style="font-size: 0.95rem;"><strong>${item.count.toLocaleString('pt-PT')}</strong> registos indexados</span>
                                 ${periodosHtml}
                                 <a href="/?q=${encodeURIComponent(item.freguesia)}" style="color: #2563eb; font-size: 0.85rem; text-decoration: underline; margin-top: 6px; display: inline-block;">Ver registos desta freguesia ➔</a>
@@ -206,9 +221,16 @@
 
                 document.getElementById('statTotal').textContent = total.toLocaleString('pt-PT');
                 document.getElementById('statFregs').textContent = data.filter(d => d.count > 0).length;
+                document.getElementById('statConcelhos').textContent = concSet.size;
                 document.getElementById('statTop').textContent = topFreguesia;
                 document.getElementById('legendMin').textContent = minCount.toLocaleString('pt-PT');
                 document.getElementById('legendMax').textContent = maxCount.toLocaleString('pt-PT');
+                if (unmapped.length) {
+                    document.getElementById('unmappedCard').style.display = 'block';
+                    document.getElementById('unmappedList').innerHTML = unmapped
+                        .sort((a,b) => b.count - a.count)
+                        .map(d => `<a href="/?freguesia=${encodeURIComponent(d.freguesia)}&concelho=${encodeURIComponent(d.concelho||'')}" style="background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; text-decoration: none;">${d.freguesia} (${d.count.toLocaleString('pt-PT')})</a>`).join('');
+                }
                 setProgress(100);
             } catch (e) {
                 console.error("Erro ao carregar dados do mapa:", e);

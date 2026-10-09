@@ -125,9 +125,10 @@ def api_mapa():
         with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
             coords = json.load(f)
         
-         # Obter contagem por freguesia do Supabase (com paginação para abranger todos os registos)
+          # Obter contagem por freguesia do Supabase (com paginação para abranger todos os registos)
         counts = {}
         counts_by_tipo = {}  # freguesia -> {DEAT: n, BIRT: n, MARR: n}
+        counts_by_concelho = {}  # freguesia -> {concelho: n} (para resolver o concelho maioritário)
         # Distribuição por século por freguesia (para os popups do mapa)
         parish_centuries = {}
         offset = 0
@@ -136,7 +137,7 @@ def api_mapa():
             resp = requests.get(
                 f"{SUPABASE_URL}/rest/v1/pessoas",
                 headers=HEADERS,
-                params={"select": "freguesia,tipo_registo,data_obito,data_nascimento", "limit": page, "offset": offset},
+                params={"select": "freguesia,concelho,tipo_registo,data_obito,data_nascimento", "limit": page, "offset": offset},
                 timeout=30
             )
             if resp.status_code != 200:
@@ -150,6 +151,9 @@ def api_mapa():
                 t = (item.get('tipo_registo') or 'DEAT').upper()
                 ct = counts_by_tipo.setdefault(f, {})
                 ct[t] = ct.get(t, 0) + 1
+                c = item.get('concelho') or 'Celorico da Beira'
+                cc = counts_by_concelho.setdefault(f, {})
+                cc[c] = cc.get(c, 0) + 1
                 d = item.get('data_obito') or item.get('data_nascimento')
                 if d:
                     try:
@@ -168,6 +172,9 @@ def api_mapa():
             offset += page
         
         # Combinar coordenadas com contagens e períodos cronológicos
+        def _top_concelho(f):
+            cc = counts_by_concelho.get(f, {})
+            return max(cc, key=cc.get) if cc else 'Celorico da Beira'
         map_data = []
         for f, coord in coords.items():
             periodos = parish_centuries.get(f, {})
@@ -175,11 +182,26 @@ def api_mapa():
             periodos_ordenados = {s: periodos[s] for s in sorted(periodos.keys()) if periodos[s] > 0}
             map_data.append({
                 'freguesia': f,
+                'concelho': _top_concelho(f),
                 'coords': coord,
                 'count': counts.get(f, 0),
                 'periodos': periodos_ordenados,
                 'counts_tipo': counts_by_tipo.get(f, {})
             })
+        # Freguesias na BD sem coordenadas (ex: Trancoso, ainda sem parish_coords):
+        # vão sem marcador mas com contagens, para cobertura/mapa as mostrarem.
+        for f in sorted(counts):
+            if f not in coords:
+                periodos = parish_centuries.get(f, {})
+                periodos_ordenados = {s: periodos[s] for s in sorted(periodos.keys()) if periodos[s] > 0}
+                map_data.append({
+                    'freguesia': f,
+                    'concelho': _top_concelho(f),
+                    'coords': None,
+                    'count': counts.get(f, 0),
+                    'periodos': periodos_ordenados,
+                    'counts_tipo': counts_by_tipo.get(f, {})
+                })
         cache_set('mapa', map_data)
         return jsonify(map_data)
     except Exception as e:
