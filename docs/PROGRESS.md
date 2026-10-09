@@ -2,6 +2,26 @@
 
 Registo de execuções e decisões do Bot. Atualizado autonomousamente a cada 8h.
 
+## 2026-10-09 (checkpoint autonomo 8h — Celorico completo, Trancoso em andamento)
+
+### Estado verificado
+- **Celorico da Beira**: 25/25 freguesias COMPLETAS, pipeline 100% sincronizado (80 650 JSON, 51 388 registos na tabela pessoas)
+- **Trancoso**: expansao iniciada, MARR a 77%
+  - Inventario: 41 paroquias, 4 605 livros (1 597 BIRT, 1 501 MARR, 1 507 DEAT)
+  - Page listings: 98 685 paginas
+  - MARR transcritas: 20 391/26 475 (77%) — worker marr_tcs.py vivo, a correr
+  - Guardian watch_htr_tcs.sh a registar a cada 8h, deteccao de travamento a cada 45min OK
+- **Watchdog Celorico**: trabalho esgotado em repouso 8h ciclico (output/daily_logs/watch_htr.log)
+- **Seguranca**: scanner 0 segredos em 174 ficheiros; .env ignorado e nao rastreado
+- **Testes**: ALL TESTS PASSED, py_compile OK
+
+### Proximos Trancoso
+- Completar MARR Trancoso (restantes ~6 084 paginas) -> lancar BIRT -> DEAT
+- Sync Supabase com mapeamento fid->freguesia Trancoso
+- Frontend: filtro por concelho nas restantes paginas; stats por concelho
+
+---
+
 ## 2026-10-05 (checkpoint autónomo 8h — pipeline estável)
 
 ### Estado verificado
