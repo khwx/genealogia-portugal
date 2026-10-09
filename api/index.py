@@ -498,7 +498,7 @@ def get_pessoas():
         sobrenome = request.args.get('sobrenome', '').strip()
         from_year = request.args.get('from_year', '').strip()
         to_year = request.args.get('to_year', '').strip()
-        tipo = request.args.get('tipo', '').strip().upper()
+        tipo = (request.args.get('tipo') or request.args.get('tipo_registo', '')).strip().upper()
         # support PostgREST-style "sobrenome=ilike.*Val*"
         if sobrenome.startswith('ilike.'):
             sobrenome = sobrenome[6:].strip('*%')
