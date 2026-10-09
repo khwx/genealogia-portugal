@@ -65,6 +65,12 @@ body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-hei
 <span style="color:var(--text2);font-size:0.85rem;align-self:center">Freguesia:</span>
 <button class="parish-tag active" onclick="filtrarFreg('')">Todas</button>
 </div>
+<div id="concFilters" style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+<span style="color:var(--text2);font-size:0.85rem;align-self:center">Concelho:</span>
+<button class="parish-tag active" data-conc="" onclick="filtrarConc('')">Todos</button>
+<button class="parish-tag" data-conc="Celorico da Beira" onclick="filtrarConc('Celorico da Beira')">Celorico da Beira</button>
+<button class="parish-tag" data-conc="Trancoso" onclick="filtrarConc('Trancoso')">Trancoso</button>
+</div>
 </div>
 <div style="max-width:1000px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center">
 <span id="cnt" style="color:var(--text2);font-size:0.9rem">A carregar...</span>
@@ -79,7 +85,7 @@ body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-hei
 const SUPABASE_URL='https://qljopxbxgflozrcdblrl.supabase.co';
 const SUPABASE_KEY='sb_publishable_-oWYfk9uhb5DIByIe7xUhw_jb_touP1';
 const H={apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
-let q='', freg='', offset=0, totalLoaded=0, hasMore=true, loading=false;
+let q='', freg='', conc='', offset=0, totalLoaded=0, hasMore=true, loading=false;
 let loaded=[];
 const PAGE=100;
 
@@ -108,6 +114,7 @@ async function fetchBatch(reset){
     const conds=[];
     if(q) conds.push(`or(nome.ilike.*${q}*,sobrenome.ilike.*${q}*,conjuge.ilike.*${q}*,testemunhas.ilike.*${q}*)`);
     if(freg) conds.push(`freguesia.ilike.*${freg}*`);
+    if(conc) conds.push(`concelho=eq.${encodeURIComponent(conc)}`);
     if(conds.length) url+='&'+conds.join('&');
     const r=await fetch(url,{headers:H});
     if(!r.ok) throw new Error(r.status);
@@ -141,7 +148,12 @@ async function loadParishes(){
 
 function filtrarFreg(f){
   freg=f;
-  document.querySelectorAll('.parish-tag').forEach(b=>b.classList.toggle('active', b.textContent.includes(f||'Todas')));
+  document.querySelectorAll('#parishFilters .parish-tag').forEach(b=>b.classList.toggle('active', b.textContent.includes(f||'Todas')));
+  offset=0; hasMore=true; fetchBatch(true);
+}
+function filtrarConc(c){
+  conc=c;
+  document.querySelectorAll('#concFilters .parish-tag').forEach(b=>b.classList.toggle('active', (b.getAttribute('data-conc')||'')===c));
   offset=0; hasMore=true; fetchBatch(true);
 }
 document.getElementById('btn').onclick=()=>{q=document.getElementById('q').value.trim(); offset=0; hasMore=true; fetchBatch(true);};

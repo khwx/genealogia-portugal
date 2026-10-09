@@ -122,6 +122,12 @@
             <button class="parish-tag" onclick="filterByType('BIRT')">Nascimentos 👶</button>
         </div>
         <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
+            <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Concelho:</span>
+            <button class="parish-tag active" onclick="filterByConcelho('')">Todos</button>
+            <button class="parish-tag" onclick="filterByConcelho('Celorico da Beira')">Celorico da Beira</button>
+            <button class="parish-tag" onclick="filterByConcelho('Trancoso')">Trancoso</button>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap;">
             <span style="color: var(--text2); font-size: 0.85rem; align-self: center;">Ano:</span>
             <input type="number" id="fromYear" class="year-input" placeholder="De (ex: 1700)" min="1600" max="2000">
             <span style="color: var(--text2); align-self: center;">→</span>
@@ -184,6 +190,7 @@
         let currentToYear = '';
         let currentQuery = '';
         let currentTipo = '';
+        let currentConcelho = '';
         let tipoFallback = false;
         let currentOffset = 0;
         const PAGE_SIZE = 100;
@@ -275,6 +282,7 @@
             if (currentQuery) params.set('q', currentQuery);
             if (currentParish) params.set('freguesia', currentParish);
             if (currentTipo) params.set('tipo', currentTipo);
+            if (currentConcelho) params.set('concelho', currentConcelho);
             if (currentFromYear) params.set('from', currentFromYear);
             if (currentToYear) params.set('to', currentToYear);
             const qs = params.toString();
@@ -285,6 +293,7 @@
             if (p.get('q')) { currentQuery = p.get('q'); document.getElementById('searchInput').value = currentQuery; }
             if (p.get('freguesia')) currentParish = p.get('freguesia');
             if (p.get('tipo')) currentTipo = p.get('tipo');
+            if (p.get('concelho')) currentConcelho = p.get('concelho');
             if (p.get('from')) { currentFromYear = p.get('from'); document.getElementById('fromYear').value = currentFromYear; }
             if (p.get('to')) { currentToYear = p.get('to'); document.getElementById('toYear').value = currentToYear; }
         }
@@ -306,7 +315,7 @@
         async function loadInitial() {
             try {
                 loadFromURL();
-                if (currentQuery || currentParish || currentTipo || currentFromYear || currentToYear) {
+                if (currentQuery || currentParish || currentTipo || currentConcelho || currentFromYear || currentToYear) {
                     return performSearch();
                 }
                 setProgress(20);
@@ -366,6 +375,7 @@
                 if (currentFromYear) conditions.push(`data_obito=gte.${currentFromYear}-01-01`);
                 if (currentToYear) conditions.push(`data_obito=lte.${currentToYear}-12-31`);
                 if (currentTipo && !tipoFallback) conditions.push(`tipo_registo=eq.${currentTipo}`);
+                if (currentConcelho) conditions.push(`concelho=eq.${encodeURIComponent(currentConcelho)}`);
                 if (conditions.length > 0) url += '&' + conditions.join('&');
                 const response = await fetch(url, { headers });
                 if (!response.ok) throw new Error('Erro na pesquisa');
@@ -448,6 +458,15 @@
             document.querySelectorAll('button[onclick^="filterByType"]').forEach(btn => {
                 const val = btn.getAttribute('onclick').match(/filterByType\('([^']*)'\)/)[1];
                 btn.classList.toggle('active', val === tipo);
+            });
+            performSearch();
+        }
+
+        function filterByConcelho(conc) {
+            currentConcelho = conc;
+            document.querySelectorAll('button[onclick^="filterByConcelho"]').forEach(btn => {
+                const val = btn.getAttribute('onclick').match(/filterByConcelho\('([^']*)'\)/)[1];
+                btn.classList.toggle('active', val === conc);
             });
             performSearch();
         }
