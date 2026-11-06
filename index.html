@@ -355,7 +355,7 @@
             isLoadingMore = true;
             showLoadingMore();
             try {
-                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=criado_em.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
+                let url = `${SUPABASE_URL}/rest/v1/pessoas?select=*&order=id.desc&limit=${PAGE_SIZE}&offset=${currentOffset}`;
                 const conditions = [];
                 if (currentQuery) {
                     const vars = getHistoricalVariants(currentQuery);

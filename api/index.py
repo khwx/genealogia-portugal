@@ -448,7 +448,11 @@ def validar():
         {"validado": "eq.false", "nome": "not.is.null", "nome_not_ilike": "[ilegível]", "limit": 5},
         {"validado": "eq.false", "nome": "not.is.null", "limit": 5},
     ]:
-        params = {"validado": filt["validado"], "nome": filt["nome"], "limit": filt["limit"], "order": "criado_em.desc"}
+        # order=id.desc (PK) e não criado_em.desc: a tabela pessoas não tem
+        # índice em criado_em e o sort de ~148k linhas estoura o statement
+        # timeout do PostgREST (500 "canceling statement"). id é serial, por
+        # isso a ordem de inserção é igual à ordem de criação.
+        params = {"validado": filt["validado"], "nome": filt["nome"], "limit": filt["limit"], "order": "id.desc"}
         resp = requests.get(f"{SUPABASE_URL}/rest/v1/pessoas", headers=HEADERS, params=params, timeout=30)
         if resp.status_code == 200 and resp.json():
             batch = resp.json()
@@ -555,9 +559,9 @@ def get_pessoas():
 
         if conditions:
             url += '&' + '&'.join(conditions)
-            url += f'&order=criado_em.desc&limit={limit}&offset={offset}'
+            url += f'&order=id.desc&limit={limit}&offset={offset}'
         else:
-            url += f'&order=criado_em.desc&limit={limit}&offset={offset}'
+            url += f'&order=id.desc&limit={limit}&offset={offset}'
 
         resp = requests.get(url, headers=HEADERS, timeout=30)
         if resp.status_code != 200:
@@ -575,7 +579,7 @@ def get_pessoas():
             if phon != query.lower():
                 url2 = SUPABASE_URL + '/rest/v1/pessoas?select=' + LIST_COLS
                 cond2 = f"or(nome.ilike.*{phon}*,sobrenome.ilike.*{phon}*,freguesia.ilike.*{phon}*)"
-                url2 += '&' + cond2 + f'&order=criado_em.desc&limit={limit}&offset={offset}'
+                url2 += '&' + cond2 + f'&order=id.desc&limit={limit}&offset={offset}'
                 r2 = requests.get(url2, headers=HEADERS, timeout=30)
                 if r2.status_code == 200 and r2.json():
                     return jsonify(r2.json())
