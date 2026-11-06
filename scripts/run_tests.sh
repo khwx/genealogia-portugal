@@ -32,6 +32,7 @@ run tests/test_htr_type_aware.py
 run tests/test_migrations.py
 run tests/test_name_phonetics.py
 run tests/test_api_quality_filter.py
+run tests/test_livros_patch.py
 
 if [ "$fail" -ne 0 ]; then
     echo "RESULT: FAILED"
