@@ -715,8 +715,11 @@ def update_livro(livro_id):
         resp = requests.patch(
             SUPABASE_URL + '/rest/v1/livros?id=eq.' + str(livro_id),
             headers=HEADERS,
-            json=data
+            json=data,
+            timeout=30
         )
+        if resp.status_code not in [200, 204]:
+            return jsonify({"error": "Supabase respondeu " + str(resp.status_code)}), 502
         return jsonify({"status": "ok"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
