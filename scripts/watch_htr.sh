@@ -6,6 +6,8 @@
 #   novos durante 45 min, o teto diário das chaves está gasto: mata-o e
 #   descansa até à meia-noite, relançando no dia seguinte.
 # - Regista um ponto de estado a cada 8h (00h/08h/16h) em output/daily_logs/watch_htr.log
+# - Se todo o trabalho HTR já estiver concluído, pausa longa em vez de ciclar
+#   constantemente entre "descansar 8h" e "tentar reiniciar um worker sem tarefas."
 #
 # Uso: scripts/watch_htr.sh            (loop principal)
 #      scripts/watch_htr.sh --status   (uma verificação pontual / inicio de log)
@@ -22,6 +24,7 @@ STUCK_MIN=45
 STUCK_SECS=$((STUCK_MIN * 60))
 SLEEP=60
 MAX_QUICK_RESTARTS=3
+ALL_DONE_WAIT=28800  # 8h pausa quando todo o trabalho está concluído
 
 mkdir -p "$LOG_DIR"
 
@@ -70,6 +73,19 @@ status_line() {
     log "ESTADO | worker=$alive | ficheiros_json=$total | MARR_feitos=$marr | chaves_usadas_hoje=$keys"
 }
 
+# Verifica se todo o trabalho HTR já está concluído
+all_work_done() {
+    local total=$1
+    local marr_count=0
+    marr_count=$(grep -rl '"record_type": "MARR"' "$OB/output/htr_text" 2>/dev/null | wc -l)
+    # 18362 é o total de registros de casamentos esperados (freguesias completas)
+    # 80000+ é o total de ficheiros HTR esperados
+    if [ "$marr_count" -ge 18362 ] && [ "$total" -ge 80000 ]; then
+        return 0  # trabalho concluído
+    fi
+    return 1  # ainda há trabalho a fazer
+}
+
 if [ "${1:-}" = "--status" ]; then
     status_line
     exit 0
@@ -91,6 +107,20 @@ status_line
 while true; do
     now=$(date +%s)
     total=$(total_files)
+
+    # NEW: Se todo o trabalho já estiver concluído, aguardar longamente e verificar apenas a cada 8h
+    if all_work_done "$total"; then
+        # Todo o trabalho já está done. Apenas reportar estado a cada 8h e dormir.
+        hour_tag=$(date +%H)
+        case "$hour_tag" in
+            00|08|16)
+                status_line
+                ;;
+            *) : ;;
+        esac
+        sleep "$ALL_DONE_WAIT"
+        continue
+    fi
 
     if worker_alive; then
         if [ "$total" -gt "$LAST_TOTAL" ]; then
