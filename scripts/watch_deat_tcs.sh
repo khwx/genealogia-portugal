@@ -6,9 +6,13 @@
 #   novos durante 45 min, o teto diário das chaves está gasto: mata-o e
 #   descansa até à meia-noite, relançando no dia seguinte.
 # - Regista um ponto de estado a cada 8h (00h/08h/16h) em output/daily_logs/watch_deat_tcs.log
+# - Instância única (flock) e arranque automático após reboot do servidor:
+#     crontab -l  ->  @reboot /bin/bash -c 'cd /home/pxtkhw/projetos/obitos && \
+#       setsid nohup /bin/bash scripts/watch_deat_tcs.sh </dev/null >> output/daily_logs/watch_deat_tcs.log 2>&1'
+#   (sem isto, um reboot matava guardian + worker e nada voltava — ver 21/11/2026)
 #
-# Uso: scripts/watch_htr_tcs.sh            (loop principal)
-#      scripts/watch_htr_tcs.sh --status   (uma verificação pontual / inicio de log)
+# Uso: scripts/watch_deat_tcs.sh            (loop principal)
+#      scripts/watch_deat_tcs.sh --status   (uma verificação pontual / inicio de log)
 
 set -u
 
@@ -72,6 +76,15 @@ status_line() {
 
 if [ "${1:-}" = "--status" ]; then
     status_line
+    exit 0
+fi
+
+# Instância única: dois guardians em simultâneo relançavam workers em
+# duplicado (ex.: arranque manual por cima do @reboot do crontab).
+# Fd 8, porque o fd 9 já é usado pelo flock do launch_worker().
+exec 8>"$LOG_DIR/watch_deat_tcs.instance.lock"
+if ! flock -n 8; then
+    log "já existe um guardian ativo — a sair."
     exit 0
 fi
 
