@@ -757,11 +757,12 @@ def extract_date(raw_text):
 
     return None
 
-def supabase_request(method, path, data=None):
-    """Make a request to Supabase REST API."""
+def supabase_request(method, path, data=None, retries=3):
+    """Make a request to Supabase REST API, with retry on transient errors."""
     import urllib.request
     import urllib.error
-    
+    import time
+
     url = f"{SUPABASE_URL}/rest/v1/{path}"
     headers = {
         "Content-Type": "application/json",
@@ -769,23 +770,35 @@ def supabase_request(method, path, data=None):
         "Authorization": f"Bearer {SUPABASE_KEY}",
         "Prefer": "return=minimal",
     }
-    
+
     body = json.dumps(data).encode() if data else None
-    req = urllib.request.Request(url, data=body, headers=headers, method=method)
-    
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            if resp.status in (200, 201, 204):
-                return {"status": "success"}
-            return {"status": "error", "code": resp.status}
-    except urllib.error.HTTPError as e:
-        body = e.read().decode()[:300]
-        return {"status": "error", "code": e.code, "body": body}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+
+    last = None
+    for attempt in range(retries):
+        req = urllib.request.Request(url, data=body, headers=headers, method=method)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                if resp.status in (200, 201, 204):
+                    return {"status": "success"}
+                return {"status": "error", "code": resp.status}
+        except urllib.error.HTTPError as e:
+            body_err = e.read().decode()[:300]
+            # Retry only on 5xx / transient; 4xx are final
+            if e.code >= 500 and attempt < retries - 1:
+                last = {"status": "error", "code": e.code, "body": body_err}
+                time.sleep(2 ** attempt)
+                continue
+            return {"status": "error", "code": e.code, "body": body_err}
+        except Exception as e:
+            last = {"status": "error", "message": str(e)}
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+                continue
+            return last
+    return last if last else {"status": "error", "message": "unknown"}
 
 def fetch_paginated(select, base_filter="file_id=not.is.null", order="id.asc",
-                    page=1000, timeout=30):
+                    page=1000, timeout=60):
     """Fetch all rows from `pessoas` paginating past Supabase's 1000-row cap.
 
     Returns a flat list of dicts. Used by every backfill/sync routine so the
