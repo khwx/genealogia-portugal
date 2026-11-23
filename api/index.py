@@ -9,6 +9,9 @@ import time
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _root not in sys.path:
     sys.path.insert(0, _root)
+_api_dir = os.path.dirname(os.path.abspath(__file__))
+if _api_dir not in sys.path:
+    sys.path.insert(0, _api_dir)
 
 try:
     import name_phonetics
@@ -37,6 +40,17 @@ HEADERS = {
     "Authorization": f"Bearer {SUPABASE_KEY}",
     "Content-Type": "application/json"
 }
+
+# Agregados pré-calculados por scripts/build_aggregates.py.
+# Os endpoints /api/mapa, /api/seculos, /api/decadas, /api/apelidos e
+# /api/stats-extras percorriam a tabela toda (≈148 pedidos ao Supabase,
+# 40–45s) em cada invocação — era isso que estourava o tempo máximo da
+# função Vercel. Com o snapshot respondem em milissegundos.
+# Se o ficheiro não existir (ex.: clone antigo), cai para o cálculo live.
+try:
+    from aggregates_data import DATA as AGGREGATES
+except Exception:
+    AGGREGATES = None
 
 # Cache simples em memória para /api/mapa, /api/seculos, /api/decadas (TTL 10 min)
 _CACHE = {}
@@ -115,17 +129,50 @@ def stats_page():
              'com_familysearch': 0, 'com_transkribus': 0}
     return render_template('stats.html', stats=stats)
 
+def _montar_mapa(freguesia_stats):
+    """Combina as contagens agregadas com parish_coords.json."""
+    with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
+        coords = json.load(f)
+    map_data = []
+    for f, coord in coords.items():
+        st = freguesia_stats.get(f, {})
+        map_data.append({
+            'freguesia': f,
+            'concelho': st.get('concelho', 'Celorico da Beira'),
+            'coords': coord,
+            'count': st.get('count', 0),
+            'periodos': st.get('periodos', {}),
+            'counts_tipo': st.get('tipos', {}),
+        })
+    # Freguesias na BD sem coordenadas (ex.: Trancoso sem parish_coords):
+    # sem marcador, mas com contagens, para cobertura/mapa as mostrarem.
+    for f in sorted(freguesia_stats):
+        if f not in coords:
+            st = freguesia_stats[f]
+            map_data.append({
+                'freguesia': f,
+                'concelho': st.get('concelho', 'Celorico da Beira'),
+                'coords': None,
+                'count': st.get('count', 0),
+                'periodos': st.get('periodos', {}),
+                'counts_tipo': st.get('tipos', {}),
+            })
+    return map_data
+
+
 @app.route('/api/mapa')
 def api_mapa():
     cached = cache_get('mapa')
     if cached is not None:
         return jsonify(cached)
     try:
-        # Carregar coordenadas
-        with open(os.path.join(_root, 'parish_coords.json'), 'r') as f:
-            coords = json.load(f)
-        
-          # Obter contagem por freguesia do Supabase (com paginação para abranger todos os registos)
+        if AGGREGATES:
+            # Snapshot pré-calculado (scripts/build_aggregates.py): ~0ms.
+            map_data = _montar_mapa(AGGREGATES.get('freguesia_stats', {}))
+            cache_set('mapa', map_data)
+            return jsonify(map_data)
+
+        # Fallback live (snapshot ausente): percorre a tabela em páginas de 1000.
         counts = {}
         counts_by_tipo = {}  # freguesia -> {DEAT: n, BIRT: n, MARR: n}
         counts_by_concelho = {}  # freguesia -> {concelho: n} (para resolver o concelho maioritário)
@@ -171,37 +218,17 @@ def api_mapa():
                 break
             offset += page
         
-        # Combinar coordenadas com contagens e períodos cronológicos
-        def _top_concelho(f):
+        # Reunir no formato do snapshot e reutilizar o mesmo assembler
+        live_stats = {}
+        for f, n in counts.items():
             cc = counts_by_concelho.get(f, {})
-            return max(cc, key=cc.get) if cc else 'Celorico da Beira'
-        map_data = []
-        for f, coord in coords.items():
-            periodos = parish_centuries.get(f, {})
-            # Ordenar séculos por ordem cronológica e manter só com registos
-            periodos_ordenados = {s: periodos[s] for s in sorted(periodos.keys()) if periodos[s] > 0}
-            map_data.append({
-                'freguesia': f,
-                'concelho': _top_concelho(f),
-                'coords': coord,
-                'count': counts.get(f, 0),
-                'periodos': periodos_ordenados,
-                'counts_tipo': counts_by_tipo.get(f, {})
-            })
-        # Freguesias na BD sem coordenadas (ex: Trancoso, ainda sem parish_coords):
-        # vão sem marcador mas com contagens, para cobertura/mapa as mostrarem.
-        for f in sorted(counts):
-            if f not in coords:
-                periodos = parish_centuries.get(f, {})
-                periodos_ordenados = {s: periodos[s] for s in sorted(periodos.keys()) if periodos[s] > 0}
-                map_data.append({
-                    'freguesia': f,
-                    'concelho': _top_concelho(f),
-                    'coords': None,
-                    'count': counts.get(f, 0),
-                    'periodos': periodos_ordenados,
-                    'counts_tipo': counts_by_tipo.get(f, {})
-                })
+            live_stats[f] = {
+                'count': n,
+                'concelho': max(cc, key=cc.get) if cc else 'Celorico da Beira',
+                'tipos': counts_by_tipo.get(f, {}),
+                'periodos': {str(s): v for s, v in sorted(parish_centuries.get(f, {}).items()) if v > 0},
+            }
+        map_data = _montar_mapa(live_stats)
         cache_set('mapa', map_data)
         return jsonify(map_data)
     except Exception as e:
@@ -212,6 +239,11 @@ def api_seculos():
     cached = cache_get('seculos')
     if cached is not None:
         return jsonify(cached)
+    if AGGREGATES:
+        payload = {"seculos": [{"seculo": s, "count": c}
+                               for s, c in AGGREGATES.get('seculos', {}).items()]}
+        cache_set('seculos', payload)
+        return jsonify(payload)
     # Distribuição de registos por século (apenas leitura, sem segredos).
     # Usa o mesmo padrão de paginação de /api/mapa para abranger todos os registos.
     try:
@@ -265,6 +297,11 @@ def api_decadas():
     cached = cache_get('decadas')
     if cached is not None:
         return jsonify(cached)
+    if AGGREGATES:
+        payload = {"decadas": [{"decada": int(d), "count": c}
+                               for d, c in AGGREGATES.get('decadas', {}).items()]}
+        cache_set('decadas', payload)
+        return jsonify(payload)
     try:
         decadas = {}
         offset = 0
@@ -307,6 +344,10 @@ def api_apelidos():
     cached = cache_get('apelidos_top100')
     if cached is not None:
         return jsonify(cached)
+    if AGGREGATES:
+        payload = AGGREGATES.get('apelidos', {})
+        cache_set('apelidos_top100', payload)
+        return jsonify(payload)
     try:
         from collections import Counter
         sobrenomes = Counter()
@@ -402,6 +443,10 @@ def api_stats_extras():
     cached = cache_get('stats_extras')
     if cached is not None:
         return jsonify(cached)
+    if AGGREGATES:
+        payload = AGGREGATES.get('stats_extras', {})
+        cache_set('stats_extras', payload)
+        return jsonify(payload)
     try:
         from collections import Counter
         sobrenomes = Counter()
