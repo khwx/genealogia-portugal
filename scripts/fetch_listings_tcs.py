@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
-"""Page listings de Trancoso: fids por livro via API Digitarq.
+"""Page listings (fids por livro) de um concelho via API Digitarq.
 
-Lê output/trancoso_inventario.json (BIRT+MARR+DEAT), saca as páginas de
-cada livro e grava output/data/doc_file_listings_tcs.json (separado de
-Celorico). Só leitura. Idempotente (salta docs já listados).
+Lê o inventário do concelho, saca as páginas de cada livro e grava um
+ficheiro de listings separado por concelho.
+
+Uso:
+  python3 scripts/fetch_listings_tcs.py                        # Trancoso
+  python3 scripts/fetch_listings_tcs.py \
+      --inventario output/pinhel_inventario.json \
+      --out output/data/doc_file_listings_pnh.json             # Pinhel
+
+Só leitura. Idempotente (salta docs já listados).
 """
 
+import argparse
 import json
 import os
 import re
@@ -34,16 +42,23 @@ def fetch_pages(doc_id, tries=3):
 
 
 def main():
-    inv = json.load(open(INV, encoding="utf-8"))
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--inventario", default=INV,
+                    help="inventário do concelho (JSON)")
+    ap.add_argument("--out", default=OUT,
+                    help="ficheiro de listings a escrever (JSON)")
+    args = ap.parse_args()
+
+    inv = json.load(open(args.inventario, encoding="utf-8"))
+    out = {}
     docs = {}
     for b in inv:
         m = re.search(r"documentDetails/([0-9a-fA-F]+)", b.get("url_info", ""))
         if m:
             docs[m.group(1).lower()] = b.get("tipo_cod")
     print(f"Livros: {len(inv)} -> docs únicos: {len(docs)}")
-    out = {}
-    if os.path.exists(OUT):
-        out = json.load(open(OUT, encoding="utf-8"))
+    if os.path.exists(args.out):
+        out = json.load(open(args.out, encoding="utf-8"))
     print(f"Já listados: {len(out)}")
     todo = sorted(d for d in docs if d not in out)
     print(f"Por listar: {len(todo)}")
@@ -55,11 +70,11 @@ def main():
         else:
             print(f"[{i}/{len(todo)}] {doc_id}: VAZIO/ERRO", flush=True)
         if i % 50 == 0:
-            json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
+            json.dump(out, open(args.out, "w", encoding="utf-8"), ensure_ascii=False)
         time.sleep(0.4)
-    json.dump(out, open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
+    json.dump(out, open(args.out, "w", encoding="utf-8"), ensure_ascii=False)
     total = sum(len(v) for v in out.values())
-    print(f"\nCompletos: {len(out)} docs, {total} páginas em {OUT}")
+    print(f"\nCompletos: {len(out)} docs, {total} páginas em {args.out}")
 
 
 if __name__ == "__main__":
