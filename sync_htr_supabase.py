@@ -1598,25 +1598,29 @@ def main():
                         synced.add(file_id)
                         synced_count += 1
                 else:
-                    synced.add(file_id)
+                    # DRY_RUN: NÃO marcar como sincronizado. Antes disto o
+                    # state era gravado e o sync real seguinte saltava estes
+                    # ficheiros para sempre (páginas nunca chegavam à BD).
                     synced_count += 1
             
             if (i + 1) % 10 == 0:
                 print(f"Progress: {i+1}/{len(to_sync)} (synced: {synced_count}, filtered: {filtered_count}, errors: {errors})")
-                state["synced_ids"] = list(synced)
-                state["errors"] = errors
-                state["filtered_out"] = filtered_count
-                save_state(state)
+                if not DRY_RUN:
+                    state["synced_ids"] = list(synced)
+                    state["errors"] = errors
+                    state["filtered_out"] = filtered_count
+                    save_state(state)
         
         except Exception as e:
             print(f"Error processing {file_id}: {e}")
             errors += 1
     
-    state["synced_ids"] = list(synced)
-    state["errors"] = errors
-    state["filtered_out"] = filtered_count
-    state["last_run"] = datetime.now().isoformat()
-    save_state(state)
+    if not DRY_RUN:
+        state["synced_ids"] = list(synced)
+        state["errors"] = errors
+        state["filtered_out"] = filtered_count
+        state["last_run"] = datetime.now().isoformat()
+        save_state(state)
     
     print(f"\n=== Sync Complete ===")
     print(f"Synced: {synced_count} persons")
