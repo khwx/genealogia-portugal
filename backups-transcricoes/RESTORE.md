@@ -5,7 +5,8 @@ Seguro off-site: se a BD e o PC falharem, restaura-se tudo daqui.
 ## Conteúdo
 - `celorico-{marr,birt,deat,legacy}.tar.gz` — 80 650 ficheiros JSON (`output/htr_text/`),
   um por página (`<file_id>.json` com `transcription` + estrutura `persons`/`baptized`/`deceased`)
-- `trancoso-{marr,birt}.tar.gz` — transcrições Trancoso (~26.5k MARR + ~16k BIRT parcial)
+- `trancoso-{marr,birt,deat}.tar.gz` — transcrições Trancoso (~26.5k MARR, ~40.5k BIRT,
+  31 643 DEAT — 100 % das páginas transcritas em 26/11/2026)
 - `inventarios/` — `celorico_casamentos_batismos.json` (livros BIRT/MARR),
   `trancoso_inventario.json` (+ Pinhel quando existir)
 
@@ -19,6 +20,7 @@ tar -xzf backups-transcricoes/celorico-legacy.tar.gz
 # Trancoso
 tar -xzf backups-transcricoes/trancoso-marr.tar.gz -C output/htr_text_tcs/
 tar -xzf backups-transcricoes/trancoso-birt.tar.gz -C output/htr_text_tcs/
+tar -xzf backups-transcricoes/trancoso-deat.tar.gz -C output/htr_text_tcs/
 # (extrai para output/htr_text/ ou output/htr_text_tcs/) e depois:
 python3 sync_htr_supabase.py
 ```
