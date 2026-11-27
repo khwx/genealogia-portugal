@@ -5,11 +5,14 @@
 # - Proteção contra o bug de 20 Set: se o worker está vivo mas faz 0 ficheiros
 #   novos durante 45 min, o teto diário das chaves está gasto: mata-o e
 #   descansa até à meia-noite, relançando no dia seguinte.
-# - Regista um ponto de estado a cada 8h (00h/08h/16h) em output/daily_logs/watch_deat_tcs.log
+# - Regista um ponto de estado a cada 8h (00h/08h/16h) em output/daily_logs/watch_deat_<codigo>.log
 # - Instância única (flock) e arranque automático após reboot do servidor:
 #     crontab -l  ->  @reboot /bin/bash -c 'cd /home/pxtkhw/projetos/obitos && \
-#       setsid nohup /bin/bash scripts/watch_deat_tcs.sh </dev/null >> output/daily_logs/watch_deat_tcs.log 2>&1'
+#       CONCELHO_CODIGO=pnh setsid nohup /bin/bash scripts/watch_deat_tcs.sh </dev/null \
+#       >> output/daily_logs/watch_deat_pnh.log 2>&1'
 #   (sem isto, um reboot matava guardian + worker e nada voltava — ver 21/11/2026)
+#
+# Concelho: CONCELHO_CODIGO=tcs (Trancoso, default) ou pnh (Pinhel).
 #
 # Uso: scripts/watch_deat_tcs.sh            (loop principal)
 #      scripts/watch_deat_tcs.sh --status   (uma verificação pontual / inicio de log)
@@ -17,11 +20,15 @@
 set -u
 
 OB="/home/pxtkhw/projetos/obitos"
+# Concelho: tcs = Trancoso (default), pnh = Pinhel.
+CODIGO="${CONCELHO_CODIGO:-tcs}"
 WORKER="$OB/output/workers/deat_tcs.py"
-WORKER_LOG="$OB/output/deat_tcs.log"
+DATA_DIR="$OB/output/htr_text_$CODIGO"
+WORKER_LOG="$OB/output/deat_$CODIGO.log"
 LOG_DIR="$OB/output/daily_logs"
-LOG="$LOG_DIR/watch_deat_tcs.log"
-LOCK="$LOG_DIR/watch_deat_tcs.lock"
+LOG="$LOG_DIR/watch_deat_$CODIGO.log"
+LOCK="$LOG_DIR/watch_deat_$CODIGO.lock"
+INSTANCE_LOCK="$LOG_DIR/watch_deat_$CODIGO.instance.lock"
 STUCK_MIN=45
 STUCK_SECS=$((STUCK_MIN * 60))
 SLEEP=60
@@ -31,9 +38,9 @@ mkdir -p "$LOG_DIR"
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 
-worker_alive() { pgrep -f "output/workers/[d]eat_tcs.py" >/dev/null 2>&1; }
+worker_alive() { pgrep -f "output/workers/[d]eat_tcs.py --codigo $CODIGO" >/dev/null 2>&1; }
 
-total_files() { find "$OB/output/htr_text_tcs" -maxdepth 1 -name '*.json' 2>/dev/null | wc -l; }
+total_files() { find "$DATA_DIR" -maxdepth 1 -name '*.json' 2>/dev/null | wc -l; }
 
 keys_today() {
     python3 -c "
@@ -55,7 +62,7 @@ launch_worker() {
         # rebenta com "unbound variable" sob set -u
         set +u
         cd "$OB" && set -a && source .env && set +a && \
-        setsid nohup python3 -u "$WORKER" >> "$WORKER_LOG" 2>&1 < /dev/null &
+        setsid nohup python3 -u "$WORKER" --codigo "$CODIGO" >> "$WORKER_LOG" 2>&1 < /dev/null &
         echo $! > "$LOCK"
         sleep 1
         rm -f "$LOCK"
@@ -70,8 +77,8 @@ status_line() {
     worker_alive && alive="vivo"
     keys=$(keys_today)
     local deat=0
-    deat=$(grep -rl '"record_type": "DEAT"' "$OB/output/htr_text_tcs" 2>/dev/null | wc -l)
-    log "ESTADO | worker=$alive | ficheiros_json=$total | DEAT_feitos=$deat | chaves_usadas_hoje=$keys"
+    deat=$(grep -rl '"record_type": "DEAT"' "$DATA_DIR" 2>/dev/null | wc -l)
+    log "ESTADO [$CODIGO] | worker=$alive | ficheiros_json=$total | DEAT_feitos=$deat | chaves_usadas_hoje=$keys"
 }
 
 if [ "${1:-}" = "--status" ]; then
@@ -82,9 +89,9 @@ fi
 # Instância única: dois guardians em simultâneo relançavam workers em
 # duplicado (ex.: arranque manual por cima do @reboot do crontab).
 # Fd 8, porque o fd 9 já é usado pelo flock do launch_worker().
-exec 8>"$LOG_DIR/watch_deat_tcs.instance.lock"
+exec 8>"$INSTANCE_LOCK"
 if ! flock -n 8; then
-    log "já existe um guardian ativo — a sair."
+    log "já existe um guardian ativo ($CODIGO) — a sair."
     exit 0
 fi
 
@@ -98,7 +105,7 @@ LAST_RESTART_EPOCH=$(date +%s)
 RUN_PRODUCED=0
 RUN_START_TOTAL=$LAST_TOTAL
 
-log "=== watch_htr arrancou (relança em ~60s se o worker cair) ==="
+log "=== watch_deat_$CODIGO arrancou (relança em ~60s se o worker cair) ==="
 status_line
 
 while true; do
@@ -117,7 +124,7 @@ while true; do
 
         if [ -n "$STUCK_START" ] && [ $((now - STUCK_START)) -ge $STUCK_SECS ]; then
             log "aviso: 0 ficheiros novos em ${STUCK_MIN}min com worker vivo — teto diário provavelmente gasto. A matar e a descansar até à meia-noite."
-            pkill -f "output/workers/[d]eat_tcs.py"
+            pkill -f "output/workers/[d]eat_tcs.py --codigo $CODIGO"
             STUCK_START=""
             WAIT_DAY=$(date +%Y-%m-%d)
             LAST_TOTAL=$total
